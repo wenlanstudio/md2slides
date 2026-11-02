@@ -108,13 +108,11 @@ PlantUML 图需要 Java 11+，jar 用 `npm run fetch:plantuml` 下载。
 
 ### 作为库使用
 
-npm 包（`@wenlanstudio/md2slides`）尚未发布；发布后：
-
 ```bash
 npm install @wenlanstudio/md2slides
 ```
 
-当前从源码使用：在仓库根目录 `npm link`，然后：
+从源码使用：在仓库根目录 `npm link`，然后：
 
 ```js
 const md2slides = require("@wenlanstudio/md2slides")
