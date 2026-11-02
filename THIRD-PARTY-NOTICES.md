@@ -7,7 +7,8 @@
 |---|---|---|---|
 | mermaid | bundled（`host/lib/mermaid.min.js`） | MIT | https://github.com/mermaid-js/mermaid |
 | Apache ECharts | 6.1.0 | Apache-2.0 | https://github.com/apache/echarts |
-| KaTeX（含 `lib/katex/fonts/`） | 0.16.47 | MIT | https://github.com/KaTeX/KaTeX |
+| KaTeX | 0.16.47 | MIT | https://github.com/KaTeX/KaTeX |
+| KaTeX 字体（`lib/katex/fonts/`） | 0.16.47 | SIL OFL 1.1 | https://github.com/KaTeX/KaTeX |
 | markdown-it | 14.3.2 | MIT | https://github.com/markdown-it/markdown-it |
 | highlight.js | 11.9.0 | BSD-3-Clause | https://github.com/highlightjs/highlight.js |
 | html-to-image | 1.11.13 | MIT | https://github.com/bubkoo/html-to-image |
