@@ -10,8 +10,8 @@
 > 建面板到导出的完整调用序列写在纸上——每一步都必须能对到 `require("md2slides")`
 > 的真实出口；哪一步对不上，就是 API 设计缺陷，改 API 而不是改宿主。
 >
-> 注：本文写于 npm 包名定为 `@quqingyuan/md2slides` 之前；文中 `require("md2slides")` 现对应
-> `require("@quqingyuan/md2slides")`。
+> 注：本文写于 npm 包名定为 `@wenlanstudio/md2slides` 之前；文中 `require("md2slides")` 现对应
+> `require("@wenlanstudio/md2slides")`。
 
 ---
 

@@ -27,7 +27,7 @@ const CLASSBUZZ = path.resolve(__dirname, "..", "..", "classbuzz")
 const PORT = Number(process.env.QUIZ_SMOKE_PORT) || 3198
 const WS_URL = `ws://127.0.0.1:${PORT}`
 
-// md2slides 可以脱离生态单独用（npm i @quqingyuan/md2slides）。classbuzz 不在旁边时，
+// md2slides 可以脱离生态单独用（npm i @wenlanstudio/md2slides）。classbuzz 不在旁边时，
 // 这条跨进程测试没法跑——跳过并说明，不让整个 test 链挂掉。
 if (!fs.existsSync(path.join(CLASSBUZZ, "server", "index.js"))) {
   console.log("SKIP  课堂竞答端到端测试：旁边没有 classbuzz/（生态兄弟目录布局）")

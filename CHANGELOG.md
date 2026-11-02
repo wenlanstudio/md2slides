@@ -8,8 +8,8 @@
 
 ## [0.1.0] — 2026-11-02
 
-首次公开发布：项目名 MD2Slides、仓库 quqingyuan/md2slides、npm 包
-`@quqingyuan/md2slides` 三层统一。npm 上的裸名 `md2slides` 已被他人占用，故以个人
+首次公开发布：项目名 MD2Slides、仓库 wenlanstudio/md2slides、npm 包
+`@wenlanstudio/md2slides` 三层统一。npm 上的裸名 `md2slides` 已被他人占用，故以个人
 作用域名发布（`npm publish --access public`）。下文历史记录中的 `require("md2slides")` /
 `md2slides/core/…` 是当时的包名。功能演进见下各节。
 

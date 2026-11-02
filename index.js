@@ -11,7 +11,7 @@
  * 宿主专属能力（图表渲染器、Electron、fs）一律经 opts 钩子注入，本文件永不 require
  * host/ 下的任何东西。
  *
- * 子路径（require("@quqingyuan/md2slides/core/xxx.js")，注意带 .js 后缀）可以用，但没有兼容
+ * 子路径（require("@wenlanstudio/md2slides/core/xxx.js")，注意带 .js 后缀）可以用，但没有兼容
  * 承诺——内部模块随时按 IR_v3 计划重构（overflow.js → plan/planner 等）。
  * 只有本文件转发的出口受 semver 保护。
  */

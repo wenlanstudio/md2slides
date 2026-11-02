@@ -243,7 +243,7 @@ PPTX 默认图片型、零依赖；加 `--editable` 走 Python sidecar 出可编
 
 ## 开始使用
 
-- 仓库：https://github.com/quqingyuan/md2slides
+- 仓库：https://github.com/wenlanstudio/md2slides
 - 快速开始：README 的「快速开始」
 - 库契约：`docs/API.md`
 - 写作规范：`USAGE.md`

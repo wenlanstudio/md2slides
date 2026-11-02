@@ -1,16 +1,16 @@
 {
-  "name": "@quqingyuan/md2slides",
+  "name": "@wenlanstudio/md2slides",
   "version": "0.1.0",
   "description": "Markdown to slides/PPTX engine that keeps core content (images, tables, formulas) intact during pagination: heading-based logical pagination + browser-measured physical pagination + frozen Slide IR, with editable PPTX export.",
   "license": "MIT",
   "author": "quqingtao",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/quqingyuan/md2slides.git"
+    "url": "git+https://github.com/wenlanstudio/md2slides.git"
   },
-  "homepage": "https://github.com/quqingyuan/md2slides#readme",
+  "homepage": "https://github.com/wenlanstudio/md2slides#readme",
   "bugs": {
-    "url": "https://github.com/quqingyuan/md2slides/issues"
+    "url": "https://github.com/wenlanstudio/md2slides/issues"
   },
   "keywords": [
     "markdown",

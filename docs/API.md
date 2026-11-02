@@ -1,4 +1,4 @@
-# MD2Slides 公开 API（npm: @quqingyuan/md2slides，0.1 · P-1 库化）
+# MD2Slides 公开 API（npm: @wenlanstudio/md2slides，0.1 · P-1 库化）
 
 > 本文档是 md2slides 作为**独立库**的对外契约：入口签名、运行环境矩阵、宿主钩子与版本承诺。
 > 内部架构见 `README.md`，演进蓝图见 [`docs/design/IR_v3.md`](./design/IR_v3.md)，
@@ -9,9 +9,9 @@
 
 ## 0. 契约的范围与承诺
 
-- 受 semver 保护的只有 `require("@quqingyuan/md2slides")` 转发的出口（见 `index.js`）。
-- 子路径 `require("@quqingyuan/md2slides/core/xxx.js")`（须带 `.js` 后缀）与
-  `@quqingyuan/md2slides/export/…`
+- 受 semver 保护的只有 `require("@wenlanstudio/md2slides")` 转发的出口（见 `index.js`）。
+- 子路径 `require("@wenlanstudio/md2slides/core/xxx.js")`（须带 `.js` 后缀）与
+  `@wenlanstudio/md2slides/export/…`
   **可以用，但没有兼容承诺**——内部模块随时按 IR_v3 重构（`overflow.js` → `plan/` 等）。
 - IR（`extractIr` 产物）按 `version` 字段独立演进：当前冻结 **v1**
   （书面定义 `export/pptx/ir.schema.json`，draft-07）。IR v3 落地时消费者按 `version`
@@ -26,7 +26,7 @@
 形态 A 宿主（自带浏览器或 Electron renderer）把一份 md 变成分好页的幻灯片：
 
 ```js
-const md2slides = require("@quqingyuan/md2slides")
+const md2slides = require("@wenlanstudio/md2slides")
 
 // ① 解析 + 逻辑分页 + 主题。Node 传 jsdom 的 document；浏览器/iframe 传 iframe 的 document
 const deck = md2slides.compose(mdText, { document: iframeDoc })

@@ -1,7 +1,7 @@
 "use strict"
 
 /**
- * index.js — 独立薄宿主（A 形态：editor-independent 的 @quqingyuan/md2slides）。
+ * index.js — 独立薄宿主（A 形态：editor-independent 的 @wenlanstudio/md2slides）。
  *
  * 它自己带上图表渲染器，复用 `core` 那条管线（解析 → 逻辑分页 → 主题 → 物理分页 → IR）。
  * core 一行不改：真正的出图只发生在这里。

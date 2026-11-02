@@ -1,12 +1,12 @@
 # MD2Slides
 
-[![CI](https://github.com/quqingyuan/md2slides/actions/workflows/ci.yml/badge.svg)](https://github.com/quqingyuan/md2slides/actions/workflows/ci.yml)
-[![Pages](https://github.com/quqingyuan/md2slides/actions/workflows/pages.yml/badge.svg)](https://quqingyuan.github.io/md2slides/)
+[![CI](https://github.com/wenlanstudio/md2slides/actions/workflows/ci.yml/badge.svg)](https://github.com/wenlanstudio/md2slides/actions/workflows/ci.yml)
+[![Pages](https://github.com/wenlanstudio/md2slides/actions/workflows/pages.yml/badge.svg)](https://wenlanstudio.github.io/md2slides/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](package.json)
 
-在线演示：**https://quqingyuan.github.io/md2slides/** · 示例 PPTX 见
-[v0.1.0 release](https://github.com/quqingyuan/md2slides/releases/tag/v0.1.0)。
+在线演示：**https://wenlanstudio.github.io/md2slides/** · 示例 PPTX 见
+[v0.1.0 release](https://github.com/wenlanstudio/md2slides/releases/tag/v0.1.0)。
 
 **用 Markdown 写幻灯片。分页时优先保住图片、表格、公式这些核心内容。**
 
@@ -39,7 +39,7 @@ MD2Slides 把「这一页里什么必须在一起」建模成**核心组**：图
 ### 从仓库运行
 
 ```bash
-git clone https://github.com/quqingyuan/md2slides.git
+git clone https://github.com/wenlanstudio/md2slides.git
 cd md2slides
 npm ci
 
@@ -55,16 +55,16 @@ PlantUML 图需要 Java 11+，jar 用 `npm run fetch:plantuml` 下载。
 
 ### 作为库使用
 
-npm 包（`@quqingyuan/md2slides`）尚未发布；发布后：
+npm 包（`@wenlanstudio/md2slides`）尚未发布；发布后：
 
 ```bash
-npm install @quqingyuan/md2slides
+npm install @wenlanstudio/md2slides
 ```
 
 当前从源码使用：在仓库根目录 `npm link`，然后：
 
 ```js
-const md2slides = require("@quqingyuan/md2slides")
+const md2slides = require("@wenlanstudio/md2slides")
 ```
 
 完整接入序列见 [docs/API.md](docs/API.md)，核心是五步：

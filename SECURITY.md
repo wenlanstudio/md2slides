@@ -2,7 +2,7 @@
 
 ## 报告问题
 
-请通过 GitHub 的 [Security Advisories](https://github.com/quqingyuan/md2slides/security/advisories/new)
+请通过 GitHub 的 [Security Advisories](https://github.com/wenlanstudio/md2slides/security/advisories/new)
 私密报告，不要开公开 issue。请附复现步骤、影响版本和可能的缓解方式。
 
 ## 已知边界
