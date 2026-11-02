@@ -1,0 +1,2910 @@
+{
+  "version": 1,
+  "canvas": {
+    "widthIn": 13.3333,
+    "heightIn": 7.5,
+    "pxWidth": 1920,
+    "pxHeight": 1080
+  },
+  "theme": {
+    "name": "lecture",
+    "cssHash": null
+  },
+  "meta": {
+    "title": "图表渲染回归",
+    "subtitle": null,
+    "author": null,
+    "date": null
+  },
+  "slides": [
+    {
+      "index": 0,
+      "pagination": 1,
+      "layout": "title",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "geo": {
+            "x": 4.3291,
+            "y": 3.0423,
+            "w": 4.675,
+            "h": 1.1432
+          },
+          "style": {
+            "fontSizePt": 56,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "align": "center",
+            "lineSpacingPt": 70,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2722,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0.1711
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "container": "cover",
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "pagination": 2,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.2542,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "这一份专打「图表由宿主渲染」那条链路：预通行必须跑在物理分页实测之前， 这样 IR 量到的图高度才是真的。"
+            }
+          ],
+          "srcRange": [
+            2,
+            3
+          ],
+          "lines": 2
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "2 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "pagination": 3,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.133,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            5,
+            5
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.212,
+            "w": 12.1667,
+            "h": 4.0369
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张小图",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "4",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                5,
+                5
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张决策树6",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                14,
+                14
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张流程图（mermaid）8",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                29,
+                29
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张统计图（echarts）10",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                43,
+                43
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张时序图（plantuml）12",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                56,
+                56
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "图后面还有正文14",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                67,
+                67
+              ]
+            }
+          ],
+          "lines": 6,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "3 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "pagination": 4,
+      "layout": "title+body",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 1.5437,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张小图"
+            }
+          ],
+          "srcRange": [
+            5,
+            5
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "image",
+          "geo": {
+            "x": 6.0313,
+            "y": 2.477,
+            "w": 1.2708,
+            "h": 3.4792
+          },
+          "src": "fig-1.png",
+          "srcRange": [
+            7,
+            12
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 0.7834,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张小图"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "4 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "pagination": 5,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.133,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            5,
+            5
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.212,
+            "w": 12.1667,
+            "h": 4.0369
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张小图4",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                5,
+                5
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张决策树",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "6",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                14,
+                14
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张流程图（mermaid）8",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                29,
+                29
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张统计图（echarts）10",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                43,
+                43
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张时序图（plantuml）12",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                56,
+                56
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "图后面还有正文14",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                67,
+                67
+              ]
+            }
+          ],
+          "lines": 6,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "5 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "pagination": 6,
+      "layout": "figure",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 0.7833,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张决策树"
+            }
+          ],
+          "srcRange": [
+            14,
+            14
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "image",
+          "geo": {
+            "x": 5.1007,
+            "y": 1.7166,
+            "w": 3.1319,
+            "h": 5
+          },
+          "src": "fig-2.png",
+          "srcRange": [
+            16,
+            27
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 0.9792,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张决策树"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "6 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "pagination": 7,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.133,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            5,
+            5
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.212,
+            "w": 12.1667,
+            "h": 4.0369
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张小图4",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                5,
+                5
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张决策树6",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                14,
+                14
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张流程图（mermaid）",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "8",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                29,
+                29
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张统计图（echarts）10",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                43,
+                43
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张时序图（plantuml）12",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                56,
+                56
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "图后面还有正文14",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                67,
+                67
+              ]
+            }
+          ],
+          "lines": 6,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "7 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "pagination": 8,
+      "layout": "title+body",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 0.673,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张流程图（mermaid）"
+            }
+          ],
+          "srcRange": [
+            29,
+            29
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.6062,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "mermaid 是浏览器运行时，只能在页面里渲染——这一块验的就是\"预通行分环境跑两遍\"。"
+            }
+          ],
+          "srcRange": [
+            31,
+            31
+          ],
+          "lines": 2
+        },
+        {
+          "type": "image",
+          "geo": {
+            "x": 5.4167,
+            "y": 2.5978,
+            "w": 2.5,
+            "h": 4.2292
+          },
+          "src": "fig-3.png",
+          "srcRange": [
+            33,
+            41
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 2.2128,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张流程图（mermaid）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "8 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "pagination": 9,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.133,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            5,
+            5
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.212,
+            "w": 12.1667,
+            "h": 4.0369
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张小图4",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                5,
+                5
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张决策树6",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                14,
+                14
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张流程图（mermaid）8",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                29,
+                29
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张统计图（echarts）",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "10",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                43,
+                43
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张时序图（plantuml）12",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                56,
+                56
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "图后面还有正文14",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                67,
+                67
+              ]
+            }
+          ],
+          "lines": 6,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "9 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "pagination": 10,
+      "layout": "title+body",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 1.2234,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张统计图（echarts）"
+            }
+          ],
+          "srcRange": [
+            43,
+            43
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 2.1567,
+            "w": 12.1667,
+            "h": 0.9074
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "echarts 画到 canvas 上，同样只能在页面里渲染；它直接 "
+            },
+            {
+              "text": "getDataURL()",
+              "style": {
+                "color": "#b3401f",
+                "font": "Cascadia Mono"
+              }
+            },
+            {
+              "text": " 出 PNG， 省掉了 SVG→PNG 那一道栅格。"
+            }
+          ],
+          "srcRange": [
+            45,
+            46
+          ],
+          "lines": 2
+        },
+        {
+          "type": "image",
+          "geo": {
+            "x": 3.8889,
+            "y": 3.1516,
+            "w": 5.5556,
+            "h": 3.125
+          },
+          "src": "fig-4.png",
+          "srcRange": [
+            48,
+            54
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 2.0584,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张统计图（echarts）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.0859,
+            "y": 7.0528,
+            "w": 0.6641,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "10 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "pagination": 11,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.133,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            5,
+            5
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.212,
+            "w": 12.1667,
+            "h": 4.0369
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张小图4",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                5,
+                5
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张决策树6",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                14,
+                14
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张流程图（mermaid）8",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                29,
+                29
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张统计图（echarts）10",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                43,
+                43
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张时序图（plantuml）",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "12",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                56,
+                56
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "图后面还有正文14",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                67,
+                67
+              ]
+            }
+          ],
+          "lines": 6,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.0859,
+            "y": 7.0528,
+            "w": 0.6641,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "11 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "pagination": 12,
+      "layout": "title+body",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.4599,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张时序图（plantuml）"
+            }
+          ],
+          "srcRange": [
+            56,
+            56
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.3931,
+            "w": 12.1667,
+            "h": 0.4554
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "plantuml 走 "
+            },
+            {
+              "text": "java -jar",
+              "style": {
+                "color": "#b3401f",
+                "font": "Cascadia Mono"
+              }
+            },
+            {
+              "text": "，跟 graphviz 一样是 Node 侧的活。"
+            }
+          ],
+          "srcRange": [
+            58,
+            58
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "image",
+          "geo": {
+            "x": 6.1944,
+            "y": 3.936,
+            "w": 0.9444,
+            "h": 1.1042
+          },
+          "src": "fig-5.png",
+          "srcRange": [
+            60,
+            65
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 2.2114,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一张时序图（plantuml）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.0859,
+            "y": 7.0528,
+            "w": 0.6641,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "12 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "pagination": 13,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.133,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            5,
+            5
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.212,
+            "w": 12.1667,
+            "h": 4.0369
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张小图4",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                5,
+                5
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张决策树6",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                14,
+                14
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张流程图（mermaid）8",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                29,
+                29
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张统计图（echarts）10",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                43,
+                43
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "一张时序图（plantuml）12",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                56,
+                56
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "图后面还有正文",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "14",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                67,
+                67
+              ]
+            }
+          ],
+          "lines": 6,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            5,
+            5
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.0859,
+            "y": 7.0528,
+            "w": 0.6641,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "13 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "pagination": 14,
+      "layout": "title+body",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 3.0136,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图后面还有正文"
+            }
+          ],
+          "srcRange": [
+            67,
+            67
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.9468,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表被当成「中心内容」，所以它会独占一页——后面的段落不该被挤到同一页上。"
+            }
+          ],
+          "srcRange": [
+            69,
+            69
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 1.3709,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图后面还有正文"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.0859,
+            "y": 7.0528,
+            "w": 0.6641,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "14 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    }
+  ]
+}

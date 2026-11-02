@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>md2slides deck</title>
+<style>
+html, body { margin: 0; height: 100%; background: #1a1a1a; overflow: hidden; }
+#deck { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+<!-- deck-full.js 自带引擎与全部常驻 lib（markdown-it / katex / hljs / html-to-image
+     作为模块进了 bundle——宿主沙箱与 CSP 都管不着服务出来的文档）。mermaid / echarts
+     体积大，由页面按文档内容动态注入（deck-full-entry 的 ensureDiagramLibs）。 -->
+<script src="/dist/deck-full.js"></script>
+</body>
+</html>

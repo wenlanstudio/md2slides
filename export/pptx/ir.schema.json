@@ -1,0 +1,331 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "md2slides/ir.schema.json",
+  "title": "Slide IR",
+  "description": "deck DOM 抽取出的内容契约：只描述“有什么、在哪、什么样式”，不含任何 PPTX 概念。母版/版式/占位符由 sidecar 决定。",
+  "type": "object",
+  "required": ["version", "canvas", "slides"],
+  "properties": {
+    "version": { "const": 1 },
+    "canvas": {
+      "type": "object",
+      "description": "归一化画布：宽固定 13.333in（PPT 标准 16:9），高按主题画布比例推出",
+      "required": ["widthIn", "heightIn", "pxWidth", "pxHeight"],
+      "properties": {
+        "widthIn": { "type": "number" },
+        "heightIn": { "type": "number" },
+        "pxWidth": { "type": "number", "description": "主题画布宽度（设计 px），px→in 的比例由它决定" },
+        "pxHeight": { "type": "number" }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "cssHash": { "type": ["string", "null"], "description": "主题 CSS 指纹，用于模板缓存失效" }
+      }
+    },
+    "meta": {
+      "type": ["object", "null"],
+      "description": "文档元数据（front-matter）：只含写进 PPTX 文件属性的三个键；book/header/footer 是版面输入，不走这里；三键全缺时为 null",
+      "properties": {
+        "title": { "type": ["string", "null"] },
+        "author": { "type": ["string", "null"] },
+        "date": { "type": ["string", "null"], "description": "front-matter 原样字符串，解析在 sidecar" }
+      }
+    },
+    "slides": { "type": "array", "items": { "$ref": "#/definitions/slide" } }
+  },
+  "definitions": {
+    "geo": {
+      "type": "object",
+      "description": "相对幻灯片左上角的实测矩形，单位英寸",
+      "required": ["x", "y", "w", "h"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number" },
+        "h": { "type": "number" }
+      }
+    },
+    "srcRange": {
+      "type": "array",
+      "description": "该块来自 md 的行区间（1 基、含端点；围栏代码含 ``` 两行）：供宿主做「点击幻灯片跳源码行」与增量重排。引擎生成的块（封面/家具）没有",
+      "items": { "type": "integer", "minimum": 1 },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "style": {
+      "type": "object",
+      "description": "块级样式，取自该元素自己的 computed style（不经过全局 token）",
+      "properties": {
+        "fontSizePt": { "type": "number" },
+        "font": { "type": ["string", "null"], "description": "字族名（取 font-family 列表的第一项）" },
+        "color": { "type": ["string", "null"], "description": "#rrggbb" },
+        "bold": { "type": "boolean" },
+        "italic": { "type": "boolean" },
+        "align": { "enum": ["left", "center", "right", "justify"] },
+        "lineSpacingPt": { "type": "number", "description": "行距的绝对磅值（浏览器行盒 pt 数）：sidecar 写 spcPts 精确行距。不记 CSS 倍数——PPT 的 spcPct 是字体自然行高的倍数，与 line-height 的倍数定义不同" },
+        "spaceBeforeIn": { "type": "number" },
+        "spaceAfterIn": { "type": "number" },
+        "paddingLeftIn": { "type": "number", "description": "四边 padding：geo 含 padding，映射成 PPT 文本框 inset，文字起点与可用宽度才与浏览器一致" },
+        "paddingRightIn": { "type": "number" },
+        "paddingTopIn": { "type": "number" },
+        "paddingBottomIn": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "runStyle": {
+      "type": "object",
+      "description": "run 级样式，只记录与所属块不同的字段",
+      "properties": {
+        "color": { "type": ["string", "null"] },
+        "bold": { "type": "boolean" },
+        "italic": { "type": "boolean" },
+        "font": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "mathSource": {
+      "type": "object",
+      "description": "KaTeX 的公式：MathML 是转成 Office 原生公式（OMML）的输入，LaTeX 是转不动时的兜底文本",
+      "required": ["mathml"],
+      "properties": {
+        "latex": { "type": "string", "description": "LaTeX 源码（KaTeX 留在 <annotation encoding=\"application/x-tex\"> 里的那份）" },
+        "mathml": { "type": "string", "description": "KaTeX 输出的 MathML（.katex-mathml 里的 <math>…</math>）" },
+        "display": { "type": "boolean", "description": "true = 块级公式（居中、独占一行），false = 行内公式" }
+      }
+    },
+    "run": {
+      "type": "object",
+      "anyOf": [{ "required": ["text"] }, { "required": ["br"] }, { "required": ["math"] }],
+      "properties": {
+        "text": { "type": "string" },
+        "br": { "type": "boolean", "description": "软换行（<br>），渲染为 PPTX 的 <a:br/>" },
+        "math": { "$ref": "#/definitions/mathSource" },
+        "style": { "$ref": "#/definitions/runStyle" }
+      }
+    },
+    "runs": { "type": "array", "items": { "$ref": "#/definitions/run" } },
+    "container": {
+      "type": "object",
+      "description": "块所在容器的线索（分栏列序、封面、引用…），供 sidecar 还原版面语义",
+      "properties": {
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number", "description": "所在分栏的序号，从 0 起" }
+      }
+    },
+    "heading": {
+      "type": "object",
+      "required": ["type", "level", "geo", "style", "runs"],
+      "properties": {
+        "type": { "const": "heading" },
+        "level": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "geo": { "$ref": "#/definitions/geo" },
+        "style": { "$ref": "#/definitions/style" },
+        "runs": { "$ref": "#/definitions/runs" },
+        "lines": { "type": "integer", "description": "视觉行数（Range 矩形按垂直重叠聚簇，一簇一行）：1 = 单行（sidecar 关 word_wrap），并供出片自检对照框高" },
+        "singleLine": { "type": "boolean", "description": "视觉行数 === 1：不许 PowerPoint 折行（折行即破版，溢出几个像素无感）" },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "paragraph": {
+      "type": "object",
+      "required": ["type", "geo", "style", "runs"],
+      "properties": {
+        "type": { "const": "paragraph" },
+        "geo": { "$ref": "#/definitions/geo" },
+        "style": { "$ref": "#/definitions/style" },
+        "runs": { "$ref": "#/definitions/runs" },
+        "role": { "enum": ["header", "footer"], "description": "Marpit 的 header/footer 指令" },
+        "lines": { "type": "integer", "description": "视觉行数（Range 矩形按垂直重叠聚簇，一簇一行）：1 = 单行（sidecar 关 word_wrap），并供出片自检对照框高" },
+        "singleLine": { "type": "boolean", "description": "视觉行数 === 1：不许 PowerPoint 折行（折行即破版，溢出几个像素无感）" },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "list": {
+      "type": "object",
+      "required": ["type", "ordered", "geo", "style", "items"],
+      "properties": {
+        "type": { "const": "list" },
+        "ordered": { "type": "boolean" },
+        "geo": { "$ref": "#/definitions/geo" },
+        "style": { "$ref": "#/definitions/style" },
+        "lines": { "type": "integer", "description": "全部条目的视觉行数之和，供出片自检对照框高" },
+        "gapAfterIn": { "type": "number", "description": "末条之后的实测间距，sidecar 写成末条的 spcAft" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["level", "runs"],
+            "properties": {
+              "level": { "type": "integer", "minimum": 0 },
+              "runs": { "$ref": "#/definitions/runs" },
+              "style": { "$ref": "#/definitions/style" },
+              "lines": { "type": "integer", "description": "该条目的视觉行数" },
+              "gapBeforeIn": { "type": "number", "description": "与上一条（或本 ul 内容顶边）的实测间距：margin 折叠、首条 margin 逃逸都已含在内，sidecar 照写 spcBef" },
+              "indentIn": { "type": "number", "description": "条目文字起点相对 ul 左边的偏移（英寸）：sidecar 的 marL = 它 − ul padding，文字列宽度因此与浏览器一致" },
+              "srcRange": { "$ref": "#/definitions/srcRange", "description": "该条目来自 md 的行区间（1 基含端点）" }
+            }
+          }
+        },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "code": {
+      "type": "object",
+      "required": ["type", "geo", "style", "lines"],
+      "properties": {
+        "type": { "const": "code" },
+        "geo": { "$ref": "#/definitions/geo" },
+        "style": { "$ref": "#/definitions/style" },
+        "lines": {
+          "type": "array",
+          "description": "逐行的 run 序列；语法高亮已在 run.style.color 里（实测色）",
+          "items": { "$ref": "#/definitions/runs" }
+        },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "table": {
+      "type": "object",
+      "required": ["type", "geo", "style", "rows"],
+      "properties": {
+        "type": { "const": "table" },
+        "geo": { "$ref": "#/definitions/geo" },
+        "style": { "$ref": "#/definitions/style" },
+        "colWidths": { "type": "array", "items": { "type": "number" }, "description": "首行实测列宽，单位英寸" },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["cells"],
+            "properties": {
+              "header": { "type": "boolean" },
+              "heightIn": { "type": "number" },
+              "cells": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["runs"],
+                  "properties": {
+                    "runs": { "$ref": "#/definitions/runs" },
+                    "style": { "$ref": "#/definitions/style" },
+                    "w": { "type": "number" },
+                    "header": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "image": {
+      "type": "object",
+      "required": ["type", "geo", "src"],
+      "properties": {
+        "type": { "const": "image" },
+        "geo": { "$ref": "#/definitions/geo" },
+        "src": {
+          "type": ["string", "null"],
+          "description": "相对 IR 文件 media/ 目录的图片文件名；null = 落盘失败（已记入 warnings）"
+        },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "math": {
+      "type": "object",
+      "description": "公式（KaTeX）：sidecar 把 MathML 转成 OMML，落成 PowerPoint 可双击编辑的原生公式",
+      "required": ["type", "geo", "mathml"],
+      "properties": {
+        "type": { "const": "math" },
+        "display": { "type": "boolean", "description": "true = 块级（$$…$$，居中独占一行）；false = 行内（$…$）" },
+        "latex": { "type": "string" },
+        "mathml": { "type": "string" },
+        "geo": { "$ref": "#/definitions/geo" },
+        "style": { "$ref": "#/definitions/style" },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "custom": {
+      "type": "object",
+      "description": "浏览器之外无法排版的内容（活 HTML 组件等）：登记为待栅格，不静默丢弃",
+      "required": ["type", "raster", "geo", "html", "text"],
+      "properties": {
+        "type": { "const": "custom" },
+        "raster": { "enum": ["html", "live"] },
+        "geo": { "$ref": "#/definitions/geo" },
+        "html": { "type": "string" },
+        "text": { "type": "string", "description": "纯文本，供文本一致性校验" },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "unknown": {
+      "type": "object",
+      "description": "未识别的元素：显式登记，便于发现抽取盲区",
+      "required": ["type", "geo", "tag", "text"],
+      "properties": {
+        "type": { "const": "unknown" },
+        "geo": { "$ref": "#/definitions/geo" },
+        "tag": { "type": "string" },
+        "cls": { "type": ["string", "null"] },
+        "text": { "type": "string" },
+        "container": { "enum": ["cols", "cover", "quote", "group"] },
+        "col": { "type": "number" },
+        "srcRange": { "$ref": "#/definitions/srcRange" }
+      }
+    },
+    "block": {
+      "oneOf": [
+        { "$ref": "#/definitions/heading" },
+        { "$ref": "#/definitions/paragraph" },
+        { "$ref": "#/definitions/list" },
+        { "$ref": "#/definitions/code" },
+        { "$ref": "#/definitions/table" },
+        { "$ref": "#/definitions/image" },
+        { "$ref": "#/definitions/math" },
+        { "$ref": "#/definitions/custom" },
+        { "$ref": "#/definitions/unknown" }
+      ]
+    },
+    "slide": {
+      "type": "object",
+      "required": ["index", "layout", "background", "blocks"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "pagination": { "type": "integer", "description": "Marpit 打的页码（若有）" },
+        "layout": {
+          "enum": ["title", "title+body", "two-col", "code", "table", "figure", "mixed", "blank"],
+          "description": "版式提示：仅供 sidecar 选占位符，几何仍以实测为准"
+        },
+        "background": {
+          "type": "object",
+          "properties": {
+            "color": { "type": "string" },
+            "image": { "type": "string", "description": "CSS 背景图（![bg] 指令），整页栅格化必丢，这里带回来" }
+          }
+        },
+        "blocks": { "type": "array", "items": { "$ref": "#/definitions/block" } },
+        "notes": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

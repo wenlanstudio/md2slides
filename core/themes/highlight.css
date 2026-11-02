@@ -1,0 +1,24 @@
+/*
+ * highlight.css — 代码高亮配色（github-light 风格，与 python-mini 主题的紫/绿/蓝调一致）。
+ *
+ * 为什么需要单独一份：highlight.js 只负责把代码切成 `.hljs-*` span，**不上色**。
+ * span 有没有颜色完全取决于 CSS 里有没有对应规则，而主题通常只给 comment/quote 上色，
+ * 其余 token 全是默认文本色 —— 于是代码看起来"根本没有高亮"。
+ *
+ * 追加在主题 CSS 之后：主题自己定义的同名 `.hljs-*` 规则按层叠顺序仍然优先，
+ * 这里只填补空缺。
+ */
+
+.hljs-comment, .hljs-quote { color: #7a8b99; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-type { color: #8250df; }
+.hljs-string, .hljs-doctag, .hljs-regexp { color: #0a7d32; }
+.hljs-number, .hljs-symbol, .hljs-bullet, .hljs-link { color: #b3401f; }
+.hljs-title, .hljs-title.function_, .hljs-section, .hljs-title.class_ { color: #1f4e79; font-weight: 600; }
+.hljs-attr, .hljs-attribute, .hljs-meta, .hljs-selector-attr,
+.hljs-selector-class, .hljs-selector-id, .hljs-built_in, .hljs-builtin-name { color: #1f4e79; }
+.hljs-variable, .hljs-template-variable, .hljs-params, .hljs-name { color: #23303f; }
+.hljs-meta .hljs-keyword, .hljs-meta .hljs-string { color: #8250df; }
+.hljs-addition { color: #0a7d32; }
+.hljs-deletion { color: #b3401f; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }

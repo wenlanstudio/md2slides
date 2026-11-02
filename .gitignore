@@ -1,0 +1,25 @@
+node_modules/
+__pycache__/
+*.pyc
+.idea/
+
+# 旧的 marp 渲染产物与快照，仅作对照，不进版本库
+*.marp.html
+
+# e2e 的产物页：分页后长什么样，翻车时才有价值，但不必进版本库
+e2e/.cache/
+
+# examples/ 是本地文档集，不进库。例外：demo.md 是 e2e 默认回归输入，必须进
+# （注意只忽略内容 /examples/*，不忽略目录本身，否则下面的取反不生效）
+/examples/*
+!examples/demo.md
+.workbuddy/
+.pu_*
+hs_err_pid*.log
+out/
+
+# marktext 形态的 deck-full 构建产物（tools/build-host.js 第三 target 生成）
+host/marktext/dist/
+
+# PlantUML 是 GPL-3.0 二进制，不进版本库；用 npm run fetch:plantuml 本地下载
+host/lib/plantuml.jar

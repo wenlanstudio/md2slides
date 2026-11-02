@@ -1,0 +1,75 @@
+# CI — 独立项目的门槛动作（P-1 库化）。
+#
+# 两道：
+#   offline：静态依赖图 + 冒烟（无浏览器，jsdom）
+#   e2e    ：物理分页 + IR 闸门 + PPTX 成品（真 Chrome + python-pptx）
+#
+# e2e 暂设 continue-on-error：CI 的字体度量与开发机（Windows/微软雅黑）不同，
+# 涉及行数的分页断言可能漂移。P2 钉字体（快照基线 / 容器固定字体）后转硬性。
+
+name: CI
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  offline:
+    name: check + smoke (no browser)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run smoke
+
+  e2e:
+    name: e2e (pagination + IR + PPTX)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # PlantUML 二进制不进仓库（GPL），e2e 的图表 fixture 需要它
+      - name: PlantUML jar
+        run: npm run fetch:plantuml
+
+      # CJK 字体：度量直接影响分页决策，至少保证中文字形不 fallback
+      # graphviz：e2e 的图表 fixture 要 dot；PlantUML 用 runner 自带的 Java 11+
+      - name: CJK fonts + graphviz
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk graphviz
+
+      # puppeteer-core 不带浏览器；装 Chrome for Testing 并把路径喂给 e2e/browser.js
+      - name: Chrome
+        run: |
+          npx --yes @puppeteer/browsers install chrome@stable --path "$HOME/chrome"
+          echo "CHROME_PATH=$(find "$HOME/chrome" -type f -name chrome | head -1)" >> "$GITHUB_ENV"
+
+      # sidecar 出片比对要 python-pptx；缺了 e2e 会跳过成品两段（其余照跑）
+      - name: python-pptx
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install python-pptx
+          echo "MD2SLIDES_PYTHON=$PWD/.venv/bin/python" >> "$GITHUB_ENV"
+
+      # 像素基线由本机（Windows/微软雅黑）生成；Ubuntu 字体不同，CI 只跑非像素部分
+      - name: e2e (no pixel baselines)
+        run: npm run e2e
+        env:
+          MD2SLIDES_SKIP_SHOTS: "1"
+      # IR 快照同样受字体度量影响：CI 作为参考，不作为硬门槛
+      - run: npm run snapshot
+        continue-on-error: true

@@ -1,0 +1,330 @@
+/* @theme lecture */
+/*
+ * lecture — 讲义蓝主题。字号体系对齐原 md_to_pptx.py 的实际出片效果
+ * （2026-11-02 由 python-mini-pptx 更名；旧名只保留在 CHANGELOG 历史里）。
+ *
+ * 换算依据（不是拍脑袋）：
+ *   md_to_pptx.py 的画布 = 13.333" x 7.5" = 1280x720 px @96dpi；
+ *   本主题画布 = 1920x1080，是其 1.5 倍。
+ *   要让导出后的物理观感一致：px = pt x (96/72) x 1.5 = pt x 2。
+ *
+ *   正文 21pt -> 42px   h1 52pt -> 104px   h2 42pt -> 84px
+ *   表格 18pt -> 36px   代码 17pt -> 34px  短代码(<=4行, x1.5) 25.5pt -> 51px
+ *
+ * 想整体放大/缩小，只改下面 --fs-* 一组变量即可，不用逐条改。
+ *
+ * 2026-10-25 结构/皮肤分家：本主题是**完整自足的皮肤**——@import 'default'
+ * 只带入 base.css 的结构骨架（画布/flex 页容器/家具结构位），零视觉；
+ * 标题/正文/列表/表格/代码的全部视觉都在本文件里，没有第二只手。
+ */
+
+@import 'default';
+
+section {
+  --fs-body: 42px;
+  --fs-h1: 104px;
+  --fs-h2: 84px;
+  --fs-h3: 68px;
+  --fs-h4: 58px;
+  --fs-h5: 50px;
+  --fs-h6: 46px;
+  --fs-code: 34px;
+  --fs-code-short: 51px;
+  --fs-table: 36px;
+  --fs-quote: 40px;
+  --fs-figcap: 26px;
+  --fs-meta: 28px;
+
+  width: 1920px;
+  height: 1080px;
+  box-sizing: border-box;
+  padding: 72px 84px;
+  font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", sans-serif;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: #23303f;
+  background: #ffffff;
+  justify-content: safe center;
+  letter-spacing: 0.2px;
+}
+
+/* 页码 / 页眉页脚 */
+section::after {
+  color: #8a97a5;
+  font-size: 26px;
+  right: 36px;
+  bottom: 21px;
+}
+
+header,
+footer {
+  color: #8a97a5;
+  font-size: var(--fs-meta);
+}
+
+/* 家具（furniture.js 注入的页眉页脚）：左右贴齐正文边距（section padding 84px），
+   颜色字号沿用上面的 header/footer 规则。base 的 :where 兜底是 2em，这里按主题精确对齐。 */
+section > header.md2s-furniture,
+section > footer.md2s-furniture { left: 84px; right: 84px; }
+section > header.md2s-furniture { top: 24px; }
+section > footer.md2s-furniture { bottom: 21px; }
+
+/* 标题基底（分家后归主题）：字重与行高决定版面节奏。 */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  color: #1f4e79;
+  margin: 0 0 0.35em 0;
+  padding-bottom: 0.22em;
+  border-bottom: 4px solid #2e75b6;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  color: #1f4e79;
+  margin: 0 0 0.35em 0;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  color: #2e75b6;
+  margin: 0.15em 0 0.35em 0;
+}
+
+h4 { font-size: var(--fs-h4); color: #2f6f9f; margin: 0.15em 0 0.3em 0; }
+h5 { font-size: var(--fs-h5); color: #2f6f9f; margin: 0.15em 0 0.3em 0; }
+h6 { font-size: var(--fs-h6); color: #2f6f9f; margin: 0.15em 0 0.3em 0; }
+
+strong { color: #c0392b; font-weight: 700; }
+em { color: #1f4e79; }
+a { color: #2e75b6; }
+
+/* 关键词高亮（front-matter `keywords`；core/render/keywords.js 包 <mark class="md2s-kw">）：
+   与 **加粗** 的 strong 完全同款——统一强调语言。IR 的 runStyleOf 读浏览器实测色，
+   PPTX 导出自动跟随。标题与代码块不高亮；作者手写的 <mark> 不带此类，不受影响。 */
+mark.md2s-kw {
+  color: #c0392b;
+  font-weight: 700;
+  background: transparent;
+}
+
+ul, ol { margin: 0.25em 0; padding-left: 1.1em; }
+li { margin: 0.15em 0; line-height: 1.5; }
+
+/* 章节目录页（core/paginate/toc.js）：当前章用标题蓝、其余灰——"我们在哪"一眼可见。
+   沿用标题与强调的既定语言（#1f4e79 / #2e75b6），不引入新色。
+   字号（2026-11-02 用户）：目录标题 = --fs-h2（84px），目录项 = --fs-h3（68px）；
+   当前章只加粗/换色，不再放大；子项同字号，只靠缩进区分层级。 */
+section.md2s-toc > p.md2s-toc-title { color: #8a97a5; font-size: var(--fs-h2); }
+section.md2s-toc > ol.md2s-toc-list { font-size: var(--fs-h3); }
+section.md2s-toc > ol.md2s-toc-list > li { color: #8a97a5; line-height: 1.25; }
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-current {
+  color: #1f4e79;
+  font-weight: 600;
+}
+/* 子项认语义类 md2s-toc-sub（级别比章深），不认 -hN 后缀——章的级别随文档而变
+   （H1/H2/H3 都可能是章），后缀硬编码必然误伤（2026-10-30 实测翻车过）。
+   比 current 规则多带一个类（0,4,3 > 0,3,3）：与书写顺序解链，谁调顺序都不翻。 */
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-item.md2s-toc-sub {
+  font-weight: 400;
+}
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-item.md2s-toc-sub.md2s-toc-current {
+  color: #2e75b6;
+  font-weight: 600;
+}
+section.md2s-toc > ol.md2s-toc-list > li > .md2s-toc-page { color: #8a97a5; font-size: 0.9em; }
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-current > .md2s-toc-page { color: #2e75b6; }
+/* 嵌套列表跟随父项，不加额外下距（分家时从 base 搬入） */
+li > ul, li > ol { margin-bottom: 0; }
+p { margin: 0.3em 0; }
+
+/* 中文排版：正文段落首行缩进 2 字符 */
+section p { text-indent: 2em; }
+section p.figcap,
+section .cover p { text-indent: 0; }
+
+/* 行内代码：用 em 相对容器字号，正文里 ≈0.9×42=38px（即原"正文-2pt"意图），
+   标题里则随 h1~h6 同比放大，不再被固定 38px 压成标题的一半。pre>code 已在下方覆盖为 1em。 */
+code {
+  font-family: "Cascadia Mono", "Consolas", "JetBrains Mono", monospace;
+  background: #eef3f8;
+  color: #b3401f;
+  padding: 0.05em 0.32em;
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+
+pre {
+  font-family: "Cascadia Mono", "Consolas", "JetBrains Mono", monospace;
+  background: #f7f9fb;
+  border: 1px solid #d9e2ec;
+  border-left: 6px solid #2e75b6;
+  border-radius: 8px;
+  padding: 16px 24px;
+  margin: 0.25em 0;
+  font-size: var(--fs-code);
+  line-height: 1.38;
+  box-shadow: none;
+}
+
+pre > code {
+  background: transparent;
+  color: #23303f;
+  padding: 0;
+  font-size: 1em;
+  border-radius: 0;
+}
+
+blockquote {
+  background: #fff8e8;
+  border-left: 6px solid #f0ad4e;
+  color: #6b5220;
+  padding: 10px 24px;
+  margin: 0.3em 0;
+  font-size: var(--fs-quote);
+}
+
+blockquote code { background: #fdf0d5; color: #a8641a; }
+
+/* 用 section table 提升特异性，覆盖内置 GitHub 风格的 display:block + width:max-content */
+section table {
+  display: table;
+  border-collapse: collapse;
+  font-size: var(--fs-table);
+  width: 100%;
+  max-width: 100%;
+  /* auto：列宽按内容分配（"编号"列窄、"核心内容"列宽），总宽仍锁 100%。
+     此前 fixed 是防两类退化：auto 布局超宽压缩时 CJK 列（min-content 仅 1 字）会被压成
+     一字一行、长标识符列（max-content 巨大）反被撑宽；现由下方 min-width 下限兜底。 */
+  table-layout: auto;
+  margin: 0.25em auto;
+  overflow: visible;
+}
+
+/* 断行策略：overflow-wrap 用 break-word 而非 anywhere——anywhere 会把断行机会计入
+   min-content 固有宽度，导致列被压到最长单词以下，出现 "boolean→bool/ean" 的
+   词中断行；break-word 不参与固有宽度计算，列宽不会低于最长单词，仅当单个单词
+   本身超出列宽时才词内断行（最后手段）。
+   min-width 是 auto 布局的压缩下限，保证 CJK 列不会被压成一字一行。 */
+section table th,
+section table td {
+  overflow-wrap: break-word;
+  vertical-align: middle;
+  min-width: 3em;
+}
+
+/* 表格内的行内代码（参数名/参数值）：整段不换行。列宽会自动让位给最长的
+   参数，杜绝 --showHeader=boolean 这类参数单元格折行。 */
+section table th code,
+section table td code {
+  white-space: nowrap;
+}
+
+th {
+  background: #2e75b6;
+  color: #ffffff;
+  font-weight: 700;
+  border: 1px solid #2e75b6;
+  padding: 10px 22px;
+}
+
+td { border: 1px solid #ccd6e0; padding: 9px 22px; }
+tr:nth-child(even) td { background: #f4f8fb; }
+
+img {
+  max-width: 92%;
+  max-height: 720px;
+  object-fit: contain;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 图题 */
+section p.figcap {
+  text-align: center;
+  font-size: var(--fs-figcap);
+  color: #5a6b7c;
+  margin: 0.35em 0 0.1em 0;
+  line-height: 1.4;
+}
+
+/* 分栏容器 */
+section .cols {
+  display: flex;
+  flex-direction: row;
+  /* stretch：各栏拉满 .cols 整高。"栏中居中"的前提是栏自己有高度——原来
+     center 让栏缩成内容高，.col 里的 justify-content 什么也居不了。 */
+  align-items: stretch;
+  justify-content: center;
+  align-self: stretch;
+  /* 占满 section 剩余高度：栏从"内容多高"变成"整屏多高"，顶级元素才有垂直
+     居中的空间（2026-10-30 用户：栏中顶级元素水平垂直都居中）。
+     装不下时不压瘪（flex 项 min-height:auto 兜底），溢出仍走 overflow.js 老路。 */
+  flex-grow: 1;
+  width: 100%;
+  gap: 40px;
+  margin: 0.2em 0;
+}
+
+section .cols > .col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* 顶级元素水平居中：子元素按 fit-content 收窄后再居中——长段落/代码的
+     max-content 超过栏宽，收窄结果仍是整栏宽，观感与单栏一致；图、短标题
+     才显出居中。表格有 width:100% 显式值，依旧铺满栏宽（内容样式不动）。 */
+  align-items: center;
+  justify-content: center;
+}
+
+section .cols > .col > :first-child { margin-top: 0; }
+section .cols > .col > :last-child { margin-bottom: 0; }
+
+section .cols img { width: 100%; max-height: 840px; }
+
+/* 分栏内适度收窄，避免挤爆栏宽 */
+section .cols table { font-size: 30px; }
+section .cols pre { font-size: 28px; }
+section .cols h3 { margin-top: 0; }
+
+/* 短代码块放大（<=4 行；.bigcode 由引擎包，见 IR_v3 预留的短码标记）。
+   必须放在 .cols pre 之后：同特异性下靠顺序覆盖。 */
+section .cols .bigcode pre,
+section .bigcode pre {
+  font-size: var(--fs-code-short);
+}
+
+hr { border: 0; border-top: 1px dashed #ccd6e0; margin: 1em 0; }
+section.lead { justify-content: center; }
+
+/* 封面 / 结尾页 */
+section .cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+
+section .cover h1 { font-size: 112px; border-bottom: none; }
+section .cover h2 { font-size: 76px; }
+section .cover p.subtitle { font-size: 56px; color: #34495e; }
+section .cover p { font-size: 44px; color: #5a6b7c; }
+
+section.lead h1 { color: #ffffff; border-bottom-color: #7fb3d5; }
+
+/* highlight.js 配色（浅色） */
+.hljs-comment, .hljs-quote { color: #7a8b99; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal { color: #8250df; }
+.hljs-string, .hljs-doctag { color: #0a7d32; }
+.hljs-number, .hljs-symbol, .hljs-bullet { color: #b3401f; }
+.hljs-title, .hljs-section, .hljs-name { color: #1f4e79; font-weight: 600; }
+.hljs-built_in, .hljs-builtin-name { color: #0b7285; }
+.hljs-attr, .hljs-attribute { color: #b3401f; }

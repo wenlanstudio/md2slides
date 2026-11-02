@@ -1,0 +1,893 @@
+{
+  "version": 1,
+  "canvas": {
+    "widthIn": 13.3333,
+    "heightIn": 7.5,
+    "pxWidth": 1920,
+    "pxHeight": 1080
+  },
+  "theme": {
+    "name": "lecture",
+    "cssHash": null
+  },
+  "meta": {
+    "title": "超高内容兜底",
+    "subtitle": null,
+    "author": null,
+    "date": null
+  },
+  "slides": [
+    {
+      "index": 0,
+      "layout": "title",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "geo": {
+            "x": 4.3291,
+            "y": 3.0423,
+            "w": 4.675,
+            "h": 1.1432
+          },
+          "style": {
+            "fontSizePt": 56,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "align": "center",
+            "lineSpacingPt": 70,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2722,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0.1711
+          },
+          "runs": [
+            {
+              "text": "超高内容兜底"
+            }
+          ],
+          "container": "cover",
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 2.4551,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            2,
+            2
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 3.5341,
+            "w": 12.1667,
+            "h": 1.3928
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "超高图片",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "3",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                2,
+                2
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "超高段落6",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                10,
+                10
+              ]
+            }
+          ],
+          "lines": 2,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            2,
+            2
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.3168,
+            "y": 7.0528,
+            "w": 0.4332,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "2 / 6"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "layout": "title+body",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.7875,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "超高图片"
+            }
+          ],
+          "srcRange": [
+            2,
+            2
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.7208,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "下面这张图比一整页还高且不可切分：引擎应把它放到无标题裸页上、等比缩放铺满版面，不允许溢出。"
+            }
+          ],
+          "srcRange": [
+            4,
+            4
+          ],
+          "lines": 2
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 0.7834,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "回归夹具"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 0.7834,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "超高图片"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.3168,
+            "y": 7.0528,
+            "w": 0.4332,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "3 / 6"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.6087,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "（续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "image",
+          "geo": {
+            "x": 6.3819,
+            "y": 1.1482,
+            "w": 0.5694,
+            "h": 5.7431
+          },
+          "src": "fig-1.png",
+          "srcRange": [
+            8,
+            8
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 0.7834,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "回归夹具"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 0.7834,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "超高图片"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.3168,
+            "y": 7.0528,
+            "w": 0.4332,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "4 / 6"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 2.4551,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "bold": true,
+            "lineSpacingPt": 65.1,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.175,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "目录"
+            }
+          ],
+          "srcRange": [
+            2,
+            2
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "geo": {
+            "x": 0.5833,
+            "y": 3.5341,
+            "w": 12.1667,
+            "h": 1.3928
+          },
+          "style": {
+            "fontSizePt": 34,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 52.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.1181,
+            "paddingLeftIn": 0.5194,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "超高图片3",
+                  "style": {
+                    "color": "#8a97a5"
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#8a97a5",
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                2,
+                2
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "超高段落",
+                  "style": {
+                    "color": "#1f4e79",
+                    "bold": true
+                  }
+                },
+                {
+                  "text": "6",
+                  "style": {
+                    "color": "#2e75b6",
+                    "bold": true
+                  }
+                }
+              ],
+              "style": {
+                "fontSizePt": 34,
+                "font": "Microsoft YaHei",
+                "color": "#1f4e79",
+                "bold": true,
+                "lineSpacingPt": 42.5,
+                "spaceBeforeIn": 0.0708,
+                "spaceAfterIn": 0.0708,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.5194,
+              "gapBeforeIn": 0.0707,
+              "srcRange": [
+                10,
+                10
+              ]
+            }
+          ],
+          "lines": 2,
+          "gapAfterIn": 0.0707,
+          "srcRange": [
+            2,
+            2
+          ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.3168,
+            "y": 7.0528,
+            "w": 0.4332,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "5 / 6"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "layout": "title+body",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "geo": {
+            "x": 0.5833,
+            "y": 2.6068,
+            "w": 12.1667,
+            "h": 0.7292
+          },
+          "style": {
+            "fontSizePt": 42,
+            "font": "Microsoft YaHei",
+            "color": "#1f4e79",
+            "bold": true,
+            "lineSpacingPt": 52.5,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.2042,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "超高段落"
+            }
+          ],
+          "srcRange": [
+            10,
+            10
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.54,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "下面这段话长得超过一整页且不可切分：引擎应原位缩小字号顺排（并发警告），不允许溢出、也不另起裸页。"
+            }
+          ],
+          "srcRange": [
+            12,
+            12
+          ],
+          "lines": 2
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 4.5316,
+            "w": 12.1667,
+            "h": 0.3451
+          },
+          "style": {
+            "fontSizePt": 4,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 6.21,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0167,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "一段没有标题、没有列表、也没有表格的连续叙述，是分页器最难处理的对象。它没有行级边界，不能像表格那样按行切；它也没有代码块的行号，不能像代码那样在任意位置断开；它更不是公式，不能整体缩放后仍保持清晰。作者写成一整段，通常意味着这些句子在语义上是一个整体，强行拆开就会让下一页从半句话开始。引擎在这种情况下只能选择整体缩小字号，让整段落在一页之内；如果缩小到可读下限仍然放不下，就应当发出警告，让作者自己决定是删减内容、改成列表，还是用手动分页重新组织。缩放不是万能的：字号太小会破坏讲述节奏，也会让投影仪前的观众看不清。真正稳妥的做法，是在写作阶段就把超长段落拆成几个有标题的小节，或者改成表格、列表、分栏这些有明确边界的结构。分页器能做的是兜底，不是替作者重写内容；它必须把警告说清楚，让问题暴露在构建阶段，而不是等放映时才发现最后一行被切掉。对于图片、表格、公式这类核心块，引擎会优先保持完整；对于段落，它能做的只是整体缩放和诚实报警。这也是为什么演示文档里每一节都尽量保持一个核心组：结构越清楚，分页器越不需要猜测，作者也越容易预测观众看到的第一眼是什么。再往深一层看，分页器的每一次选择都在和作者争夺排版权。作者用标题、空行、列表和分栏表达结构，引擎应当尊重这些结构；只有当结构本身缺失时，才轮到引擎用测量结果做兜底。兜底不是重排，更不是改写：段落仍然是那一段，文字不能少一行，顺序不能变，唯一允许变化的是字号和必要的留白。正因为如此，超高段落的处理必须克制——缩到可读下限就停，剩下的交给警告。作者看到警告后，可以删掉重复的句子，可以把并列关系改成列表，也可以把一段拆成几页来讲。引擎不替作者做这些决定，它只负责把这里装不下这件事说清楚。"
+            }
+          ],
+          "srcRange": [
+            14,
+            14
+          ],
+          "lines": 4
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 0.7834,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "回归夹具"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 0.7834,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "超高段落"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.3168,
+            "y": 7.0528,
+            "w": 0.4332,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "6 / 6"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    }
+  ]
+}

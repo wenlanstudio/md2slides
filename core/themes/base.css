@@ -1,0 +1,122 @@
+/*
+ * base.css — 引擎的结构骨架（2026-10-25 结构/皮肤分家定案）。
+ *
+ * 这里只有"引擎运行契约"：画布与页容器布局、分页测量依赖的间距口径、家具
+ * （页眉页脚）的结构位、markdown-it 产物的结构兜底。**零视觉**——颜色、字体、
+ * 字号、边框、背景一概不写，全部由主题自带（参考 lecture.css，
+ * 它是完整的皮肤；引擎默认主题见 core/compose.js 的 DECK_DEFAULTS）。
+ *
+ * 分家的原因：base 曾同时扮演"结构契约 + 视觉基底"，视觉部分与主题在同一条
+ * 级联里打架（section th / section pre 的特异性 0,0,2 压死主题裸选择器的
+ * 0,0,1），表格表头与代码块字体三轮失真。分家后主题层只有一个人的意志。
+ *
+ * 两条纪律：
+ *  1. 尺寸一律用 em，跟着主题的 `section { font-size }` 缩放。
+ *  2. 任何"没有就难看"的兜底一律 :where() 零特异性——结构兜底也不许压主题。
+ */
+
+/* 页容器：section 是画布内的内容盒，家具的定位锚。 */
+section { position: relative; }
+
+/* 垂直居中（2026-10-24 拍板）：section 是 flex 列容器，主题里的
+   `justify-content: safe center` 才活。`safe center`：装得下才居中；
+   装不下（溢出态）回退起始对齐，不把内容顶出页面。 */
+section[data-slide] {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+}
+
+/* 首末元素贴边：分页实测的是"内容盒"，页首多出来的 margin 会白白吃掉一行的高度。 */
+section > :first-child { margin-top: 0; }
+section > :last-child { margin-bottom: 0; }
+
+/* flex 子项的外边距不折叠：正常流里相邻块的上下 margin 会合成一个，flex 里会加成
+   ——整页间距凭空松一档，分页边界也跟着平移。统一抹平直接子元素的上外边距、
+   保留下边距，间距口径与正常流一致；主题要恢复某个元素的上留白，写更具体的
+   规则盖回去即可。
+   用 :is() 枚举而不是 `> *`：通配符特异性为 0，`section[data-slide] > *` 只有
+   (0,1,1)，会与主题的 `section .cols { margin: 0.2em 0 }` 同分并被后到的主题盖
+   回去——2026-10-24 实测就是这样漏的。:is() 取最重参数的份量，整条 (0,1,2)，
+   压过主题一层。 */
+section[data-slide] > :is(p, div, ul, ol, li, dl, table, pre, blockquote,
+  h1, h2, h3, h4, h5, h6, figure, img, hr, section, article, aside, details) {
+  margin-top: 0;
+}
+
+/* 页眉页脚（家具）：分页收敛后由 core/paginate/furniture.js 统一注入。
+   绝对定位 + HEADER/FOOTER 标签 = overflow.js 的 isFixed 白名单认它们，不参与
+   内容测量；块序在 section 子元素末尾，保 IR 块序 = PPTX 形状序。
+   一律 :where()（特异性 0）：主题的 `header, footer { … }` 与任何具名规则都能
+   覆盖它。字号颜色在这里兜底"没有就难看"，主题必赢。 */
+:where(section > header.md2s-furniture, section > footer.md2s-furniture) {
+  position: absolute;
+  left: 2em;
+  right: 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.55em;
+  color: #6a737d;
+  pointer-events: none;
+}
+/* 右槽永远贴右：只有一项时 space-between 会把它留在起始位（页码就跑到了左下角） */
+:where(section > header.md2s-furniture > .md2s-slot-right,
+       section > footer.md2s-furniture > .md2s-slot-right) { margin-left: auto; }
+:where(section > header.md2s-furniture) { top: 0.6em; }
+:where(section > footer.md2s-furniture) { bottom: 0.6em; }
+
+/* 章节目录页（core/paginate/toc.js 注入的引擎产物）：结构位与"没有就难看"的
+   兜底归这里，颜色字号归主题。一律 :where()（特异性 0）——主题的具名规则必赢，
+   与家具同款纪律。
+   不覆盖 justify-content：沿用 section 的 `safe center`——条目少时整块居中，
+   条目多到装不下时自动回退到顶对齐，正好是目录页想要的两种形态。 */
+:where(section.md2s-toc > p.md2s-toc-title) {
+  margin: 0 0 0.4em 0;
+  text-indent: 0;
+  font-size: 2em; /* 兜底：跟 2 级标题 */
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #8a97a5;
+}
+:where(section.md2s-toc > ol.md2s-toc-list) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1.5em; /* 兜底：跟 3 级标题 */
+}
+:where(section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-item) {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0.12em 0;
+  line-height: 1.25;
+  opacity: 0.5;
+}
+/* 当前章是这页唯一要被看清的东西：只加粗/换色，不放大字号 */
+:where(section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-current) { opacity: 1; }
+/* 子项只缩进；字号继承目录项（主题定为 3 级标题） */
+:where(section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-sub) { padding-left: 1.4em; }
+:where(section.md2s-toc > ol.md2s-toc-list > li > .md2s-toc-text) { flex: 1 1 auto; min-width: 0; }
+:where(section.md2s-toc > ol.md2s-toc-list > li > .md2s-toc-page) {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+/* markdown-it-plugins 产出的结构（脚注、任务列表、GitHub alert）：
+   只兜结构位，配色字号 :where() 归主题覆盖。 */
+:where(section .footnotes) {
+  margin-top: 1em;
+  padding-top: 0.4em;
+  border-top: 1px solid #e1e4e8;
+  font-size: 0.7em;
+  color: #6a737d;
+}
+:where(section .task-list-item) { list-style: none; }
+:where(section .markdown-alert) {
+  margin: 0 0 0.8em;
+  padding: 0.4em 0.8em;
+  border-left: 4px solid #0969da;
+}
+:where(section .markdown-alert-title) { font-weight: 600; }

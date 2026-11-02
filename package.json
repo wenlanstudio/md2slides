@@ -1,0 +1,77 @@
+{
+  "name": "@quqingyuan/md2slides",
+  "version": "0.1.0",
+  "description": "Markdown to slides/PPTX engine that keeps core content (images, tables, formulas) intact during pagination: heading-based logical pagination + browser-measured physical pagination + frozen Slide IR, with editable PPTX export.",
+  "license": "MIT",
+  "author": "quqingtao",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quqingyuan/md2slides.git"
+  },
+  "homepage": "https://github.com/quqingyuan/md2slides#readme",
+  "bugs": {
+    "url": "https://github.com/quqingyuan/md2slides/issues"
+  },
+  "keywords": [
+    "markdown",
+    "slides",
+    "pptx",
+    "presentation",
+    "pagination",
+    "deck",
+    "slide-ir",
+    "core-content",
+    "markdown-to-pptx"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./index.js",
+  "types": "./types/index.d.ts",
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./index.js"
+    },
+    "./package.json": "./package.json",
+    "./*": "./*"
+  },
+  "files": [
+    "index.js",
+    "types/",
+    "kit/",
+    "core/",
+    "export/",
+    "docs/",
+    "lib/",
+    "LICENSE",
+    "CHANGELOG.md",
+    "THIRD-PARTY-NOTICES.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "check": "node tools/check-deps.js",
+    "smoke": "node tools/smoke.js",
+    "quiz": "node tools/quiz-smoke.js",
+    "build:host": "node tools/build-host.js",
+    "fetch:plantuml": "node tools/fetch-plantuml.js",
+    "e2e": "node e2e/check.js",
+    "e2e:lightbox": "node e2e/lightbox-real.js",
+    "e2e:tap": "node e2e/tap-real.js",
+    "html": "node tools/export-html.js",
+    "snapshot": "node tools/ir-snapshot.js",
+    "shot:update": "node tools/shot-update.js",
+    "snapshot:update": "node tools/ir-snapshot.js --update",
+    "test:unit": "node --test \"test/unit/*.test.js\"",
+    "test": "npm run test:unit && node tools/check-deps.js && node tools/smoke.js && node tools/quiz-smoke.js && node tools/build-host.js && node e2e/check.js",
+    "pack:marktext": "node tools/build-host.js && node tools/pack-marktext.js"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "pptxgenjs": "^4.0.1",
+    "puppeteer-core": "^25.14.0"
+  }
+}
