@@ -13,13 +13,56 @@
 > An editor-independent Markdown → slides engine with heading-based logical pagination,
 > browser-measured physical pagination, a frozen Slide IR, and editable PPTX export.
 
-<p align="center">
-  <img src="docs/assets/demo-cover.png" width="46%" alt="自动生成的封面页" />
-  <img src="docs/assets/demo-table.png" width="46%" alt="表格页" />
-</p>
-<p align="center">
-  <img src="docs/assets/demo-formula.png" width="46%" alt="公式页" />
-</p>
+<table>
+<tr>
+<th align="left" width="46%">输入 · <code>examples/demo.md</code>（节选）</th>
+<th align="left" width="54%">输出 · 自动分页出的幻灯片</th>
+</tr>
+<tr>
+<td>
+
+<pre><code>---
+title: MD2Slides 功能总览
+subtitle: 从 Markdown 到幻灯片，核心内容不拆页
+author: quqingtao
+date: 2026-11-02
+book: MD2Slides 演示
+theme: lecture
+headingDivider: 2
+---</code></pre>
+
+</td>
+<td><img src="docs/assets/demo-cover.png" width="100%" alt="自动生成的封面页" /></td>
+</tr>
+<tr>
+<td>
+
+<pre><code>## 核心组：一页一个主角
+
+| 角色 | 例子 | 规则 |
+| --- | --- | --- |
+| 引导语 | 下面这张表…… | 紧贴核心前的唯一段落 |
+| 核心 | 表格、代码、列表、图片、公式 | 一页最多一个核心组，可含 1~4 个核心 |
+| 结束语 | 上表说明…… | 紧贴核心后的唯一段落 |
+
+## 公式：行内与块级
+
+块级公式是一个核心，独占一页，不会被切成两半：
+
+$$
+\sum_{t=1}^{T} V_t \neq V_T
+$$</code></pre>
+
+</td>
+<td>
+  <img src="docs/assets/demo-table.png" width="48%" alt="表格页" />
+  <img src="docs/assets/demo-formula.png" width="48%" alt="公式页" />
+</td>
+</tr>
+</table>
+
+完整 11 章效果见在线演示：**https://wenlanstudio.github.io/md2slides/**。
+
 
 ## 为什么是 MD2Slides
 
