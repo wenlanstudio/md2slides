@@ -5,10 +5,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](package.json)
 
-在线演示：**https://wenlanstudio.github.io/md2slides/** · 示例 PPTX 见
-[v0.1.0 release](https://github.com/wenlanstudio/md2slides/releases/tag/v0.1.0)。
+在线演示：**https://wenlanstudio.github.io/md2slides/**
 
-**用 Markdown 写幻灯片。分页时优先保住图片、表格、公式这些核心内容。**
+**用 Markdown 写幻灯片，不用手动分页符**——标题自动切章，装不下时自动分割：
+表格按行续（续页重复表头）、代码按行续（行号不断）、列表按项续（编号接上），
+图片、表格、公式这些核心内容优先保证完整。
 
 > An editor-independent Markdown → slides engine with heading-based logical pagination,
 > browser-measured physical pagination, a frozen Slide IR, and editable PPTX export.
@@ -62,6 +63,15 @@ $$</code></pre>
 </table>
 
 完整 11 章效果见在线演示：**https://wenlanstudio.github.io/md2slides/**。
+
+同一份输入（`examples/demo.md`，无手动分页符），四种产物点开即看：
+
+| 产物 | 文件 | 说明 |
+| --- | --- | --- |
+| Markdown 输入 | [examples/demo.md](examples/demo.md) | 11 章，交给引擎自动分割 |
+| 独立 HTML 放映 | [examples/demo.html](examples/demo.html) · [在线预览](https://wenlanstudio.github.io/md2slides/) | 一个文件双击可放，20 页 |
+| 图片型 PPTX | [examples/demo.pptx](examples/demo.pptx) | 零依赖、所见即所得 |
+| 可编辑 PPTX | [examples/demo-editable.pptx](examples/demo-editable.pptx) | PowerPoint 里可改文字与形状 |
 
 
 ## 为什么是 MD2Slides

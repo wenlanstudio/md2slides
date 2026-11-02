@@ -9,10 +9,14 @@ __pycache__/
 # e2e 的产物页：分页后长什么样，翻车时才有价值，但不必进版本库
 e2e/.cache/
 
-# examples/ 是本地文档集，不进库。例外：demo.md 是 e2e 默认回归输入，必须进
+# examples/ 是本地文档集，不进库。例外：demo.md 是 e2e 默认回归输入，
+# 及其导出产物（README「点开即看」清单指向它们），必须进
 # （注意只忽略内容 /examples/*，不忽略目录本身，否则下面的取反不生效）
 /examples/*
 !examples/demo.md
+!examples/demo.html
+!examples/demo.pptx
+!examples/demo-editable.pptx
 .workbuddy/
 .pu_*
 hs_err_pid*.log
