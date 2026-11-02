@@ -1,0 +1,7 @@
+# Design notes stay in the repository; they are not part of the library package.
+docs/design/
+export/pptx/ARCHITECTURE.md
+
+# Local Python bytecode is environment-specific and must never ship.
+**/__pycache__/
+**/*.pyc
