@@ -14,6 +14,7 @@
  *   页面 → 宿主  {type:"md2s:ready", pages, index, total, steps, diagrams, images,
  *                 slideWidth, slideHeight, meta, theme, ms}
  *              | {type:"md2s:change", index, total, step, steps, mode}
+ *              | {type:"md2s:warn", message}                       （缺图占位等非致命提示）
  *              | {type:"md2s:error", stage:"build", message}
  *              | {type:"md2s:rpc", id, kind:"diagram", diagramType, source}
  *   宿主 → 页面  {type:"md2s:rpc-result", id, ok, dataUrl?|error?}   （图表托渲染应答）
@@ -255,8 +256,99 @@ const markOverflowWarnings = () => {
   return warned
 }
 
+// ---------------------------------------------------------------------------
+// 缺图护栏：markdown 引用了不存在的图片时，旧行为是整单失败、报「[object Event]」
+// （html-to-image 的 createImage 把 onerror 的 Event 原样 reject；可编辑型更糟——
+// imageBlock 把 http URL 当 dataUrl 塞进 media，sidecar 按 PNG 落盘，PIL 直接炸）。
+// 改为构建时检测：坏图换画布画的占位 PNG（媒体通道只认 dataURL），缺失清单经
+// md2s:warn 报宿主——演示继续，损失可见。（2026-11-03 讲义真机翻车的修复）
+// ---------------------------------------------------------------------------
+
+/** 事件/未知抛出物 → 人话（Error 用 message；Event 带 type 与目标 src）。 */
+const describeError = error => {
+  if (error instanceof Error) return error.message
+  if (error && typeof error === "object" && typeof error.type === "string") {
+    const target = error.target
+    const what = target?.src
+      ? `（${String(target.src).slice(0, 200)}）`
+      : target?.tagName
+        ? `（${target.tagName}）`
+        : ""
+    return `${error.type} 事件 ${what}`.trim()
+  }
+  return String(error)
+}
+
+/** 占位图（PNG dataURL）：媒体通道按 .png 落盘、sidecar 按 PNG 读，必须是真 PNG。 */
+const placeholderPng = label => {
+  const c = document.createElement("canvas")
+  c.width = 640
+  c.height = 400
+  const g = c.getContext("2d")
+  g.fillStyle = "#565656"
+  g.fillRect(0, 0, c.width, c.height)
+  g.strokeStyle = "#7a7a7a"
+  g.lineWidth = 4
+  g.strokeRect(8, 8, c.width - 16, c.height - 16)
+  g.fillStyle = "#ffffff"
+  g.textAlign = "center"
+  g.textBaseline = "middle"
+  g.font = "600 44px sans-serif"
+  g.fillText("缺图", c.width / 2, 150)
+  g.font = "24px sans-serif"
+  g.fillStyle = "#d8d8d8"
+  g.fillText(label, c.width / 2, 240, 560)
+  return c.toDataURL("image/png")
+}
+
+let missingImages = []
+
+const labelOfSrc = src => {
+  try {
+    return decodeURIComponent(new URL(src, location.href).pathname.split("/").pop() || "") || "image"
+  } catch {
+    return "image"
+  }
+}
+
+/** 坏图（载完但 0 宽）换成占位 PNG；返回本次新标记的张数。幂等（dataset 门闩）。 */
+const markMissingImages = () => {
+  let marked = 0
+  for (const img of document.images) {
+    if (img.dataset.md2sMissing) continue
+    if (img.src.startsWith("data:")) continue
+    if (!img.complete || img.naturalWidth > 0) continue
+    img.dataset.md2sMissing = "1"
+    const label = labelOfSrc(img.getAttribute("src") ?? img.src)
+    img.src = placeholderPng(label)
+    missingImages.push(label)
+    marked += 1
+  }
+  return marked
+}
+
+/** 等未完成的图片落定（load/error 都算），限时兜底防挂死，然后补标坏图。 */
+const waitForDeckImages = async (timeoutMs = 10000) => {
+  const pending = [...document.images].filter(img => !img.complete)
+  if (pending.length) {
+    await Promise.race([
+      Promise.all(
+        pending.map(img =>
+          new Promise(resolve => {
+            img.addEventListener("load", () => resolve(), { once: true })
+            img.addEventListener("error", () => resolve(), { once: true })
+          })
+        )
+      ),
+      new Promise(resolve => setTimeout(resolve, timeoutMs)),
+    ])
+  }
+  markMissingImages()
+}
+
 const doBuild = async msg => {
   const started = performance.now()
+  missingImages = []
   try {
     await warmAssets()
     await ensureDiagramLibs(msg.md ?? "")
@@ -285,6 +377,8 @@ const doBuild = async msg => {
       ? window.scrollY
       : 0
     root.innerHTML = html
+    // 缺图必须赶在分页前换成占位（坏图 0 宽 vs 占位有真实几何，量晚了页就错）。
+    await waitForDeckImages()
 
     const { mode, browse, startIndex, view } = msg.runOpts ?? {}
     const result = await deckCore.run({
@@ -301,6 +395,12 @@ const doBuild = async msg => {
     })
     const warnings = view === "list" ? applyListView(deck.slideWidth) : 0
     if (view === "list") window.scrollTo(0, savedScroll)
+    if (missingImages.length) {
+      post({
+        type: "md2s:warn",
+        message: `缺图 ${missingImages.length} 张，已用占位图：${[...new Set(missingImages)].join("、")}`,
+      })
+    }
     post({
       type: "md2s:ready",
       pages: result.pages,
@@ -318,7 +418,7 @@ const doBuild = async msg => {
       ms: Math.round(performance.now() - started),
     })
   } catch (error) {
-    post({ type: "md2s:error", stage: "build", message: error?.message ?? String(error) })
+    post({ type: "md2s:error", stage: "build", message: describeError(error) })
   }
 }
 
@@ -376,18 +476,33 @@ const doExport = async msg => {
       post({ type: "md2s:export-result", id: msg.id, ok: false, ir, issues })
       return
     }
+    // 保险丝：media 通道只认 dataURL——imageBlock 万一塞进 http URL（构建后又坏过
+    // 一场的残骸），写盘就是 PIL 读不出的文本文件，sidecar 当场炸。换占位图续走。
+    const safeMedia = (media ?? []).map(item =>
+      String(item.dataUrl).startsWith("data:image/")
+        ? item
+        : { ...item, dataUrl: placeholderPng("缺图") }
+    )
     // media 同理走旁路；IR 本体是几百 KB 的 JSON，桥上直传没问题。
     sid = (await exportSideChannel.begin()).sid
-    for (const item of media ?? []) {
+    for (const item of safeMedia) {
       const b64 = String(item.dataUrl).split(",")[1] ?? ""
       await exportSideChannel.put(sid, item.name, b64)
     }
     const { dir } = await exportSideChannel.done(sid)
     sid = null
-    post({ type: "md2s:export-result", id: msg.id, ok: true, ir, issues, mediaDir: dir, mediaCount: (media ?? []).length })
+    post({
+      type: "md2s:export-result",
+      id: msg.id,
+      ok: true,
+      ir,
+      issues,
+      mediaDir: dir,
+      mediaCount: safeMedia.length,
+    })
   } catch (error) {
     if (sid) void exportSideChannel.abort(sid)
-    post({ type: "md2s:export-result", id: msg.id, ok: false, error: error?.message ?? String(error) })
+    post({ type: "md2s:export-result", id: msg.id, ok: false, error: describeError(error) })
   }
 }
 
