@@ -395,12 +395,13 @@ const doBuild = async msg => {
     })
     const warnings = view === "list" ? applyListView(deck.slideWidth) : 0
     if (view === "list") window.scrollTo(0, savedScroll)
+    // 非致命提示合并成一条：面板只有一个胶囊，各自 post 会互相覆盖。
+    const notes = []
+    if (deck.themeWarning) notes.push(deck.themeWarning)
     if (missingImages.length) {
-      post({
-        type: "md2s:warn",
-        message: `缺图 ${missingImages.length} 张，已用占位图：${[...new Set(missingImages)].join("、")}`,
-      })
+      notes.push(`缺图 ${missingImages.length} 张，已用占位图：${[...new Set(missingImages)].join("、")}`)
     }
+    if (notes.length) post({ type: "md2s:warn", message: notes.join("；") })
     post({
       type: "md2s:ready",
       pages: result.pages,

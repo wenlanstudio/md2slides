@@ -55,8 +55,8 @@ const clampDivider = value => {
  * @param {string}  [opts.themesDir]     主题目录
  * @param {Function}[opts.readFile]      读文件实现（浏览器宿主注入）
  * @returns {{ html: string, css: string, slideWidth: number, slideHeight: number,
- *             slideCount: number, theme: string|null, columns: number,
- *             coverDiags: object[], meta: object, doc: Document }}
+ *             slideCount: number, theme: string|null, themeWarning: string|null,
+ *             columns: number, coverDiags: object[], meta: object, doc: Document }}
  */
 const compose = (md, opts = {}) => {
   const text = ensureFrontMatter(md ?? "", opts.defaults ?? DECK_DEFAULTS)
@@ -102,10 +102,24 @@ const compose = (md, opts = {}) => {
     })
   }
 
-  const theme = loadTheme(fm.theme ?? DECK_DEFAULTS.theme, {
+  // 主题找不到就回退到默认主题并留一条警告：loadTheme 返回 null 时整份 deck
+  // 一条主题 CSS 都没有（base.css 只从主题的 @import 'default' 带进来），
+  // 黑底小字错位的「残页」比一句「主题不存在」更难查。
+  const requestedTheme = fm.theme ?? DECK_DEFAULTS.theme
+  let theme = loadTheme(requestedTheme, {
     themesDir: opts.themesDir,
     readFile: opts.readFile,
   })
+  let themeWarning = null
+  if (!theme) {
+    theme = loadTheme(DECK_DEFAULTS.theme, {
+      themesDir: opts.themesDir,
+      readFile: opts.readFile,
+    })
+    themeWarning = theme
+      ? `主题「${requestedTheme}」不存在，已按「${DECK_DEFAULTS.theme}」渲染`
+      : `主题「${requestedTheme}」不存在，默认主题「${DECK_DEFAULTS.theme}」也不可用——幻灯片没有主题样式`
+  }
   // 高亮在这里上一次，让离线产物（CLI 出片）也有颜色。
   // 浏览器里跑完物理分页后宿主还得再上一次：overflow.js 按行切代码块会把 span 全丢掉。
   const painted = (opts.highlight ?? true) ? highlightCode(doc) : 0
@@ -126,6 +140,7 @@ const compose = (md, opts = {}) => {
     slideHeight: theme?.slideHeight ?? 1080,
     slideCount,
     theme: theme?.name ?? null,
+    themeWarning,
     columns: expanded.count,
     columnDiags: expanded.diagnostics ?? [],
     // 转成列表的分号段落数（0 = 未开启或没有命中）

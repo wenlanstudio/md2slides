@@ -87,7 +87,8 @@ front-matter（八键）、封面生成、关键词高亮、主题都在这里�
 | `html` / `css` | 序列化产物。⚠ `html` 是 compose 完成那一刻的快照——之后 `renderDiagrams` 改了 DOM，宿主要自己从 `doc` 重新序列化（见 §3 时序 3） |
 | `doc` | 文档对象（就是传入的那个 document 加工后的样子），后续所有步骤的操作对象 |
 | `slideWidth` / `slideHeight` | 画布尺寸（px，来自主题；默认 1920×1080）。**直接喂给 `splitOverflow` / `extractIr`** |
-| `slideCount` / `theme` / `columns` | 逻辑页数 / 主题名 / 展开的分栏组数 |
+| `slideCount` / `theme` / `columns` | 逻辑页数 / 实际使用的主题名 / 展开的分栏组数 |
+| `themeWarning` | 主题名找不到时（如旧名 `python-mini-pptx`）回退到默认主题的说明；正常为 `null`。宿主应展示给用户（deck 面板经 `md2s:warn` 出胶囊） |
 | `meta` | 八键文档元数据（title/subtitle/author/date/book/header/footer/keywords），透传给 `splitOverflow`（家具）与 `extractIr`（文件属性） |
 | `columnDiags` / `coverDiags` | 分栏语法诊断（带源码行号）与封面诊断 |
 | `semicolons` | 转成列表的分号段落数 |
