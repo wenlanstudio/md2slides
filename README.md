@@ -104,7 +104,8 @@ npm test                                                 # check + smoke + e2e �
 
 环境要求：Node.js >= 18。物理分页和 e2e 需要 Chrome / Edge（`CHROME_PATH` 可指定）；
 PPTX 成品比对需要 Python + python-pptx（`MD2SLIDES_PYTHON` 可指定，缺则跳过成品段）；
-PlantUML 图需要 Java 11+，jar 用 `npm run fetch:plantuml` 下载。
+PlantUML 图需要 Java 11+，jar 用 `npm run fetch:plantuml` 下载；
+` ```matplotlib ` 围栏需要带 matplotlib 的 Python（`PYTHON_PATH` 可指定解释器，缺则硬失败）。
 
 ### 作为库使用
 
@@ -193,7 +194,7 @@ md2slides.checkIr(iframeDoc, ir)
 > marktext 与自定义宿主。
 
 - **marktext deck-full**：整链 deck 页面 + 共享本地服务 + postMessage 桥。宿主侧实现在独立 fork，本仓库只含页面入口
-- **自己的宿主**：实现 `renderDiagram` 等钩子即可；参考 `host/thin/`（graphviz / plantuml）与 `host/browser/`（mermaid / echarts）
+- **自己的宿主**：实现 `renderDiagram` 等钩子即可；参考 `host/thin/`（graphviz / plantuml / matplotlib）与 `host/browser/`（mermaid / echarts）
 
 core 不渲染图表、不碰编辑器；宿主专属能力全部经 opts 钩子注入。`host/` 随仓库分发，
 **不进 npm 包**；npm 包只含库本体（core / kit / export / lib / types / docs）。
@@ -227,6 +228,9 @@ docs/      API 契约与设计档案
 - 物理分页必须在真实浏览器里跑；`file://` 取不到字体，量出的高度不可信
 - 字体和浏览器版本会影响分页与截图基线，跨环境比对前先重建基线
 - PlantUML 需要 Java 11+，jar 不入库，用 `npm run fetch:plantuml` 下载
+- ` ```matplotlib ` 围栏会在**本机 Python 里执行文档作者写的代码**（与可执行代码块同一
+  安全口径）：只对可信文档开启，服务端部署须自行隔离解释器与资源；没有解释器时构建
+  硬失败，不会退化成代码块
 - 投屏广播绑 `0.0.0.0` 且不做访问控制，只适合可信局域网
 - 可执行代码块在放映时点 ▶ 会真的在本机执行；ECharts option 用 `new Function` 求值。
   不要打开或放映来源不可信的 deck

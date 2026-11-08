@@ -24,6 +24,8 @@ const DIAGRAM_TYPES = {
   plantuml: "plantuml",
   puml: "plantuml",
   echarts: "echarts",
+  // matplotlib 不是浏览器运行时：core 只认类型，真出图由宿主 spawn Python（见 host/thin）。
+  matplotlib: "matplotlib",
 }
 
 /** 图表渲染的硬失败。带 type / source，好让报错直接指到是哪一块图。 */

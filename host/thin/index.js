@@ -16,10 +16,11 @@
  * 注意这不是"降级跳过"：它们只是换了个环境渲染，最后统一由
  * `assertDiagramsRendered()` 兜底，谁都没接手就硬失败。
  */
-const NODE_TYPES = ["graphviz", "plantuml"]
+const NODE_TYPES = ["graphviz", "plantuml", "matplotlib"]
 
 const { renderGraphviz } = require("./graphviz")
 const { renderPlantuml } = require("./plantuml")
+const { renderMatplotlib } = require("./matplotlib")
 
 /**
  * @param {{type: string, source: string, lang: string}} block
@@ -32,6 +33,8 @@ const renderDiagram = async block => {
       return renderGraphviz(block.source)
     case "plantuml":
       return renderPlantuml(block.source)
+    case "matplotlib":
+      return renderMatplotlib(block.source)
     default:
       // 铁律：不接受占位降级。渲染不了就明明白白报错，让构建停下来，别拿灰块糊弄。
       throw new Error(`薄宿主还没接 ${block.type} 的渲染器（图表必须真渲染，不接受降级）`)
