@@ -67,9 +67,16 @@ const deckPage = (deck, bodyHtml) => `<!doctype html>
 
 /**
  * 生成可在浏览器里打开的 deck 页面（分页前）。
- * @returns {{ deck: object, file: string }} 落盘路径
+ * @param {object} [opts] 选项
+ * @param {Function} [opts.transformDeck] 通用 DOM 钩子：写页前改 deck.doc，
+ *   之后由本函数重新序列化。宿主可借此清洗数据属性等，钩子本身不认识任何业务概念。
+ * @param {boolean} [opts.writeFile=true] 是否落盘到 cacheDir；伴生服务用 false 走内存
+ * @returns {{ deck: object, file: string|null, html: string }} html 恒返回，file 仅落盘时非 null
  */
-const buildPage = async (md, { name = "deck", cacheDir = CACHE_DIR, baseUrl = null, renderDiagram } = {}) => {
+const buildPage = async (md, {
+  name = "deck", cacheDir = CACHE_DIR, baseUrl = null, renderDiagram,
+  transformDeck = null, writeFile = true,
+} = {}) => {
   const document = new JSDOM("").window.document
   const composed = compose(md, { document, katexFontsUrl: katexFontsUrl(baseUrl) })
   const deck = { name, ...composed }
@@ -89,10 +96,22 @@ const buildPage = async (md, { name = "deck", cacheDir = CACHE_DIR, baseUrl = nu
   // 还剩下的图表类型 = 交给别的环境去渲染的。最后没人接手就是硬失败。
   deck.diagram = { ...diagram, deferred: [...new Set(chartBlocksOf(composed.doc).map(b => b.type))] }
 
+  // 宿主清洗钩子在写页之前：改的是同一个 doc，随后重新序列化，物理分页量到的
+  // 才是清洗后的真实 DOM（页码、续页都会跟着对）。
+  if (transformDeck) {
+    await transformDeck(deck)
+    const el = composed.doc.querySelector(".md2slides-deck")
+    if (el) deck.html = el.innerHTML
+  }
+  const html = deckPage(deck, deck.html)
+  if (!writeFile) {
+    return { deck, file: null, html }
+  }
+
   fs.mkdirSync(cacheDir, { recursive: true })
   const file = path.join(cacheDir, `${name}.html`)
-  fs.writeFileSync(file, deckPage(deck, deck.html), "utf8")
-  return { deck, file }
+  fs.writeFileSync(file, html, "utf8")
+  return { deck, file, html }
 }
 
 /** 反复分页直到它没活干（`splitOverflow` 返回 0）。 */
