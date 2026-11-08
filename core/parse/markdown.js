@@ -17,6 +17,8 @@ const MarkdownIt = require("../../lib/markdown-it")
 const plugins = require("../../lib/markdown-it-plugins")
 const { RE_FRONT_MATTER } = require("./frontMatter")
 const { registerQuiz } = require("../quiz/parse")
+const { registerFencePolicy } = require("./fencePolicy")
+const { FENCE_ACTIONS } = require("../teaching-fences")
 
 // KaTeX 是可选的：拿不到就把公式原样留着，总好过整个解析器起不来。
 let katex = null
@@ -113,6 +115,12 @@ const md = () => {
   // 必须早于 sectionize——sectionize 只搬元素节点，注释节点会被丢掉，
   // 那时再想认题已经晚了。
   registerQuiz(instance)
+
+  // 教学载荷围栏（check-code / match-output / sql-result）默认不进任何产物——
+  // 块体是判分秘密，印出去就是泄题（SPEC §一.4 秘密边界，M1.5 防泄题裁决）。
+  // token 层删一处，HTML / IR / PPTX 三条下游全干净；教师版/学生版投影（M2a）
+  // 会经同一钩子换动作表。机制见 fencePolicy.js，默认表来自 teaching-fences。
+  registerFencePolicy(instance, FENCE_ACTIONS)
 
   cached = instance
   return cached

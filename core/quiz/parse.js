@@ -32,6 +32,8 @@
  * 编辑器无关：这一层不认识 Typora，也不认识 classbuzz——它只认识「题」。
  */
 
+const { parseParams, normalizeAnswer: normalizeAnswerBase } = require("../teaching-fences")
+
 /** 标记必须是独占一行的注释（最多 3 空格缩进，和分栏标记同规矩）。 */
 const RE_MARKER = /^<!--\s*quiz\b([^>]*?)\s*-->$/i
 
@@ -49,37 +51,20 @@ const BLOCKERS = new Set([
 /**
  * 解析标记里的参数。
  *
- * 首选 JSON（`{"answer":"B","limit":30}`）；JSON 不合法时退回 `key=value` 简写
- * （`answer=B limit=30`）——老师在讲义里手写，两种都得认。
+ * 参数双形式（JSON 优先、kv 退回）与答案归一收敛到 teaching-fences——语法只允许
+ * 一份实现（SPEC §八：原语复用，防「预览认得出的题，判分认不出」式漂移）。
  *
  * @param {string} raw 标记里 `<!--quiz` 与 `-->` 之间的内容
  * @returns {{answer: number|null, limit: number, id: string|null, raw: object}|null}
  *   null = 参数完全读不懂；answer 为 null = 参数读懂了但没给答案。
  */
 function parseQuizMeta(raw) {
-  const text = String(raw ?? "").trim()
-  if (!text) return { answer: null, limit: 30, id: null, raw: {} }
+  const obj = parseParams(raw)
+  if (obj === null) return null
 
-  let obj = null
-  if (text.startsWith("{")) {
-    try {
-      const parsed = JSON.parse(text)
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) obj = parsed
-    } catch { /* 退回简写 */ }
-  }
-  if (!obj) {
-    obj = {}
-    // key=value（值可带引号），只认没有空格的值——带空格的值请用 JSON
-    const re = /([A-Za-z][\w-]*)\s*=\s*("[^"]*"|'[^']*'|[^\s]+)/g
-    let m
-    while ((m = re.exec(text))) {
-      obj[m[1].toLowerCase()] = m[2].replace(/^["']|["']$/g, "")
-    }
-    if (!Object.keys(obj).length) return null
-  }
-
-  const answer = normalizeAnswer(obj.answer)
-  const limit = Number(obj.limit ?? obj.limitsec ?? obj.limitSec ?? 30)
+  const answer = normalizeAnswerBase(obj.answer)
+  // limitsec 是抢答态的历史键名（键已统一小写），保留识别防旧讲义失效
+  const limit = Number(obj.limit ?? obj.limitsec ?? 30)
   const id = obj.id ? String(obj.id) : null
   return {
     answer,
@@ -92,17 +77,9 @@ function parseQuizMeta(raw) {
 /**
  * 答案归一：字母（A–F，忽略大小写）或 0 基序号 → 0 基序号。
  * 认不出来返回 null——宁可让面板明确报「没设答案」，也不能猜错把分判反了。
+ * （实现委托 teaching-fences：0 基约定一处持有，课堂判分与平台判分同口径。）
  */
-function normalizeAnswer(value) {
-  if (value == null) return null
-  if (typeof value === "number") {
-    return Number.isInteger(value) && value >= 0 ? value : null
-  }
-  const text = String(value).trim()
-  if (/^[A-Fa-f]$/.test(text)) return text.toUpperCase().charCodeAt(0) - 65
-  if (/^\d+$/.test(text)) return Number(text)
-  return null
-}
+const normalizeAnswer = value => normalizeAnswerBase(value, "single")
 
 /** 标记里的参数是不是「至少读出点东西」——用来决定要不要把标记留在文档里。 */
 const isUsableMeta = meta => !!meta && meta.answer !== null

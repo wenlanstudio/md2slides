@@ -1,0 +1,26 @@
+{
+  "quizzes": [
+    {
+      "id": "m1",
+      "type": "multi",
+      "answer": [0, 2],
+      "point": 5,
+      "stem": "下面哪些属于 HDFS 的角色？",
+      "options": ["NameNode", "YARN", "DataNode", "ZooKeeper"]
+    },
+    {
+      "id": "f1",
+      "type": "fill",
+      "answer": "fs.defaultFS",
+      "stem": "HDFS 的核心配置项是 ______。"
+    },
+    {
+      "id": "e1",
+      "type": "essay",
+      "answer": null,
+      "stem": "谈谈你对数据本地性的理解。"
+    }
+  ],
+  "problems": [],
+  "warnings": []
+}

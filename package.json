@@ -69,7 +69,8 @@
     "shot:update": "node tools/shot-update.js",
     "snapshot:update": "node tools/ir-snapshot.js --update",
     "test:unit": "node --test \"test/unit/*.test.js\"",
-    "test": "npm run test:unit && node tools/check-deps.js && node tools/smoke.js && node tools/quiz-smoke.js && node tools/build-host.js && node e2e/check.js",
+    "test:teaching": "node --test \"core/teaching-fences/test/*.test.js\"",
+    "test": "npm run test:unit && npm run test:teaching && node tools/check-deps.js && node tools/smoke.js && node tools/quiz-smoke.js && node tools/build-host.js && node e2e/check.js",
     "pack:marktext": "node tools/build-host.js && node tools/pack-marktext.js"
   },
   "devDependencies": {

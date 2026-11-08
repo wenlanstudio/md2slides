@@ -1,0 +1,7 @@
+{
+  "problems": [
+    { "code": "QUIZ_ANSWER_OUT_OF_RANGE", "line": 1, "verb": "quiz" },
+    { "code": "QUIZ_NO_ANSWER", "line": 7, "verb": "quiz" }
+  ],
+  "warnings": []
+}

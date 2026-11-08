@@ -1,0 +1,8 @@
+{
+  "problems": [
+    { "code": "BAD_PATH", "line": 3, "verb": "check-file" },
+    { "code": "BAD_PATH", "line": 5, "verb": "check-code" },
+    { "code": "BAD_PATH", "line": 9, "verb": "match-output" }
+  ],
+  "warnings": []
+}

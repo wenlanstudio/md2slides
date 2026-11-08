@@ -1,0 +1,14 @@
+{
+  "options": { "requireIds": true },
+  "quizzes": [
+    { "id": "ok1", "answer": 0 },
+    { "id": "q2", "answer": 1 }
+  ],
+  "steps": [{ "id": "s1", "name": "配置环境", "point": 7, "asserts": 0 }],
+  "fills": [{ "id": "f1", "min": 30 }],
+  "problems": [
+    { "code": "ID_MISSING", "line": 7, "verb": "quiz" },
+    { "code": "ID_MISSING", "line": 17, "verb": "fill" }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,11 @@
+{
+  "quizzes": [
+    { "id": "dup", "stem": "第一题。" },
+    { "id": "dup", "stem": "同一 id 再来一次。" }
+  ],
+  "problems": [
+    { "code": "QUIZ_DUPLICATE_ID", "line": 7, "verb": "quiz" },
+    { "code": "QUIZ_NO_STEM", "line": 13, "verb": "quiz" }
+  ],
+  "warnings": []
+}

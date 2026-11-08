@@ -1,0 +1,16 @@
+{
+  "quizzes": [
+    {
+      "id": "jq1",
+      "type": "single",
+      "answer": 0,
+      "point": 10,
+      "limit": 300,
+      "shuffle": "yes",
+      "stem": "Shuffle 发生在哪个阶段之间？",
+      "options": ["Map 与 Reduce", "内存与磁盘"]
+    }
+  ],
+  "problems": [],
+  "warnings": []
+}

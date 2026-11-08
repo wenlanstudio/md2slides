@@ -1,0 +1,9 @@
+{
+  "quizzes": [
+    { "id": "w1", "answer": 3 }
+  ],
+  "problems": [],
+  "warnings": [
+    { "code": "SHUFFLE_POSITION_DEPENDENT", "line": 1 }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "quizzes": [
+    {
+      "id": "wc-q1",
+      "type": "single",
+      "answer": 1,
+      "point": 3,
+      "stem": "MapReduce 的数据本地性指的是？",
+      "options": ["数据存在内存", "计算靠近数据"]
+    }
+  ],
+  "fences": [
+    { "verb": "check-code", "lineStart": 21 },
+    { "verb": "match-output", "lineStart": 32 }
+  ],
+  "steps": [
+    { "id": "wc-s1", "name": "编写 Mapper", "point": 7, "asserts": 1 },
+    { "id": "wc-s2", "name": "运行并验证输出", "point": 7, "asserts": 2 }
+  ],
+  "fills": [{ "id": "wc-r1", "min": 30, "max": null }],
+  "problems": [],
+  "warnings": []
+}

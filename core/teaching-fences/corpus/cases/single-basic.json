@@ -1,0 +1,26 @@
+{
+  "quizzes": [
+    {
+      "id": "q1",
+      "type": "single",
+      "answer": 1,
+      "point": 3,
+      "limit": 30,
+      "shuffle": "yes",
+      "stem": "MapReduce 的数据本地性指的是？",
+      "options": ["数据存在内存", "计算靠近数据", "数据存到云上"]
+    },
+    {
+      "id": "q2",
+      "type": "single",
+      "answer": 2,
+      "point": 5,
+      "limit": 30,
+      "shuffle": "yes",
+      "stem": "1 + 1 = ?",
+      "options": ["一", "二", "三"]
+    }
+  ],
+  "problems": [],
+  "warnings": []
+}

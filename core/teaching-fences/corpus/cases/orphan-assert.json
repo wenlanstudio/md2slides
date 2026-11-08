@@ -1,0 +1,6 @@
+{
+  "steps": [{ "id": "s1", "asserts": 0 }],
+  "fences": [{ "verb": "check-code" }],
+  "problems": [{ "code": "ASSERT_ORPHAN", "line": 1, "verb": "check-code" }],
+  "warnings": []
+}
