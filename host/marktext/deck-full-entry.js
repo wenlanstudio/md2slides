@@ -140,7 +140,11 @@ const rpc = (kind, payload, timeoutMs = 30000) =>
   })
 
 const rpcDiagram = async block => {
-  if (block.type !== "graphviz" && block.type !== "plantuml") return undefined
+  // 页面里画不了的图表交给宿主（父页面）出位图：graphviz / plantuml / matplotlib。
+  // mermaid / echarts 是浏览器运行时，页面自己渲染，不走这条。
+  if (block.type !== "graphviz" && block.type !== "plantuml" && block.type !== "matplotlib") {
+    return undefined
+  }
   return rpc("diagram", { diagramType: block.type, source: block.source })
 }
 
@@ -419,6 +423,9 @@ const doBuild = async msg => {
       ms: Math.round(performance.now() - started),
     })
   } catch (error) {
+    // 协议只带人话 message；堆栈留给宿主日志——没有它，构建失败就只剩一句
+    // "Cannot read properties of undefined"，排障得靠猜。
+    console.error("[deck] build failed:", error)
     post({ type: "md2s:error", stage: "build", message: describeError(error) })
   }
 }

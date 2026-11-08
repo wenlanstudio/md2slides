@@ -96,7 +96,7 @@ front-matter（八键）、封面生成、关键词高亮、主题都在这里�
 
 ### 2.2 `renderDiagrams(doc, opts?) → Promise<{ rendered, types, pending }>`
 
-图表预通行：认出图表围栏（mermaid / graphviz / plantuml / echarts），调宿主钩子出位图，
+图表预通行：认出图表围栏（mermaid / graphviz / plantuml / echarts / matplotlib），调宿主钩子出位图，
 替换成 `<img>`（只缩不放）。**不接受缺图降级**：缺钩子 / 返回空 / 渲染抛错 → 抛
 `DiagramError` 中止。
 
@@ -331,8 +331,8 @@ core 调度宿主执行，与 `renderDiagram` 同构），没钩子 = 整块一�
 
 ## 5. 不在 API 内（边界声明）
 
-- **图表渲染引擎**（mermaid / echarts / plantuml / graphviz）：宿主职责，core 永不引入
-  （README「架构决策」铁律）。参考实现：`host/thin/`（graphviz / plantuml）、
+- **图表渲染引擎**（mermaid / echarts / plantuml / graphviz / matplotlib）：宿主职责，core 永不引入
+  （README「架构决策」铁律）。参考实现：`host/thin/`（graphviz / plantuml / matplotlib）、
   `e2e/mermaidHost.js`、`e2e/echartsHost.js`。**`host/` 不随 npm 包分发**，宿主参考实现
   在仓库里。
 - **PPTX sidecar**（python-pptx）：导出通道，进程外独立存在，幻灯片视图不依赖它。
