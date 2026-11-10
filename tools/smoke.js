@@ -1307,6 +1307,73 @@ check("查看器开着时输入不穿透到播放器（←→/滑动都不许翻
   root.remove()
 })
 
+check("翻页笔：Enter 开图 → 上/下一页遍历 → Enter 关闭 → 焦点归还", () => {
+  const { createDeckPlayer } = require("../kit/player")
+  const { mountLightbox } = require("../kit/lightbox")
+  const win = document.defaultView
+  const root = document.createElement("div")
+  document.body.appendChild(root)
+  root.innerHTML = '<section data-slide class="md2s-current"><p><img src="a.png" alt="甲图"></p></section>'
+    + "<section data-slide>B</section>"
+
+  let closedWith = null
+  const lb = mountLightbox(document, {
+    onClose: img => { closedWith = img; root.focus() },
+  })
+  const p = createDeckPlayer(root, { mode: "page", browse: true })
+  const img = root.querySelector("img")
+  const buttons = [...document.querySelectorAll(".md2s-lb-bar button")]
+  const actOf = () => document.activeElement?.getAttribute?.("data-act")
+  // 派到 root：player 的监听在这；事件向上冒泡时会被 lightbox 的 window capture 先拿走。
+  const keyAt = (k, extra) => root.dispatchEvent(new win.KeyboardEvent("keydown", {
+    key: k, bubbles: true, cancelable: true, ...(extra ?? {}),
+  }))
+
+  // 逐元素遍历链保持原样：先步进到第一个元素，再按确定键。
+  keyAt("ArrowDown")
+  assert.strictEqual(p.step, 1, "下一页应先步进到第一个元素")
+  keyAt("Enter")
+  assert.strictEqual(lb.isOpen, true, "当前步是图片时确定键应打开浮窗")
+  assert.strictEqual(p.index, 1, "打开浮窗不该翻页")
+  assert.strictEqual(p.step, 1, "打开浮窗不该推进当前步")
+
+  // 打开即落在 ✕（最短闭环）。
+  assert.strictEqual(actOf(), "close", "打开后焦点应默认落在 ✕")
+  assert.ok(buttons.includes(document.activeElement), "焦点应在工具条内")
+
+  // ✕ 是末项：按「下一页」不环绕。真机曾绕回工具条开头的 −，看起来像按错键。
+  keyAt("PageDown")
+  assert.strictEqual(actOf(), "close", "✕ 是末项，下一页应停在 ✕，不绕回 −")
+  keyAt("PageUp")
+  assert.strictEqual(actOf(), "one", "上一页应退到 1:1")
+  keyAt("PageDown")
+  assert.strictEqual(actOf(), "close", "下一页回到 ✕")
+  assert.ok(buttons.includes(document.activeElement), "焦点不许跑出浮窗")
+
+  // 翻页笔 OK 键常发空格：空格必须当确定键，不能当遍历键（真机复现过跳到 −）。
+  keyAt(" ")
+  assert.strictEqual(lb.isOpen, false, "空格作为确定键应关闭浮窗")
+  assert.strictEqual(closedWith, img, "onClose 应带回打开时那张图")
+  assert.strictEqual(document.activeElement, root, "焦点应还给播放器容器")
+
+  // Enter 路径同样可用；关闭后当前步仍是那张图，可以再次打开。
+  keyAt("Enter")
+  assert.strictEqual(lb.isOpen, true, "当前步仍是那张图，确定键可再次打开")
+  keyAt("Enter")
+  assert.strictEqual(lb.isOpen, false, "Enter 命中 ✕ 应关闭")
+
+  // 关闭后翻页笔继续走原来的逐元素遍历链。
+  keyAt("ArrowDown")
+  assert.strictEqual(p.index, 2, "关闭后下一步应照常溢出翻页（遍历链未变）")
+
+  // Esc 与浮窗内切图/缩放热键没有被键盘改造弄丢。
+  keyAt("Enter")
+  assert.strictEqual(lb.isOpen, false, "换页后当前步没有图，确定键不该开浮窗")
+  lb.destroy()
+  p.destroy()
+  root.remove()
+})
+
 check("容器无尺寸时缩放保底 1（不把内容缩没了）", () => {
   const { createDeckPlayer } = require("../kit/player")
   const root = document.createElement("div")

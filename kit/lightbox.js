@@ -38,6 +38,8 @@
  * | 双击 / 双 tap | 在「适应屏幕 ↔ 1:1 原像素」间切（手指下的像素保持不动） |
  * | ← → | 同页上一张 / 下一张（N/M 计数；跨图重置 pose） |
  * | 0 / 1 / + / − | 适应 / 1:1 / 放大 / 缩小 |
+ * | PgDn / ↓ / Tab（PgUp / ↑ / Shift+Tab） | 工具条按钮间移动焦点，到边界停住；打开时默认落在 ✕ |
+ * | Enter / 空格（翻页笔确定键） | 按下当前聚焦的按钮（落在 ✕ 即关闭） |
  * | Esc / 点背景 / ✕ | 关闭，回到原来那一页继续放映 |
  *
  * **输入隔离（集成要点）**：浮层 DOM 挂在 `<body>` 而不是 `#deck` 里，所以打开后绝大多数
@@ -100,7 +102,8 @@ const LIGHTBOX_CSS = `
  * @param {string} [opts.ignore]        额外忽略的选择器（默认已跳过本浮层与 exec / quiz 浮层）
  * @param {number} [opts.maxScale]      放大上限（相对原像素），默认 8
  * @param {Function}[opts.onOpen]       ({index, count, alt}) 打开回调
- * @param {Function}[opts.onClose]      关闭回调
+ * @param {Function}[opts.onClose]      (opener: HTMLImageElement) 关闭回调；宿主在此把焦点
+ *                                      还给播放器容器，当前步本来就还停在 opener 那张图上
  * @returns {{ openAt: Function, close: Function, refresh: Function, destroy: Function,
  *             isOpen: boolean, count: number, index: number, scale: number }}
  */
@@ -159,6 +162,35 @@ function mountLightbox(doc, opts = {}) {
   let pinch = null             // { d0, cx, cy, k0, tx0, ty0 }  cx/cy 为容器中点系坐标
   let tap = null               // { t, moved } 本次按下
   let lastTap = null           // { t, x, y } 上一次有效 tap（判双击）
+  let opener = null            // 打开时的那张图；关闭时交给宿主做焦点归还的锚点
+
+  /**
+   * 翻页笔只有「上一页 / 下一页 / 确定」三个键。浮窗开着时 onKey 在 window
+   * capture 上吞掉全部按键，所以焦点必须由我们自己搬，且只许落在工具条按钮上
+   * ——Tab 的默认移动已被 preventDefault，跑不出去，播放器也不会收到翻页键。
+   * 上一页/下一页（只有一张图时 prev/next 会 disabled）跳过不可用的按钮。
+   */
+  const focusables = [...el.querySelectorAll(".md2s-lb-bar button")]
+  const moveFocus = delta => {
+    if (!focusables.length) return
+    let i = focusables.indexOf(doc.activeElement)
+    if (i < 0) i = delta > 0 ? -1 : 0
+    // 到边界停住，不环绕：✕ 是末项，按「下一页」绕回工具条另一头（−）会让
+    // 讲课的人以为按错了，而且那样确定键就不再总是能关。翻页笔只有两三个键，
+    // 可预测比「绕得回来」重要。
+    for (let n = 0; n < focusables.length; n++) {
+      const next = i + delta
+      if (next < 0 || next >= focusables.length) return
+      i = next
+      if (!focusables[i].disabled) { focusables[i].focus(); return }
+    }
+  }
+  /** 打开即落在 ✕：看完按一下确定键就关，闭环最短；要放大再按上一页/下一页走。 */
+  const focusClose = () => {
+    const x = focusables.find(b => b.getAttribute("data-act") === "close")
+    if (x && !x.disabled) x.focus()
+    else moveFocus(1)
+  }
 
   /** 当前放映页：宿主各自的标记不同，故留 opts.currentSlide 覆盖位。 */
   const currentSlide = () => {
@@ -274,17 +306,22 @@ function mountLightbox(doc, opts = {}) {
       const Ctor = view?.CustomEvent ?? null
       if (Ctor) view.dispatchEvent(new Ctor("md2s-overlay-dismiss", { detail: { by: "lightbox" } }))
     } catch { /* 没有 CustomEvent 就算了，不因此打不开 */ }
+    opener = node
     opened = true
     el.hidden = false
     if (view?.requestAnimationFrame) view.requestAnimationFrame(() => el.classList.add("md2s-lb-on"))
     else el.classList.add("md2s-lb-on")
     view?.addEventListener?.("keydown", onKey, true)
     show(at)
+    // show() 才决定 prev/next 的 disabled，聚焦必须排在它后面。
+    focusClose()
     return true
   }
 
   const close = () => {
     if (!opened) return
+    const from = opener
+    opener = null
     opened = false
     pointers.clear()
     pinch = null
@@ -294,7 +331,7 @@ function mountLightbox(doc, opts = {}) {
     el.hidden = true
     el.classList.remove("md2s-lb-on", "md2s-lb-drag")
     img.removeAttribute("src")
-    opts.onClose?.()
+    opts.onClose?.(from)
   }
 
   /**
@@ -311,6 +348,23 @@ function mountLightbox(doc, opts = {}) {
       case "-": case "_": zoomBy(1 / 1.2); break
       case "0": zoomAt(fit, viewport().w / 2, viewport().h / 2); break
       case "1": zoomAt(1, viewport().w / 2, viewport().h / 2); break
+      // 翻页笔：上一页 / 下一页在工具条按钮间移动（到边界停住），Tab 同义（兼容鼠标党）。
+      // 默认的 Tab 移动被下面的 preventDefault 拦掉，焦点跑不出浮窗。
+      // 空格刻意**不**放在这里：很多翻页笔的确定键发 " " 而不是 "Enter"，
+      // 把它当遍历键会让「确定」变成「跳到 −」（真机复现过）。放映态里空格是
+      // 步进，但浮窗是模态，两处语义各自独立。
+      case "PageDown": case "ArrowDown": case "Tab":
+        moveFocus(e.shiftKey ? -1 : 1); break
+      case "PageUp": case "ArrowUp":
+        moveFocus(-1); break
+      case "Enter": case " ": {
+        // 确定键：按下当前聚焦的按钮（工具条只接 click，不接 keydown——老教训：
+        // 浮层可聚焦元素必须同时接 click，翻页笔/宿主未必派发原生键盘到按钮）。
+        const active = doc.activeElement
+        if (active && focusables.includes(active)) active.click()
+        else close()   // 焦点意外流到浮窗外：确定键当关闭，别把人卡住
+        break
+      }
       default: break
     }
     if (e.cancelable) e.preventDefault()

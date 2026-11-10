@@ -161,7 +161,12 @@ const run = async (opts = {}) => {
   if (opts.view === "list") {
     // 列表态：物理分页照常（真页 + 真主题），无播放器、无翻页步进。
     player = null
-    lightbox = lightbox ?? mountLightbox(document, { maxScale: 12 })
+    lightbox = lightbox ?? mountLightbox(document, {
+      maxScale: 12,
+      // 关闭浮窗后把焦点还给播放器容器（createDeckPlayer 会给 root 挂 tabindex="-1"）。
+      // 放映的当前步本来就停在打开时那张图上，游标无需恢复。
+      onClose: () => rootOf()?.focus?.(),
+    })
     const count = sectionsOf(document).length
     return { pages: count, index: 1, total: count, steps: 0, diagrams: diagram.rendered, player: null }
   }
@@ -174,7 +179,10 @@ const run = async (opts = {}) => {
     startIndex: opts.startIndex ?? 1,
   })
   player = created
-  lightbox = lightbox ?? mountLightbox(document, { maxScale: 12 })
+  lightbox = lightbox ?? mountLightbox(document, {
+    maxScale: 12,
+    onClose: () => rootOf()?.focus?.(),
+  })
   return {
     pages: sectionsOf(document).length,
     index: created.index,

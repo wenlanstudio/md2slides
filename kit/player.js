@@ -404,6 +404,17 @@ function createDeckPlayer(root, opts = {}) {
     if (el.matches?.("[data-md2s-activatable]")) return el
     return el.querySelector?.("[data-md2s-activatable]") ?? null
   }
+  /**
+   * 图片是「可看」而不是「可执行」：绝不给它打 `data-md2s-activatable`
+   * （那是 IR 的 skipSelector，打了图就会从导出里消失），也不套 wrapper。
+   * 裸 IMG 的 click() 会被 kit/lightbox 在 document capture 上的委托接住，
+   * 于是 player 完全不需要知道查看器存在——零耦合、图片 DOM 零改动。
+   */
+  const findImage = el => {
+    if (!el) return null
+    if (el.tagName === "IMG") return el
+    return el.querySelector?.("img") ?? null
+  }
   const activate = () => {
     const section = sections[index - 1]
     if (!section) return false
@@ -411,11 +422,11 @@ function createDeckPlayer(root, opts = {}) {
     if (stepping()) {
       const step = planFor(index - 1)[shownOf(index - 1) - 1]
       for (const t of step ? [step.el, ...(step.extra ?? [])] : []) {
-        target = findActivatable(t)
+        target = findActivatable(t) ?? findImage(t)
         if (target) break
       }
     } else {
-      target = section.querySelector("[data-md2s-activatable]")
+      target = section.querySelector("[data-md2s-activatable]") ?? section.querySelector("img")
     }
     if (!target) return false
     target.click()

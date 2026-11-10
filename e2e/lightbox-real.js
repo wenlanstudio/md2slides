@@ -193,6 +193,29 @@ const main = async () => {
     const stillPlaying = await page.evaluate(() => !!document.querySelector("#viewer, .md2s-player, section[data-slide]"))
     show(stillPlaying, "查看器关掉后放映页还在（Esc 没穿透到放映器）")
 
+    // —— 翻页笔真键盘：打开即落在 ✕，上一页/下一页遍历工具条，确定键关闭 ——
+    // 「Enter 打开图片」需要 player.activate，由 tools/smoke.js 的全链路用例覆盖；
+    // 独立放映器用的是自己的 show/go 键盘，这里只验真浏览器里的焦点与按键。
+    const actOf = () => page.evaluate(() => document.activeElement?.getAttribute?.("data-act") ?? null)
+    await page.mouse.click(cx, cy)
+    show((await actOf()) === "close", "打开后焦点默认落在 ✕")
+    await page.keyboard.press("PageDown")
+    show((await actOf()) === "close", "✕ 是末项，下一页不环绕（停在 ✕，不跳到 −）")
+    await page.keyboard.press("PageUp")
+    const back = await actOf()
+    show(back !== null && back !== "close", `上一页退到前一个按钮：${back}`)
+    await page.keyboard.press("PageDown")
+    show((await actOf()) === "close", "下一页回到 ✕")
+    await page.keyboard.press("Space")
+    st = await state()
+    show(!st.open, "确定键发空格（翻页笔常见）也应关闭查看器")
+    await page.mouse.click(cx, cy)
+    await page.keyboard.press("Enter")
+    st = await state()
+    show(!st.open, "确定键 Enter 命中 ✕ 应关闭查看器")
+    const stillPlaying2 = await page.evaluate(() => !!document.querySelector("#viewer, .md2s-player, section[data-slide]"))
+    show(stillPlaying2, "确定键关掉查看器后放映页还在（没穿透成翻页）")
+
     show(errors.length === 0, `页面无未捕获异常${errors.length ? `：${errors.join(" | ")}` : ""}`)
   } finally {
     await browser.close()
