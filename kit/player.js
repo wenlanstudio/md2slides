@@ -369,6 +369,12 @@ function createDeckPlayer(root, opts = {}) {
 
   const isEditable = t =>
     t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)
+  /**
+   * 焦点在原生可激活控件上时，键盘归控件。否则一次 Enter / 空格会双触发：
+   * 浏览器原生 click 一次，player 的 activate()/navKey 再吃一次——真机表现为
+   * 「确定键在顶部工具栏上还顺带按了下一页」。放映容器 #deck 是普通 div，不受影响。
+   */
+  const isNativeControl = t => !!(t?.closest?.("button, a[href], [role=\"button\"]"))
 
   // —— 翻页（两种模式同义；恢复目标页的步进状态）——
   const goto = k => show(k)
@@ -482,7 +488,8 @@ function createDeckPlayer(root, opts = {}) {
 
   const onKey = e => {
     if (e.ctrlKey || e.metaKey || e.altKey) return
-    if (isEditable(e.target)) return   // 宿主面板里可能有编辑框，别抢键
+    // 编辑框与原生按钮都归控件自己：别抢键、更别双触发
+    if (isEditable(e.target) || isNativeControl(e.target)) return
     if (navKey(e.key)) e.preventDefault()
   }
   const keyTarget = opts.keyTarget ?? root

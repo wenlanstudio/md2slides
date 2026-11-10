@@ -1268,6 +1268,7 @@ check("打开 / fit / 缩放钳制 / 拖动边界 / pinch / 同页切图 / Esc",
 
   key("Escape")
   assert.strictEqual(lb.isOpen, false, "Esc 应关闭")
+  assert.ok(!document.activeElement?.closest?.(".md2s-lb-bar"), "没接 onClose 时也不该把焦点留在已隐藏的工具条上")
   fire(document.body, "click")
   assert.strictEqual(lb.isOpen, false, "点空白不该打开")
   lb.destroy()
@@ -1370,6 +1371,35 @@ check("翻页笔：Enter 开图 → 上/下一页遍历 → Enter 关闭 → 焦
   keyAt("Enter")
   assert.strictEqual(lb.isOpen, false, "换页后当前步没有图，确定键不该开浮窗")
   lb.destroy()
+  p.destroy()
+  root.remove()
+})
+
+check("焦点在原生按钮上时 player 不抢键（确定键不双触发）", () => {
+  const { createDeckPlayer } = require("../kit/player")
+  const win = document.defaultView
+  const root = document.createElement("div")
+  document.body.appendChild(root)
+  root.innerHTML = '<section data-slide class="md2s-current"><button id="toolbar-next">下一页</button><p>A</p></section>'
+    + "<section data-slide>B</section>"
+  const p = createDeckPlayer(root, { mode: "page", browse: true })
+  const btn = root.querySelector("button")
+  btn.focus()
+  // 从当前焦点派发，冒泡到 #deck（player 的 keyTarget）
+  const keyAt = k => document.activeElement.dispatchEvent(
+    new win.KeyboardEvent("keydown", { key: k, bubbles: true, cancelable: true }))
+
+  keyAt("Enter")
+  assert.strictEqual(p.index, 1, "焦点在按钮上按确定键不该翻页")
+  assert.strictEqual(p.step, 0, "焦点在按钮上按确定键不该步进")
+  keyAt("ArrowDown")
+  assert.strictEqual(p.index, 1, "焦点在按钮上按 ↓ 不该翻页")
+  assert.strictEqual(p.step, 0, "焦点在按钮上按 ↓ 不该步进")
+
+  // 焦点回到放映容器后，键盘恢复正常（逐元素遍历链不变）
+  root.focus()
+  keyAt("ArrowDown")
+  assert.strictEqual(p.step, 1, "焦点回到放映容器后 ↓ 应恢复步进")
   p.destroy()
   root.remove()
 })

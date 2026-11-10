@@ -331,6 +331,11 @@ function mountLightbox(doc, opts = {}) {
     el.hidden = true
     el.classList.remove("md2s-lb-on", "md2s-lb-drag")
     img.removeAttribute("src")
+    // 宿主没接 onClose 时也不能把焦点留在已隐藏的按钮上：浏览器会把它搬到页面里
+    // 下一个可聚焦控件（常常正是顶部工具栏），下一次确定键就会误触导航。
+    if (typeof opts.onClose !== "function") {
+      try { doc.activeElement?.blur?.() } catch { /* 没有 blur 就算了 */ }
+    }
     opts.onClose?.(from)
   }
 

@@ -205,6 +205,9 @@ html, body { margin: 0; height: 100%; background: #20252b; overflow: hidden; }
   document.getElementById("prev").onclick = function () { go(-1); };
   document.getElementById("next").onclick = function () { go(1); };
   window.addEventListener("keydown", function (e) {
+    // 焦点在底部/顶部工具条按钮上时键盘归控件：否则原生 click 与这里的 go(1)
+    // 双触发，表现为按一下确定键却翻了一页。
+    if (e.target && e.target.closest && e.target.closest("button, a[href], input, textarea, select, [contenteditable]")) return;
     if (["ArrowRight","ArrowDown","PageDown"," ","Spacebar"].indexOf(e.key) >= 0) { e.preventDefault(); go(1); }
     else if (["ArrowLeft","ArrowUp","PageUp"].indexOf(e.key) >= 0) { e.preventDefault(); go(-1); }
     else if (e.key === "Home") { e.preventDefault(); show(0); }
@@ -273,7 +276,12 @@ html, body { margin: 0; height: 100%; background: #20252b; overflow: hidden; }
   var api = window.installMd2slides({});
   if (!api || !api.mountLightbox) return;
   api.mountLightbox(document, {
-    currentSlide: function () { return document.querySelector("#deck > section[data-slide].active"); }
+    currentSlide: function () { return document.querySelector("#deck > section[data-slide].active"); },
+    // 关闭浮窗后把焦点还给放映容器，别让它留在已隐藏的 ✕ 上被浏览器搬到 #bar。
+    onClose: function () {
+      var v = document.getElementById("viewer");
+      if (v) { v.setAttribute("tabindex", "-1"); v.focus(); }
+    }
   });
 })();
 </script>
