@@ -28,6 +28,41 @@ const DIAGRAM_TYPES = {
   matplotlib: "matplotlib",
 }
 
+/**
+ * 图表位图缓存（进程/页面内）。key = `${type} ${source}`。
+ * 仅缓存成功出位的位图结果；defer 的块不缓存。
+ *
+ * 注意：diagramHost 在浏览器 page 内运行，engine 每次 render 新建 page，
+ * 故本缓存在跨 render（反复放映）间不生效——跨放映秒开由 engine 整 deck
+ * 层（render.js 的 deckCache）保证。此处缓存服务于单次 render 内多遍
+ * only 调度复用，且不依赖任何 Node 专有 API（浏览器侧也可用）。
+ */
+const diagramCache = new Map()
+const DIAGRAM_CACHE_MAX = 600
+const diagramCacheKey = (type, source) => `${type} ${source}`
+function diagramCacheGet(type, source) {
+  const k = diagramCacheKey(type, source)
+  const v = diagramCache.get(k)
+  if (v) {
+    diagramCache.delete(k)
+    diagramCache.set(k, v) // 最近使用移到末尾（简易 LRU）
+  }
+  return v
+}
+function diagramCacheSet(type, source, payload) {
+  const k = diagramCacheKey(type, source)
+  if (diagramCache.has(k)) diagramCache.delete(k)
+  diagramCache.set(k, payload)
+  while (diagramCache.size > DIAGRAM_CACHE_MAX) {
+    const oldest = diagramCache.keys().next().value
+    if (oldest == null) break
+    diagramCache.delete(oldest)
+  }
+}
+function clearDiagramCache() {
+  diagramCache.clear()
+}
+
 /** 图表渲染的硬失败。带 type / source，好让报错直接指到是哪一块图。 */
 class DiagramError extends Error {
   constructor(message, detail = {}) {
@@ -155,7 +190,17 @@ const renderDiagrams = async (doc, opts = {}) => {
 
   const done = []
   const deferred = []
+  const useCache = opts.cache !== false
   for (const block of blocks) {
+    // 命中进程/页面内位图缓存：同一图表源码（type+source）跳过昂贵的运行时重绘。
+    if (useCache) {
+      const cached = diagramCacheGet(block.type, block.source)
+      if (cached) {
+        injectDiagram(doc, block.pre, { ...cached, type: block.type })
+        done.push(block.type)
+        continue
+      }
+    }
     let result
     try {
       result = await hook(block)
@@ -182,6 +227,14 @@ const renderDiagrams = async (doc, opts = {}) => {
       )
     }
     injectDiagram(doc, block.pre, { ...result, type: block.type })
+    if (useCache) {
+      diagramCacheSet(block.type, block.source, {
+        dataUrl: result.dataUrl,
+        png: result.png,
+        width: result.width,
+        height: result.height,
+      })
+    }
     done.push(block.type)
   }
 
@@ -219,4 +272,5 @@ module.exports = {
   injectDiagram,
   renderDiagrams,
   assertDiagramsRendered,
+  clearDiagramCache,
 }
