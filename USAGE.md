@@ -288,7 +288,7 @@ toc: true        # 开（缺省）；false 关；2 表示子项列到 H2
 
 | 用途 | 语言标记示例 |
 | --- | --- |
-| 图表渲染 | `plantUML` `mermaid` `chart` `echarts` `kanban` `graphviz` `matplotlib` |
+| 图表渲染 | `plantUML` `mermaid` `chart` `echarts` `kanban` `graphviz` `matplotlib` `svg` |
 | 可执行 | `python` `powershell` `bash` `hive` `mysql` |
 | 仅展示 | `sql` `shell`（通用语言标记，只上色不执行） |
 
@@ -302,9 +302,26 @@ toc: true        # 开（缺省）；false 关；2 表示子项列到 H2
 
 ### 4.3 图表渲染
 
-图表由**宿主**渲染成图（mermaid / echarts 浏览器运行时；graphviz 走 `dot`；plantuml 走 Java），
-引擎只消费结果图。**图表必须真渲染成功，否则构建直接报错**（不接受缺图降级）。
+图表由**宿主**渲染成图（mermaid / echarts / svg 在浏览器页面；graphviz 走 `dot`；
+plantuml 走 Java；matplotlib 走 Python），引擎只消费结果图。**图表必须真渲染成功，
+否则构建直接报错**（不接受缺图降级）。
 PlantUML 的 jar 不进仓库（GPL 二进制），先跑 `npm run fetch:plantuml` 下载，并准备 Java 11+。
+
+手写矢量图用 `svg` 围栏，不要贴内联 `<svg>` 或写 `![](x.svg)`：
+
+````markdown
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+  <circle cx="100" cy="50" r="40" fill="#D85A30"/>
+</svg>
+```
+````
+
+围栏内容必须是完整且合法的 SVG/XML，并写 `viewBox`（推荐）或数值 `width`/`height`；
+`width="100%"` 无法量尺寸会报错。页面侧把它栅格成 2x PNG，后续与 `mermaid` 出来的图
+完全同路：`<img>` → 图片核心 → IR image 块 → `.png` 媒体 → PPTX。
+外链图片、外部字体、`<foreignObject>` 在 SVG-as-image 里不绘制，会硬失败。
+详见 [README「手写 SVG 图」](README.md#手写-svg-图) 与 `e2e/fixtures/svg.md`。
 
 ---
 

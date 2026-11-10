@@ -85,7 +85,7 @@ const buildPage = async (md, {
   // 晚一步 overflow.js 量到的就是 0，IR 的几何跟着全错。
   const diagram = await renderDiagrams(composed.doc, {
     renderDiagram: renderDiagram ?? thinRenderDiagram,
-    // 只做 Node 侧会的那几种；mermaid 是浏览器运行时，留给页面那一遍。
+    // 只做 Node 侧会的那几种；mermaid / echarts / svg 要浏览器，留给页面那一遍。
     only: NODE_TYPES,
   })
   if (diagram.rendered > 0) {
@@ -140,8 +140,9 @@ const injectRuntime = async (page, deferred) => {
     window.md2slides = window.installMd2slides(window.__md2slides_externals)
   })
 
-  // 图表预通行第二遍：mermaid / echarts 是浏览器运行时，只能在页面里渲染。
-  // 两个 lib 都不小（mermaid 5.5 MB、echarts 1.1 MB），只在文档真用到时才注入。
+  // 图表预通行第二遍：mermaid / echarts 是浏览器运行时，svg 栅格要 canvas，
+  // 三者都只能在真页面里渲染。两个 lib 都不小（mermaid 5.5 MB、echarts 1.1 MB），
+  // 只在文档真用到时才注入；svg 不需要任何 lib。
   if (deferred.includes("mermaid")) {
     await page.addScriptTag({ path: require.resolve("../host/lib/mermaid.min.js") })
   }
@@ -149,7 +150,7 @@ const injectRuntime = async (page, deferred) => {
     await page.addScriptTag({ path: require.resolve("../host/lib/echarts.min.js") })
   }
   // 这一遍跑完会当场过 `assertDiagramsRendered` 闸门：谁都没接手的图表类型在这里炸。
-  // 不传 only：默认接管页面侧全部类型（mermaid + echarts）。
+  // 不传 only：默认接管页面侧全部类型（mermaid + echarts + svg）。
   return page.evaluate(() => window.md2slides.diagramPass({}))
 
   // 字体没就位就量，量到的是 fallback 字体的高度——中文字体尤其明显。

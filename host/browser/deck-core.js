@@ -68,7 +68,12 @@ const showAllSlides = () => {
   style.setAttribute("data-md2s-export", "")
   style.textContent = ".md2s-stage>section[data-slide]{display:flex!important;}"
   document.head.appendChild(style)
-  return () => style.remove()
+  // 契约 v1 §4.1：导出恒取静态终态，冻结宿主触发的动画（.md2s-anim-play）。
+  player?.freezeAnims?.()
+  return () => {
+    style.remove()
+    player?.unfreezeAnims?.()
+  }
 }
 
 let player = null
@@ -80,7 +85,8 @@ let player = null
 let lightbox = null
 
 /**
- * 图表预通行：mermaid / echarts 是浏览器运行时，页面侧用 host/browser 的真渲染器画。
+ * 图表预通行：mermaid / echarts 是浏览器运行时，svg 栅格要 canvas，
+ * 页面侧用 host/browser 的真渲染器画。
  *
  * 时序铁律（API.md）：必须在分页实测**之前**——晚一步 overflow.js 量到的就是 0，
  * IR 的几何跟着全错。跑完当场过 `assertDiagramsRendered` 闸门：接不了的图会在这里
@@ -119,6 +125,9 @@ const diagramPass = async (opts = {}) => {
  *   "list" = 幻灯片列表（形态模型 v2 §4）：**物理分页照跑**（真页），但不建播放器
  *   ——堆叠/缩放/溢出警告由页面侧（deck-full 的 applyListView）负责。同一 iframe
  *   实例的 view 恒定（宿主为 slide/present 两叶各开一个实例），rebuild 原样保留。
+ * @param {boolean} [opts.skipBuild] 第三方 HTML 放映稿分支（deck-full-entry 的
+ *   msg.html）：DOM 已由作者编排好（<section data-slide> + 画布排版），跳过图表预通行
+ *   / 物理分页 / 代码染色三道"改写 DOM"的工序，直接建播放器（见 html-slide.md）。
  * @returns {Promise<{pages: number, index: number, total: number, steps: number,
  *                     diagrams: number, player: object|null}>}
  *   player 是活的播放器句柄（activate/next/go/…）——**同源调用方**（宿主经
@@ -127,19 +136,24 @@ const diagramPass = async (opts = {}) => {
  *   list 视图 player 为 null。
  */
 const run = async (opts = {}) => {
+  // 第三方 HTML 放映稿：DOM 已由作者编排（<section data-slide> + 画布排版），
+  // 跳过改写 DOM 的三道工序（图表预通行 / 物理分页 / 代码染色），直接建播放器。
+  const skipBuild = opts.skipBuild === true
   // 图表预通行先行：浏览器类型图先画完（外加宿主托渲染的类型），再谈测量。
-  const diagram = await diagramPass(opts)
-  const paginateOpts = {
-    slideWidth: opts.slideWidth,
-    slideHeight: opts.slideHeight,
-    meta: opts.meta ?? null,
-    contMarker: opts.contMarker ?? "（续）",
-    margin: opts.margin ?? 1,
+  const diagram = skipBuild ? { rendered: 0 } : await diagramPass(opts)
+  if (!skipBuild) {
+    const paginateOpts = {
+      slideWidth: opts.slideWidth,
+      slideHeight: opts.slideHeight,
+      meta: opts.meta ?? null,
+      contMarker: opts.contMarker ?? "（续）",
+      margin: opts.margin ?? 1,
+    }
+    paginate(paginateOpts)
+    // 切页会丢高亮 span，收敛后必须补染（API.md 时序铁律 2）
+    const painted = highlightCode(document)
+    if (painted > 0) paginate(paginateOpts)
   }
-  paginate(paginateOpts)
-  // 切页会丢高亮 span，收敛后必须补染（API.md 时序铁律 2）
-  const painted = highlightCode(document)
-  if (painted > 0) paginate(paginateOpts)
 
   // 原地重建（deck-full 的防抖 rebuild 会重调 run）：先拆旧播放器，键盘/触屏监听
   // 不许累积。首次运行为 null，Typora 形态不受影响。
@@ -273,6 +287,8 @@ const exportImages = async (opts = {}) => {
     // 否则代码块角落会带着小按钮出图；可编辑型走 IR 抽取，不受此影响。
     "[data-md2s-activatable]{display:none!important;}"
   document.head.appendChild(style)
+  // 契约 v1 §4.1：逐页栅格也取静态终态，冻结宿主触发的动画。
+  player?.freezeAnims?.()
   const urls = []
   try {
     for (const sec of sections) {
@@ -287,6 +303,7 @@ const exportImages = async (opts = {}) => {
     }
   } finally {
     style.remove()
+    player?.unfreezeAnims?.()
   }
   return urls
 }

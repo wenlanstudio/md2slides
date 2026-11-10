@@ -24,6 +24,9 @@ const DIAGRAM_TYPES = {
   plantuml: "plantuml",
   puml: "plantuml",
   echarts: "echarts",
+  // svg 是作者手写的完整 <svg> 源码：浏览器侧栅格成 PNG（见 host/browser/svgHost）。
+  // 不是"把 SVG 塞进 deck"——预通行结束时它已经是 <img>，与其余图表同一份位图契约。
+  svg: "svg",
   // matplotlib 不是浏览器运行时：core 只认类型，真出图由宿主 spawn Python（见 host/thin）。
   matplotlib: "matplotlib",
 }

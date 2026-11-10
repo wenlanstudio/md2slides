@@ -12,9 +12,9 @@
 /**
  * 薄宿主在 **Node 侧**能渲染的图表类型。
  *
- * mermaid / echarts 是浏览器运行时，Node 侧没有，留给页面那一遍（见 `e2e/pageDiagram.js`）。
- * 注意这不是"降级跳过"：它们只是换了个环境渲染，最后统一由
- * `assertDiagramsRendered()` 兜底，谁都没接手就硬失败。
+ * mermaid / echarts 是浏览器运行时，```svg 的栅格要 `Image` + `canvas`（jsdom 没有），
+ * 三者都留给页面那一遍（见 `e2e/pageDiagram.js`）。注意这不是"降级跳过"：它们只是
+ * 换了个环境渲染，最后统一由 `assertDiagramsRendered()` 兜底，谁都没接手就硬失败。
  */
 const NODE_TYPES = ["graphviz", "plantuml", "matplotlib"]
 
@@ -37,6 +37,12 @@ const renderDiagram = async block => {
       return renderMatplotlib(block.source)
     default:
       // 铁律：不接受占位降级。渲染不了就明明白白报错，让构建停下来，别拿灰块糊弄。
+      if (block.type === "svg") {
+        throw new Error(
+          "```svg 需要在真浏览器页面里栅格成 PNG（jsdom 没有 canvas）。" +
+            "请把 svg 留在 deferred 里、页面侧跑 diagramPass()；或提前导出 PNG 改用 ![](x.png)。",
+        )
+      }
       throw new Error(`薄宿主还没接 ${block.type} 的渲染器（图表必须真渲染，不接受降级）`)
   }
 }

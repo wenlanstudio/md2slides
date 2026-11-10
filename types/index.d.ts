@@ -81,7 +81,7 @@ export interface DiagramBlock {
   pre: HTMLElement
   code: HTMLElement
   lang: string
-  type: "mermaid" | "graphviz" | "plantuml" | "echarts" | string
+  type: "mermaid" | "graphviz" | "plantuml" | "echarts" | "svg" | "matplotlib" | string
   source: string
 }
 

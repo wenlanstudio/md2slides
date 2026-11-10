@@ -181,7 +181,8 @@ const report = (opts = {}) => {
 }
 
 /**
- * 页面侧的图表预通行：mermaid / echarts 只能在这里渲染（都是浏览器运行时，Node 侧没有）。
+ * 页面侧的图表预通行：mermaid / echarts 是浏览器运行时，svg 栅格要 canvas，
+ * 三者都只能在这里渲染（Node 侧没有）。
  *
  * 跑完立刻过闸门 `assertDiagramsRendered`——谁都没接手的图表类型会在这里炸出来，
  * 这是"不接受缺图降级"的兜底。

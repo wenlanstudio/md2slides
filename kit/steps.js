@@ -132,6 +132,11 @@ function baseStepsOfBlock(el, steppers, issues) {
  */
 function buildStepPlan(section, opts = {}) {
   const issues = opts.issues ?? []
+  // 空页 / 越界索引：deck 一页都没有时，player 的 show(1)→emit→stepCountOf(0)
+  // →planFor(0) 会把 sections[0] === undefined 传进来。此时若读 section.querySelector
+  // 就会抛 "Cannot read properties of undefined (reading 'querySelector')"——第三方
+  // HTML 放映稿（0 个 <section data-slide>）正是这条路径。给空步表即可，别炸。
+  if (!section) return []
   // 封面（div.cover 由引擎生成）：整页锚点，没有步
   if (section.querySelector?.(":scope > .cover")) return []
   // 章节目录页（toc.js）：整页一次出现（2026-10-30 拍板）。目录的作用是"一眼看到

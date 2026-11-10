@@ -11,11 +11,14 @@
  * 桥协议（postMessage，设计稿 integration-marktext.md §5.3）：
  *   页面 → 宿主  {type:"md2s:boot"}                     页面就绪（脚本装载完毕，可收 build）
  *   宿主 → 页面  {type:"md2s:build", md, mdDir, runOpts?{mode,browse,startIndex}}
+ *              | {type:"md2s:build", html, mdDir, runOpts?…}      （HTML 放映稿，契约 v1）
  *   页面 → 宿主  {type:"md2s:ready", pages, index, total, steps, diagrams, images,
  *                 slideWidth, slideHeight, meta, theme, ms}
  *              | {type:"md2s:change", index, total, step, steps, mode}
  *              | {type:"md2s:warn", message}                       （缺图占位等非致命提示）
  *              | {type:"md2s:error", stage:"build", message}
+ *              | {type:"md2s:error", stage:"validate", code:"E_CONTRACT_VIOLATION",
+ *                 contractVersion, message, issues[], rawCount}   （HTML 契约校验拒绝）
  *              | {type:"md2s:rpc", id, kind:"diagram", diagramType, source}
  *   宿主 → 页面  {type:"md2s:rpc-result", id, ok, dataUrl?|error?}   （图表托渲染应答）
  *   宿主 → 页面  {type:"md2s:export", id, kind:"image"|"editable",
@@ -41,6 +44,11 @@ const deckCore = require("../browser/deck-core")
 const { compose } = require("../../core/compose")
 const { sectionsOf } = require("../../core/section")
 const { CONT_CLASS } = require("../../core/paginate/overflow")
+const {
+  validateHtmlDeck,
+  formatIssues,
+  CONTRACT_VERSION,
+} = require("../../core/htmlDeck/validate")
 
 // html-to-image 在本形态是 bundle 模块（sourceRoots 含 lib）；deck-core 的
 // ir()/exportImages() 读 window.htmlToImage（Typora 形态由 srcdoc 内联脚本提供）——挂上。
@@ -350,10 +358,141 @@ const waitForDeckImages = async (timeoutMs = 10000) => {
   markMissingImages()
 }
 
+/** 宿主钉死画布（契约 §5）：只管尺寸/盒模型，配色与排版交文稿 <style>。
+ *  每次 rebuild 重写内容（同一 iframe 可能换用不同画布），但只挂一个 style 节点。 */
+const injectHtmlBaseCss = (sw, sh) => {
+  let el = document.getElementById("md2slides-html-base-css")
+  if (!el) {
+    el = document.createElement("style")
+    el.id = "md2slides-html-base-css"
+    document.head.appendChild(el)
+  }
+  el.textContent = `
+section[data-slide] {
+  position: relative;
+  box-sizing: border-box;
+  width: ${sw}px;
+  height: ${sh}px;
+  overflow: hidden;
+}
+`
+}
+
+/** 文稿 <style> 统一挂到 head（每次 rebuild 全量替换，避免旧样式残留）。 */
+const injectDeckStyles = styles => {
+  let el = document.getElementById("md2slides-html-deck-css")
+  if (!el) {
+    el = document.createElement("style")
+    el.id = "md2slides-html-deck-css"
+    document.head.appendChild(el)
+  }
+  el.textContent = styles.map(s => s.textContent || "").join("\n")
+}
+
+/**
+ * 第三方 HTML 放映稿分支（msg.html）——契约 v1 的宿主实现，见
+ * md2slides/docs/html-deck-contract.md。
+ *
+ * §2 摄取模型：DOMParser 解析 → ② validateHtmlDeck 校验（有 error 即结构化拒绝、
+ * 不注入、不包装、不降级）→ ③ 只提取唯一 #deck 子树 + 全部 <style> →
+ * ⑤ importNode 注入宿主 #deck → deckCore.run({skipBuild:true})。
+ */
+const buildHtml = async (msg, started) => {
+  // ① 解析：独立于宿主 DOM，校验器看到的就是作者写的那份文稿。
+  const source = String(msg.html ?? "")
+  const parsed = new DOMParser().parseFromString(source, "text/html")
+
+  // ② 校验：硬契约，有任何 error 就拒绝（P7）。
+  const verdict = validateHtmlDeck(parsed)
+  if (!verdict.ok) {
+    post({
+      type: "md2s:error",
+      stage: "validate",
+      code: "E_CONTRACT_VIOLATION",
+      contractVersion: CONTRACT_VERSION,
+      message: formatIssues(verdict),
+      issues: verdict.issues,
+      rawCount: verdict.rawCount,
+    })
+    return
+  }
+
+  const sw = verdict.canvas.width
+  const sh = verdict.canvas.height
+  const root = document.getElementById("deck") ?? document.body
+  const savedScroll = document.documentElement.classList.contains("md2s-list")
+    ? window.scrollY
+    : 0
+
+  // ③ 提取有效载荷；④ 外壳/垃圾节点一律丢弃。
+  const sourceDeck = parsed.querySelector("#deck")
+  const styles = [...parsed.querySelectorAll("style")]
+  injectHtmlBaseCss(sw, sh)
+  injectDeckStyles(styles)
+  root.innerHTML = ""
+  for (const child of [...sourceDeck.children]) {
+    if (child.tagName === "STYLE") continue // 已统一进 head
+    root.appendChild(document.importNode(child, true))
+  }
+
+  // 相对图片改道到本地服务（与 md 分支同款 /f?p=；allowRoots 含 mdDir）。
+  if (msg.mdDir) rewriteImages(document, msg.mdDir)
+  // 缺图必须赶在测量前换成占位（坏图 0 宽 vs 占位有真实几何）。
+  await waitForDeckImages()
+
+  const { mode, browse, startIndex, view } = msg.runOpts ?? {}
+  const result = await deckCore.run({
+    slideWidth: sw,
+    slideHeight: sh,
+    meta: null,
+    renderDiagramHost: rpcDiagram,
+    onChange: ({ index, total, step, steps, mode: m }) =>
+      post({ type: "md2s:change", index, total, step, steps, mode: m }),
+    mode,
+    browse,
+    startIndex,
+    view,
+    skipBuild: true,
+  })
+  const warnings = view === "list" ? applyListView(sw) : 0
+  if (view === "list") window.scrollTo(0, savedScroll)
+
+  // SHOULD 级建议随 warn 提示，不阻止放映。
+  const notes = []
+  for (const w of verdict.warns) {
+    notes.push(`[${w.rule}] ${w.message}${w.count > 1 ? `（×${w.count}）` : ""}`)
+  }
+  if (missingImages.length) {
+    notes.push(`缺图 ${missingImages.length} 张，已用占位图：${[...new Set(missingImages)].join("、")}`)
+  }
+  if (notes.length) post({ type: "md2s:warn", message: notes.join("；") })
+
+  post({
+    type: "md2s:ready",
+    pages: result.pages,
+    index: result.index,
+    total: result.total,
+    steps: result.steps,
+    diagrams: result.diagrams,
+    images: 0,
+    slideWidth: sw,
+    slideHeight: sh,
+    meta: null,
+    theme: null,
+    warnings,
+    ms: Math.round(performance.now() - started),
+  })
+}
+
 const doBuild = async msg => {
   const started = performance.now()
   missingImages = []
   try {
+    // 第三方 HTML 放映稿：绕开 compose，已编排好的 DOM 直接建播放器。
+    if (msg.html != null) {
+      await buildHtml(msg, started)
+      return
+    }
     await warmAssets()
     await ensureDiagramLibs(msg.md ?? "")
     const deck = compose(msg.md ?? "", {

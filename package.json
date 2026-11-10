@@ -64,6 +64,7 @@
     "e2e": "node e2e/check.js",
     "e2e:lightbox": "node e2e/lightbox-real.js",
     "e2e:tap": "node e2e/tap-real.js",
+    "e2e:svg": "node e2e/svg-fence-real.js",
     "html": "node tools/export-html.js",
     "snapshot": "node tools/ir-snapshot.js",
     "shot:update": "node tools/shot-update.js",

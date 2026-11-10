@@ -62,6 +62,13 @@ const { createSwipe } = require("./swipe")
 const PLAYER_CSS_ID = "md2s-player-css"
 
 /**
+ * 契约 v1 §4.1 的宿主保留类：文稿只能把动画声明挂在 .md2s-anim-play 之下，
+ * 由播放器在「页进入 / 步成为当前」时加上、离开时移除。与
+ * core/htmlDeck/validate.js 的 ANIM_PLAY_CLASS 是同一个字面量（单测两侧都断言）。
+ */
+const ANIM_PLAY_CLASS = "md2s-anim-play"
+
+/**
  * 轻点导航的默认禁区：点在这些东西上「有自己的事要办」，不该顺手翻页。
  *   - a[href] / button / 表单控件 / label → 本来就等一次点击；
  *   - img / svg / video / audio → 图开了查看器（kit/lightbox，点图全屏），图里点不翻；
@@ -262,6 +269,68 @@ function createDeckPlayer(root, opts = {}) {
 
   const shownOf = i => shown.get(i) ?? 0
 
+  // —— 契约 v1 §4.1：宿主按播放进度触发文稿动画 ——
+  // 文稿只能把 animation 写在 .md2s-anim-play 之下（校验器强制），播放器决定
+  // 什么时候加这个类。活跃集合 = 当前页里「不属于任何步」的元素（页级，进入即播）
+  // ∪ 当前步所属元素内的元素（步级，成为当前步才播）。离开就移除 → 回看重播。
+  let animActive = new Set()
+  let animFrozen = false
+
+  const animElsOf = root => {
+    const out = []
+    if (root.matches?.("[data-md2s-anim]")) out.push(root)
+    for (const el of root.querySelectorAll?.("[data-md2s-anim]") ?? []) out.push(el)
+    return out
+  }
+
+  const syncAnims = () => {
+    const wanted = new Set()
+    const sec = sections[index - 1]
+    if (sec && !animFrozen) {
+      if (!stepping()) {
+        // 纯翻页形态：页进入即触发页内全部动画
+        for (const el of animElsOf(sec)) wanted.add(el)
+      } else {
+        const plan = planFor(index - 1)
+        const inStep = new Set()
+        for (const step of plan) {
+          for (const r of [step.el, ...(step.extra ?? [])]) {
+            for (const el of animElsOf(r)) inStep.add(el)
+          }
+        }
+        const cur = shownOf(index - 1) - 1
+        if (cur >= 0 && plan[cur]) {
+          for (const r of [plan[cur].el, ...(plan[cur].extra ?? [])]) {
+            for (const el of animElsOf(r)) wanted.add(el)
+          }
+        }
+        // 标题 / 家具 / 封面锚点等不属于任何步的元素：页级触发
+        for (const el of animElsOf(sec)) if (!inStep.has(el)) wanted.add(el)
+      }
+    }
+    for (const el of animActive) {
+      if (!wanted.has(el)) el.classList.remove(ANIM_PLAY_CLASS)
+    }
+    for (const el of wanted) {
+      if (animActive.has(el)) continue
+      // 移除 → 强制重排 → 重新加类，保证回退再前进时能重播（而非停在终态）
+      el.classList.remove(ANIM_PLAY_CLASS)
+      void el.offsetWidth
+      el.classList.add(ANIM_PLAY_CLASS)
+    }
+    animActive = wanted
+  }
+
+  const freezeAnims = () => {
+    animFrozen = true
+    for (const el of animActive) el.classList.remove(ANIM_PLAY_CLASS)
+    animActive = new Set()
+  }
+  const unfreezeAnims = () => {
+    animFrozen = false
+    syncAnims()
+  }
+
   const show = k => {
     index = Math.max(1, Math.min(total, k))
     sections.forEach((s, i) => s.classList.toggle("md2s-current", i === index - 1))
@@ -278,6 +347,8 @@ function createDeckPlayer(root, opts = {}) {
       step: stepping() ? shownOf(index - 1) : 0,
       steps: stepping() ? stepCountOf(index - 1) : 0,
     })
+    // 翻页/步进/切形态之后，按新的播放进度刷新动画触发类。
+    syncAnims()
   }
 
   /** 容器没有尺寸（刚挂载 / 测试环境）时保持 1，不把内容缩没了。 */
@@ -540,6 +611,9 @@ function createDeckPlayer(root, opts = {}) {
       show(index)
     },
     fit,
+    /** 导出前冻结动画（契约 §4.1）：IR/PPTX/栅格恒取静态终态，可复现。 */
+    freezeAnims,
+    unfreezeAnims,
     destroy: () => {
       if (opts.keys !== false) keyTarget.removeEventListener("keydown", onKey)
       swipe?.destroy()
@@ -548,6 +622,7 @@ function createDeckPlayer(root, opts = {}) {
       stage.style.removeProperty("transition")
       ro?.disconnect()
       clearSteps()
+      freezeAnims()   // 文稿节点搬回原位前复位到静态终态
       for (const s of sections) root.appendChild(s)   // 原序搬回
       stage.remove()
       root.classList.remove("md2s-player")
@@ -555,4 +630,4 @@ function createDeckPlayer(root, opts = {}) {
   }
 }
 
-module.exports = { createDeckPlayer, PLAYER_CSS, TAP_IGNORE }
+module.exports = { createDeckPlayer, PLAYER_CSS, TAP_IGNORE, ANIM_PLAY_CLASS }

@@ -175,6 +175,29 @@ md2slides.checkIr(iframeDoc, ir)
 
 完整写作规范见 [USAGE.md](USAGE.md)。
 
+### 手写 SVG 图
+
+矢量图请写进 **svg 围栏**，内容是完整的 `<svg>` 源码——不要在正文里贴内联 `<svg>` 标签，
+也不要用 `![](x.svg)`：
+
+````markdown
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+  <circle cx="100" cy="50" r="40" fill="#D85A30"/>
+</svg>
+```
+````
+
+引擎在真浏览器页面里把它栅格成 2x PNG 再插进 deck，于是分页把它当图片核心保护、放映时
+点得开大图，图片型 / 可编辑型 PPTX 和离线单文件 HTML 全都通。约定：
+
+- **必须写 `viewBox`**（推荐）或数值 `width`/`height`；`width="100%"` 没有可量基准，直接报错
+- 源码要是合法 XML（`&` 写成 `&amp;`）；外链图片、外部字体、`<foreignObject>` 在
+  SVG-as-image 里画不出来，会硬失败而不是给一张空白图
+- 栅格需要 `canvas`，Node 侧 jsdom 跑不了：把 `svg` 留在 deferred，页面侧跑 `diagramPass()`
+
+示例：[e2e/fixtures/svg.md](e2e/fixtures/svg.md)；全链路冒烟：`node e2e/svg-fence-real.js`。
+
 ## 分页怎么工作
 
 **逻辑分页**按标题层级把文档切成页，只认结构，不管装不装得下。

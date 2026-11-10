@@ -96,21 +96,30 @@ front-matter（八键）、封面生成、关键词高亮、主题都在这里�
 
 ### 2.2 `renderDiagrams(doc, opts?) → Promise<{ rendered, types, pending }>`
 
-图表预通行：认出图表围栏（mermaid / graphviz / plantuml / echarts / matplotlib），调宿主钩子出位图，
+图表预通行：认出图表围栏（mermaid / graphviz / plantuml / echarts / matplotlib / svg），调宿主钩子出位图，
 替换成 `<img>`（只缩不放）。**不接受缺图降级**：缺钩子 / 返回空 / 渲染抛错 → 抛
 `DiagramError` 中止。
 
 | opts | 说明 |
 |---|---|
 | `renderDiagram(block)` | 宿主钩子。`block = { pre, code, lang, type, source }`；返回 `{ dataUrl \| png, width?, height? }`，**必须给位图**（SVG 由宿主先栅格成 PNG）；也可返回 `{ defer: true } = 这一遍不接，块原样留给下一遍`（块级版 `only`——同类型不同块归宿不同时用，如带编辑器的宿主：有 panel 的 mermaid 父侧收割，没 panel 的 defer 给页面侧） |
-| `only` | `string[]`：这一遍只处理这些类型（分环境多遍：graphviz 在 Node、mermaid 在页面） |
+| `only` | `string[]`：这一遍只处理这些类型（分环境多遍：graphviz 在 Node、mermaid / echarts / svg 在页面） |
 | `settle` / `frames` | 是否等帧让异步图铺开（默认 true / 2 帧） |
 
 返回值的 `pending` = 被 defer 遗留的类型（去重）——调用方据此决定下一遍要谁接手、
-要不要注入对应运行时（宿主按它条件内联 mermaid / echarts 库）。
+要不要注入对应运行时（宿主按它条件内联 mermaid / echarts 库；`svg` 不需要额外库，
+但必须在有 `canvas` 的真页面里跑，jsdom 不行）。
 
 配套：`assertDiagramsRendered(doc)`——所有预通行跑完后调一次，仍有未渲染围栏即抛
 `DiagramError`。
+
+**svg 围栏的契约**：`block.source` 是完整的 SVG/XML 源码（不是片段、不是路径）。
+浏览器侧参考实现 `host/browser/svgHost.js` 校验根元素与固有尺寸（`viewBox` 优先），
+剥掉非法 XML 注释后用 `core/render/diagram.js::rasterizeSvg` 出 2x PNG data URL，
+返回 `{ dataUrl, width, height }`。围栏随即被换成普通的 `<img class="md2slides-diagram">`，
+所以下游（分页的图片核心、lightbox、IR image 块、media 落盘 `.png`、两种 PPTX）
+完全不知道它原本是 SVG。缺 `viewBox` / 百分比尺寸 / 非法 XML / `foreignObject` /
+栅格空白一律抛错，不出占位图。
 
 ### 2.3 `splitOverflow(doc, opts?) → number`
 
@@ -331,10 +340,10 @@ core 调度宿主执行，与 `renderDiagram` 同构），没钩子 = 整块一�
 
 ## 5. 不在 API 内（边界声明）
 
-- **图表渲染引擎**（mermaid / echarts / plantuml / graphviz / matplotlib）：宿主职责，core 永不引入
+- **图表渲染引擎**（mermaid / echarts / svg / plantuml / graphviz / matplotlib）：宿主职责，core 永不引入
   （README「架构决策」铁律）。参考实现：`host/thin/`（graphviz / plantuml / matplotlib）、
-  `e2e/mermaidHost.js`、`e2e/echartsHost.js`。**`host/` 不随 npm 包分发**，宿主参考实现
-  在仓库里。
+  `host/browser/`（mermaid / echarts / svg，`e2e/pageDiagram.js` 是转发 shim）。
+  **`host/` 不随 npm 包分发**，宿主参考实现在仓库里。
 - **PPTX sidecar**（python-pptx）：导出通道，进程外独立存在，幻灯片视图不依赖它。
 - **源码行映射**：✅ 已内置（`srcRange`，见 §2.5）；增量重排（section 级脏标记）在
   IR_v3 P1（`docs/design/IR_v3.md`）。
