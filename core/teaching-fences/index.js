@@ -19,6 +19,7 @@ module.exports = {
   // 语法常量（宿主据此决定要不要把某个注释/围栏交给本模块）
   COMMAND_VERBS: require("./src/verbs").COMMAND_VERBS,
   FENCE_VERBS: require("./src/verbs").FENCE_VERBS,
+  QUIZ_FENCE_VERBS: require("./src/verbs").QUIZ_FENCE_VERBS,
   ASSERT_VERBS: require("./src/verbs").ASSERT_VERBS,
   // 教学围栏的默认节点动作（喂给 md2slides 的围栏策略钩子 fencePolicy）
   FENCE_ACTIONS: require("./src/verbs").FENCE_ACTIONS,

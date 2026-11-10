@@ -17,6 +17,8 @@ const {
   normalizeAnswer,
   COMMAND_VERBS,
   FENCE_VERBS,
+  QUIZ_FENCE_VERBS,
+  FENCE_ACTIONS,
 } = require("../index.js")
 
 // ---- parseParams：双形式（SPEC §一.2）----
@@ -103,7 +105,22 @@ test("hasPositionDependency: 信号词与字母引用", () => {
 
 // ---- 动词表（SPEC §十：v0 收录 7 个）----
 
-test("动词白名单 = 4 注释 + 3 围栏", () => {
+test("动词白名单 = 4 注释 + 3 载荷围栏 + 1 题面围栏", () => {
   assert.deepStrictEqual([...COMMAND_VERBS].sort(), ["check-file", "fill", "quiz", "step"])
   assert.deepStrictEqual([...FENCE_VERBS].sort(), ["check-code", "match-output", "sql-result"])
+  assert.deepStrictEqual([...QUIZ_FENCE_VERBS], ["quiz"])
+  // 题面围栏与载荷围栏产物命运相反：绝不能被默认 hide 一起吞掉
+  for (const verb of FENCE_VERBS) assert.equal(FENCE_ACTIONS[verb], "hide")
+  assert.notEqual(FENCE_ACTIONS.quiz, "hide", "quiz 是题面，不是秘密")
+})
+
+test("parseFenceInfo: ```quiz info-string 与注释族共用参数语法", () => {
+  assert.deepStrictEqual(parseFenceInfo('quiz id=q1 answer=B point=3 shuffle=no'), {
+    verb: "quiz",
+    params: { id: "q1", answer: "B", point: "3", shuffle: "no" },
+  })
+  assert.deepStrictEqual(parseFenceInfo('quiz {"id":"q2","answer":"AC","type":"multi"}'), {
+    verb: "quiz",
+    params: { id: "q2", answer: "AC", type: "multi" },
+  })
 })

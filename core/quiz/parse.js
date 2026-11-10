@@ -159,6 +159,28 @@ function registerQuiz(instance) {
 }
 
 /**
+ * 元素的「人话文本」。
+ *
+ * KaTeX 渲染一个公式会输出三份内容（MathML 无障碍层 + katex-html 可见层 +
+ * annotation 里的 TeX 原文），直接取 textContent 会把公式重复三遍——放映页
+ * 看着正常，可题目发到学生手机上就成了 `n(n+1)n(n+1)n(n+1)`。把每个
+ * .katex 节点换回 `$<annotation>$`，文本侧就恢复成作者写的 TeX。
+ * 双轨语法鼓励在题面写公式，这一层必须跟上；不含公式的题走原路径，零开销。
+ */
+function textOf(el) {
+  if (!el) return ""
+  if (!el.querySelector || !el.querySelector(".katex")) {
+    return (el.textContent || "").trim()
+  }
+  const clone = el.cloneNode(true)
+  for (const node of [...clone.querySelectorAll(".katex")]) {
+    const tex = node.querySelector("annotation")?.textContent || ""
+    node.replaceWith(clone.ownerDocument.createTextNode(tex ? `$${tex}$` : ""))
+  }
+  return (clone.textContent || "").trim()
+}
+
+/**
  * 从渲染产物（DOM）里读出一道题。宿主（kit/quiz）用它把 DOM 上的题目还原成
  * classbuzz 要的 `{stem, options, answer, limitSec}`。
  *
@@ -180,12 +202,12 @@ function readQuizzes(root) {
     const options = optionsEl
       ? [...optionsEl.children]
         .filter(el => el.tagName === "LI")
-        .map(li => li.textContent.trim())
+        .map(textOf)
         .filter(Boolean)
       : []
     out.push({
       qid,
-      stem: (stemEl.textContent || "").trim(),
+      stem: textOf(stemEl),
       options,
       answer: Number.isInteger(meta.answer) ? meta.answer : null,
       limitSec: Number(meta.limit) > 0 ? Number(meta.limit) : 30,

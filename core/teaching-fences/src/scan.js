@@ -20,7 +20,7 @@ const { parseFenceInfo } = require("./fence")
 const { parseParams, toInt } = require("./params")
 const { normalizeAnswer } = require("./answers")
 const { stripOptionPrefix, hasPositionDependency } = require("./options")
-const { COMMAND_VERBS, FENCE_VERBS, ASSERT_VERBS, PARAM_KEYS } = require("./verbs")
+const { COMMAND_VERBS, FENCE_VERBS, QUIZ_FENCE_VERBS, ASSERT_VERBS, PARAM_KEYS } = require("./verbs")
 
 /** 块级阻断物：quiz 结构被它们打断即判无效（题干归属必须唯一可判，SPEC §2.2）。 */
 const RE_HEADING = /^\s{0,3}#{1,6}\s/
@@ -67,6 +67,7 @@ function scan(md, opts = {}) {
     if (fenceOpen) {
       const ticks = fenceOpen[1].length
       const startLine = i + 1
+      const bodyStart = i + 1                  // 0 基：块体第一行
       const body = []
       i++
       while (i < lines.length && !new RegExp(`^\\s{0,3}\`{${ticks},}\\s*$`).test(lines[i])) {
@@ -74,10 +75,17 @@ function scan(md, opts = {}) {
         i++
       }
       const closed = i < lines.length
+      const bodyEnd = i                       // 0 基：闭合行（未闭合时 = 文末）
       if (closed) i++
+      // 1 基半开右端 [lineStart, lineEnd)：i 此刻是 0 基的「闭合行之后」，
+      // 换成 1 基行号要 +1。少这一格曾让 derive 删载荷围栏时残留孤立的 ```，
+      // 那个反引号会吃掉后一个代码块的开栏行。
+      const lineEnd = i + 1
 
       const info = parseFenceInfo(fenceOpen[2])
-      if (!info || !FENCE_VERBS.has(info.verb)) continue // 普通代码块：跳过
+      if (!info || (!FENCE_VERBS.has(info.verb) && !QUIZ_FENCE_VERBS.has(info.verb))) {
+        continue // 空 info 或普通代码块：整体跳过（体内标记作废）
+      }
       const params = info.params
       if (params === null) {
         problem("PARAMS_UNREADABLE", startLine, "围栏参数读不出（JSON 与 key=val 都失败）", info.verb)
@@ -85,12 +93,27 @@ function scan(md, opts = {}) {
       }
       validateParams(info.verb, params, startLine, problem)
 
+      // 题面围栏：块体是题面 Markdown，与注释标记族归一成同一个 quiz 结构。
+      // 刻意不进 out.fences —— fences 的语义是「块体即秘密、学生版整块删」，
+      // 任何按 fences 批量剥离的地方都不该把题目一起删掉。
+      if (QUIZ_FENCE_VERBS.has(info.verb)) {
+        if (!closed) {
+          problem("QUIZ_FENCE_UNCLOSED", startLine,
+            "```quiz 围栏没有闭合行（题面会一直吃到文末）", "quiz")
+        }
+        const rec = { verb: "quiz", params, line: startLine }
+        collectQuiz(lines, startLine - 1, rec, out,
+          { opts, usedIds, seq, problem, warning },
+          { from: bodyStart, stop: bodyEnd, source: "fence", lineStart: startLine, lineEnd })
+        continue
+      }
+
       const fence = {
         verb: info.verb,
         params,
         body: body.join("\n"),
         lineStart: startLine,
-        lineEnd: i, // 闭合行的下一行（行号语义：[lineStart, lineEnd) ，派生按行删正好用）
+        lineEnd,
       }
       out.fences.push(fence)
       if (ASSERT_VERBS.has(info.verb)) {
@@ -175,9 +198,16 @@ const isBlocker = l =>
 /**
  * 从标记行下标开始组装一道题；返回扫描推进到的新下标。
  * 结构无效时题目不入 `quizzes`（标记原样保留在 marks 里，老师看得到没生效）。
+ *
+ * `span` 给题面围栏用：{from, stop} 把题干/选项的查找限定在围栏块体内，
+ * {source, lineStart, lineEnd} 让派生层知道该按哪段行区间整块替换。
+ * 注释标记族不传 span：from = 标记行之后，stop = 文末——行为和双轨前一致。
+ * 两种载体共用这一份组装逻辑，「预览认得出的题，判分认不出」的漂移无处产生。
  */
-function collectQuiz(lines, i, rec, out, ctx) {
+function collectQuiz(lines, i, rec, out, ctx, span = {}) {
   const { opts, usedIds, seq, problem, warning } = ctx
+  const from = span.from ?? i + 1
+  const stop = span.stop ?? lines.length
   const params = rec.params
   const type = params.type ?? "single"
   if (!QUIZ_TYPES.has(type)) {
@@ -186,10 +216,10 @@ function collectQuiz(lines, i, rec, out, ctx) {
   }
 
   // 题干：跳过空行后第一个连续段落
-  let j = i + 1
-  while (j < lines.length && isBlank(lines[j])) j++
+  let j = from
+  while (j < stop && isBlank(lines[j])) j++
   const stemLines = []
-  while (j < lines.length && !isBlank(lines[j]) && !isBlocker(lines[j]) && !RE_LIST_ITEM.test(lines[j])) {
+  while (j < stop && !isBlank(lines[j]) && !isBlocker(lines[j]) && !RE_LIST_ITEM.test(lines[j])) {
     stemLines.push(lines[j].trim())
     j++
   }
@@ -197,13 +227,13 @@ function collectQuiz(lines, i, rec, out, ctx) {
     problem("QUIZ_NO_STEM", rec.line, "quiz 标记后没有题干段落（标记 → 空行 → 题干 → 空行 → 选项）", "quiz")
     return i + 1
   }
-  while (j < lines.length && isBlank(lines[j])) j++
+  while (j < stop && isBlank(lines[j])) j++
 
   // 选项：fill/essay 只要题干；其余必须紧跟选项列表
   const options = []
   if (type === "single" || type === "multi") {
     let inList = false
-    while (j < lines.length) {
+    while (j < stop) {
       const line = lines[j]
       if (isBlank(line)) break // 空行结束列表（列表内空行属多段列表，v0.1 从简）
       const item = RE_LIST_ITEM.exec(line)
@@ -242,6 +272,11 @@ function collectQuiz(lines, i, rec, out, ctx) {
     stem: stemLines.join("\n"),
     options,
     line: rec.line,
+    // 双轨来源：comment = 注释标记族（题块边界靠启发式），fence = 题面围栏
+    // （边界确定，lineStart/lineEnd 是 1 基半开区间，派生按行整块替换用）。
+    source: span.source ?? "comment",
+    lineStart: span.lineStart ?? null,
+    lineEnd: span.lineEnd ?? null,
   }
 
   const answer = normalizeAnswer(params.answer, type)

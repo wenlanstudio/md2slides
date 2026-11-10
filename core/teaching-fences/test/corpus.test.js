@@ -35,6 +35,10 @@ function projectQuiz(q, expected) {
     shuffle: q.shuffle,
     stem: q.stem,
     options: q.options.map(o => o.text),
+    // 双轨来源与围栏行区间：期望里写了才比较（旧语料不涉及载体差异）
+    source: q.source,
+    lineStart: q.lineStart,
+    lineEnd: q.lineEnd,
   }
   return pick(full, expected)
 }

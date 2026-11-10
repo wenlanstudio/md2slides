@@ -17,6 +17,7 @@ const MarkdownIt = require("../../lib/markdown-it")
 const plugins = require("../../lib/markdown-it-plugins")
 const { RE_FRONT_MATTER } = require("./frontMatter")
 const { registerQuiz } = require("../quiz/parse")
+const { registerQuizFence } = require("../quiz/fence")
 const { registerFencePolicy } = require("./fencePolicy")
 const { FENCE_ACTIONS } = require("../teaching-fences")
 
@@ -115,6 +116,11 @@ const md = () => {
   // 必须早于 sectionize——sectionize 只搬元素节点，注释节点会被丢掉，
   // 那时再想认题已经晚了。
   registerQuiz(instance)
+
+  // 题面围栏（```quiz）：在 quiz 规则之前展开成「标记 + 二次解析的题干/选项」，
+  // 于是上面那条规则与后面所有下游都不必区分题目是哪种载体。
+  // 顺序靠 ruler.before("quiz") 保证，不能靠注册先后猜。
+  registerQuizFence(instance)
 
   // 教学载荷围栏（check-code / match-output / sql-result）默认不进任何产物——
   // 块体是判分秘密，印出去就是泄题（SPEC §一.4 秘密边界，M1.5 防泄题裁决）。

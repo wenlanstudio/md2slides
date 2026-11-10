@@ -1,0 +1,39 @@
+{
+  "options": { "requireIds": true },
+  "quizzes": [
+    {
+      "id": "sum-q1",
+      "type": "single",
+      "answer": 1,
+      "point": 3,
+      "limit": 30,
+      "shuffle": "yes",
+      "stem": "求 $\\sum_{i=1}^n i$ 的值？（**n 为正整数**）",
+      "options": ["$n(n+1)$", "$n(n+1)/2$", "$n^2$"],
+      "source": "fence",
+      "lineStart": 10,
+      "lineEnd": 17
+    },
+    {
+      "id": "sum-q2",
+      "type": "single",
+      "answer": 0,
+      "point": 5,
+      "limit": 30,
+      "shuffle": "yes",
+      "stem": "注释族题目与围栏题并存",
+      "options": ["甲", "乙"],
+      "source": "comment",
+      "lineStart": null,
+      "lineEnd": null
+    }
+  ],
+  "steps": [
+    { "id": "sum-s1", "name": "验证输出", "point": 7, "asserts": 1 }
+  ],
+  "fences": [
+    { "verb": "match-output", "lineStart": 28 }
+  ],
+  "problems": [],
+  "warnings": []
+}

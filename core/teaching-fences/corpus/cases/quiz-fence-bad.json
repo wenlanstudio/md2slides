@@ -1,0 +1,29 @@
+{
+  "options": { "requireIds": true },
+  "quizzes": [
+    {
+      "id": "bad-q2",
+      "type": "single",
+      "answer": 2,
+      "stem": "题干？",
+      "options": ["一", "二"],
+      "source": "fence"
+    },
+    {
+      "id": "bad-q3",
+      "type": "single",
+      "answer": 0,
+      "stem": "未闭合的题面围栏",
+      "options": ["一", "二"],
+      "source": "fence"
+    }
+  ],
+  "problems": [
+    { "code": "QUIZ_NO_OPTIONS", "line": 1, "verb": "quiz" },
+    { "code": "QUIZ_NO_OPTIONS", "line": 4, "verb": "quiz" },
+    { "code": "UNKNOWN_PARAM", "line": 8, "verb": "quiz" },
+    { "code": "QUIZ_ANSWER_OUT_OF_RANGE", "line": 8, "verb": "quiz" },
+    { "code": "QUIZ_FENCE_UNCLOSED", "line": 15, "verb": "quiz" }
+  ],
+  "warnings": []
+}
