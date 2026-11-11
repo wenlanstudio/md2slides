@@ -148,7 +148,8 @@ const renderSvg = async (block, opts = {}) => {
     )
   }
 
-  const dataUrl = await rasterizeSvg(svg, opts.scale ?? 2)
+  const scale = opts.scale ?? 2
+  const dataUrl = await rasterizeSvg(svg, scale)
   if (!dataUrl) {
     throw new Error(
       "SVG 栅格出来是空白：多半用了外链图片、外部字体或 foreignObject（SVG-as-image 不加载外部资源）。" +
@@ -156,7 +157,12 @@ const renderSvg = async (block, opts = {}) => {
     )
   }
 
-  return { dataUrl, width: size.width, height: size.height }
+  // 显示尺寸 = SVG 固有尺寸 × 栅格倍率，两者用同一个 scale。
+  // viewBox 只是作者的内部坐标系（如 `0 0 680 348`），不是图的显示宽度；SVG 上的
+  // width="100%" 是「铺满容器」的意图，栅格前必须覆盖成数值，但据此把 680 直接
+  // 写进 <img width> 就会让图在 1920×1080 的幻灯片上只占 39% 宽——看着又小又糊。
+  // 乘回 scale 后 1 个 PNG 像素对应 1 个 CSS 像素：既铺得开，也不会虚。
+  return { dataUrl, width: size.width * scale, height: size.height * scale }
 }
 
 module.exports = { renderSvg, svgIntrinsicSize, svgOpenTag, stripSvgComments, pxOf }

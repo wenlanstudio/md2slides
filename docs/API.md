@@ -116,7 +116,7 @@ front-matter（八键）、封面生成、关键词高亮、主题都在这里�
 **svg 围栏的契约**：`block.source` 是完整的 SVG/XML 源码（不是片段、不是路径）。
 浏览器侧参考实现 `host/browser/svgHost.js` 校验根元素与固有尺寸（`viewBox` 优先），
 剥掉非法 XML 注释后用 `core/render/diagram.js::rasterizeSvg` 出 2x PNG data URL，
-返回 `{ dataUrl, width, height }`。围栏随即被换成普通的 `<img class="md2slides-diagram">`，
+返回 `{ dataUrl, width, height }`，其中 `width/height` 是**显示尺寸 = SVG 固有尺寸 × 栅格倍率**（`viewBox` 只是内部坐标系，不是显示宽度；这样 1 个 PNG 像素对应 1 个 CSS 像素，图既能铺开也不发虚）。围栏随即被换成普通的 `<img class="md2slides-diagram">`，
 所以下游（分页的图片核心、lightbox、IR image 块、media 落盘 `.png`、两种 PPTX）
 完全不知道它原本是 SVG。缺 `viewBox` / 百分比尺寸 / 非法 XML / `foreignObject` /
 栅格空白一律抛错，不出占位图。

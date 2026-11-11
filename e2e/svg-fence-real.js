@@ -71,6 +71,16 @@ const main = async () => {
     `栅格倍率 2x 生效：${JSON.stringify(sizes)}（期望 400×200 / 320×160）`,
   )
 
+  // 方案 1：显示尺寸 = 固有尺寸 × 栅格倍率，PNG 像素与 CSS 像素 1:1。
+  const display = tags.map(tag => ({
+    width: Number(/width="(\d+)"/.exec(tag)?.[1] ?? 0),
+    height: Number(/height="(\d+)"/.exec(tag)?.[1] ?? 0),
+  }))
+  show(
+    JSON.stringify(display) === JSON.stringify([{ width: 400, height: 200 }, { width: 320, height: 160 }]),
+    `显示尺寸按倍率放大（1 PNG px = 1 CSS px）：${JSON.stringify(display)}`,
+  )
+
   const media = r.ir?.media ?? []
   show(media.length >= 2 && media.every(m => m.name.endsWith(".png")), "IR media 全部落盘成 .png，没有 .svg")
   show((r.ir?.stats?.byType?.image ?? 0) >= 2, "IR 里抽到了 image 块")
