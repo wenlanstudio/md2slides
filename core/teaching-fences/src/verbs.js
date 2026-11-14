@@ -33,7 +33,10 @@ const PARAM_KEYS = {
   step: new Set(["id", "name", "point"]),
   fill: new Set(["id", "min", "max"]),
   "check-file": new Set(["path", "mode"]),
-  "check-code": new Set(["path", "mode", "judge"]),
+  // class=（2026-11-14）：project 档姓名包名工程的定位键——学生文件路径每人不同
+  // 写不死，按类名解析（与 todo 块 class= 同一套约定）；path=（body 档章工作目录）
+  // 与 class= 二选一，校验在 scan 层。
+  "check-code": new Set(["path", "class", "mode", "judge"]),
   "match-output": new Set(["run", "path", "stdin", "judge"]),
   "sql-result": new Set(["db", "judge"]),
 }

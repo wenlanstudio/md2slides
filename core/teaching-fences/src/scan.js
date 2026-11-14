@@ -376,10 +376,22 @@ function validateParams(verb, params, line, problem) {
     }
   }
 
-  // required（SPEC §六#2/§三）
-  const required = { "check-file": "path", "check-code": "path", "match-output": "run", "sql-result": "db" }[verb]
-  if (required && !params[required]) {
-    problem("REQUIRED_MISSING", line, `${verb} 缺必填参数 ${required}=`, verb)
+  // required（SPEC §六#2/§三）。check-code 二选一：path=（body 档，章工作目录内
+  // 文件）或 class=（project 档，学生工程类名——姓名包名路径每人不同写不死）。
+  if (verb === "check-code") {
+    if (!params.path && !params.class) {
+      problem("REQUIRED_MISSING", line, "check-code 缺必填参数 path= 或 class=（project 档用 class=）", verb)
+    } else if (params.path && params.class) {
+      problem("UNKNOWN_PARAM", line, "check-code 的 path= 与 class= 二选一", verb)
+    }
+  } else {
+    const required = { "check-file": "path", "match-output": "run", "sql-result": "db" }[verb]
+    if (required && !params[required]) {
+      problem("REQUIRED_MISSING", line, `${verb} 缺必填参数 ${required}=`, verb)
+    }
+  }
+  if (params.class && /[/\\]|\.\./.test(params.class)) {
+    problem("BAD_ENUM", line, "check-code class= 是类名，不含路径分隔符", verb)
   }
 
   // enum（错值宽容处理：报 problem，消费方按默认走）

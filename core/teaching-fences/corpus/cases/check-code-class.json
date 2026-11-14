@@ -1,0 +1,8 @@
+{
+  "problems": [
+    { "code": "UNKNOWN_PARAM", "line": 7, "verb": "check-code" },
+    { "code": "REQUIRED_MISSING", "line": 11, "verb": "check-code" },
+    { "code": "BAD_ENUM", "line": 15, "verb": "check-code" }
+  ],
+  "warnings": []
+}
