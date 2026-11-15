@@ -44,9 +44,10 @@
  *
  * **输入隔离（集成要点）**：浮层 DOM 挂在 `<body>` 而不是 `#deck` 里，所以打开后绝大多数
  * 事件的传播路径压根不经过播放器的 `root`——键盘与触屏滑动天然打不到播放器。唯一还要抢
- * 的是 Esc：exec 结果面板在 **document capture** 上吃 Esc，而捕获顺序是 window → document
- * → … → target，因此本模块把键盘挂在 **window capture**，抢在它前面（独占约定：查看器开着
- * 时 Esc 归查看器）。打开时还会向 window 派发 `md2s-overlay-dismiss`，礼貌地请其它浮层让位。
+ * 的是 Esc：exec 结果面板的键盘也在 **window capture**（2026-11-14 起与本模块同一层，
+ * 此前它在 document capture、靠层级差让位）；两者还靠 `md2s-overlay-dismiss` 互斥，
+ * 不会同时开着，所以同层没有先后问题。打开时还会向 window 派发 `md2s-overlay-dismiss`，
+ * 礼貌地请其它浮层让位。
  */
 
 const CSS_ID = "md2s-lb-css"
