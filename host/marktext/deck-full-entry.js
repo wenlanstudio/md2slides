@@ -55,6 +55,24 @@ const {
 window.htmlToImage = require("../../lib/html-to-image.js")
 
 // ---------------------------------------------------------------------------
+// 缺口 B（2026-11-15 发题对齐）：当前页的 quiz 标记 id 列表。
+// 教师版放映 DOM 的题干元素带 data-md2s-quiz="{qid}"（core/quiz/registerQuiz 产物；
+// 学生版投影才会被 strip），quiz 标记 id 与服务端 question_key 恒等——
+// 随 md2s:change 上报后，宿主发题面板把本页题置顶。
+// ---------------------------------------------------------------------------
+const currentPageQuizKeys = () => {
+  try {
+    const current = document.querySelector("section.md2s-current")
+    if (!current) return []
+    return [...current.querySelectorAll("[data-md2s-quiz]")]
+      .map(el => el.getAttribute("data-md2s-quiz"))
+      .filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 资产预热：compose 的 readFile 是同步签名，页面里取资产只有异步 fetch。
 // 先把清单里的文本资产拉进内存，之后以"按 basename 查表"实现同步 readFile。
 // loadTheme 扫目录走的是全局 fs.readdirSync（不经 readFile 钩子），同样打补丁。
@@ -447,7 +465,7 @@ const buildHtml = async (msg, started) => {
     meta: null,
     renderDiagramHost: rpcDiagram,
     onChange: ({ index, total, step, steps, mode: m }) =>
-      post({ type: "md2s:change", index, total, step, steps, mode: m }),
+      post({ type: "md2s:change", index, total, step, steps, mode: m, quizKeys: currentPageQuizKeys() }),
     mode,
     browse,
     startIndex,
@@ -530,7 +548,7 @@ const doBuild = async msg => {
       meta: deck.meta,
       renderDiagramHost: rpcDiagram,
       onChange: ({ index, total, step, steps, mode: m }) =>
-        post({ type: "md2s:change", index, total, step, steps, mode: m }),
+        post({ type: "md2s:change", index, total, step, steps, mode: m, quizKeys: currentPageQuizKeys() }),
       mode,
       browse,
       startIndex,
