@@ -28,6 +28,8 @@ function pick(actual, expected) {
 function projectQuiz(q, expected) {
   const full = {
     id: q.id,
+    // id 是教师起名还是内容寻址（ADR-26）：期望里写了才比较
+    autoId: q.autoId,
     type: q.type,
     answer: q.answer,
     point: q.point,
@@ -87,12 +89,10 @@ for (const file of fs.readdirSync(CASES_DIR).filter(f => f.endsWith(".md"))) {
   test(`corpus: ${name}`, () => {
     const md = fs.readFileSync(path.join(CASES_DIR, file), "utf8")
     const expected = JSON.parse(fs.readFileSync(path.join(CASES_DIR, `${name}.json`), "utf8"))
-    const opts = expected.options ?? {}
-    const result = scan(md, { requireIds: !!opts.requireIds })
+    const result = scan(md)
 
     const actual = projectResult(result, expected, name)
     for (const [key, expectedValue] of Object.entries(expected)) {
-      if (key === "options") continue
       assert.deepStrictEqual(actual[key], expectedValue, `${name} .${key} 不符`)
     }
   })

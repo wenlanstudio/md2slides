@@ -142,3 +142,54 @@ test("multi / fill 题型在围栏里同样归一", () => {
   // 平台发题链从 scan() 取；这里只锁题面正常渲染、不炸管线。
   assert.ok(html.includes("选出偶数"))
 })
+
+test("缺 id 的题（双轨）由 scan 内容寻址赋 id，DOM 与 scan 同源（ADR-26）", () => {
+  const md = [
+    "<!--quiz answer=B limit=20-->",
+    "没有 id 的注释题",
+    "",
+    "- 甲",
+    "- 乙",
+    "",
+    "```quiz answer=A",
+    "没有 id 的围栏题",
+    "",
+    "- 一",
+    "- 二",
+    "```",
+    "",
+  ].join("\n")
+  const { scan } = require("../../core/teaching-fences")
+  const scanned = scan(md).quizzes
+  const doc = domOf(renderMarkdown(md))
+  const quizzes = readQuizzes(doc)
+  assert.deepEqual(
+    quizzes.map(q => q.qid),
+    scanned.map(q => q.id),
+    "DOM 上的题号必须与 scan 的 id 逐题相等（deck 发题链的映射前提）",
+  )
+  assert.ok(scanned.every(q => q.autoId), "两道题都应标记为内容寻址 id")
+  assert.notEqual(scanned[0].id, scanned[1].id, "不同题面 → 不同 id")
+  assert.match(scanned[0].id, /^q-[0-9a-f]{12}$/)
+  assert.equal(quizzes[0].limitSec, 20, "limit 元数据随 scan 透传")
+})
+
+test("围栏体内嵌的 quiz 标记不再是题（与 scan 同口径，防预览/判分漂移）", () => {
+  const md = [
+    "```quiz id=outer answer=A",
+    "外围栏题干",
+    "",
+    "- 一",
+    "- 二",
+    "",
+    "内嵌示例：<!--quiz answer=B--> 不是题",
+    "",
+    "- 甲",
+    "- 乙",
+    "```",
+  ].join("\n")
+  const { scan } = require("../../core/teaching-fences")
+  assert.equal(scan(md).quizzes.length, 1, "scan 只认围栏题本身")
+  const quizzes = readQuizzes(domOf(renderMarkdown(md)))
+  assert.deepEqual(quizzes.map(q => q.qid), ["outer"], "渲染侧同样只出 outer 一题")
+})

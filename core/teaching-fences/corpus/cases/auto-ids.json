@@ -1,0 +1,11 @@
+{
+  "quizzes": [
+    { "id": "q-4166b62d2362", "autoId": true, "stem": "没有 id 的第一题。", "answer": 1, "point": 5, "limit": 30 },
+    { "id": "q-ac0c8109ff06", "autoId": true, "stem": "没有 id 的第二题。", "answer": 0, "point": 2, "limit": 30 },
+    { "id": "named-1", "autoId": false, "stem": "显式 id 原样保留。", "answer": 0, "point": 5, "limit": 30 }
+  ],
+  "steps": [{ "id": "step-a", "name": "实验步骤", "point": 7, "asserts": 0 }],
+  "fills": [{ "id": "f1", "min": 30 }],
+  "problems": [],
+  "warnings": []
+}

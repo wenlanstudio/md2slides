@@ -20,6 +20,7 @@ const {
   QUIZ_FENCE_VERBS,
   FENCE_ACTIONS,
 } = require("../index.js")
+const { autoQuizId } = require("../src/autoid.js")
 
 // ---- parseParams：双形式（SPEC §一.2）----
 
@@ -123,4 +124,41 @@ test("parseFenceInfo: ```quiz info-string 与注释族共用参数语法", () =>
     verb: "quiz",
     params: { id: "q2", answer: "AC", type: "multi" },
   })
+})
+
+// ---- autoQuizId：内容寻址缺省 id（ADR-26）----
+
+const QUIZ_LIKE = (stem, options, type = "single") => ({
+  type,
+  stem,
+  options: (options ?? []).map(text => ({ text })),
+})
+
+test("autoQuizId: 格式与确定性（同题面 → 同 id）", () => {
+  const id = autoQuizId(QUIZ_LIKE("1 + 1 = ?", ["2", "3"]))
+  assert.match(id, /^q-[0-9a-f]{12}$/)
+  assert.equal(id, autoQuizId(QUIZ_LIKE("1 + 1 = ?", ["2", "3"])))
+})
+
+test("autoQuizId: 题面变了 → id 变；选项相同题干不同也变", () => {
+  const a = autoQuizId(QUIZ_LIKE("1 + 1 = ?", ["2", "3"]))
+  const b = autoQuizId(QUIZ_LIKE("1 + 2 = ?", ["2", "3"]))
+  const c = autoQuizId(QUIZ_LIKE("1 + 1 = ?", ["2", "4"]))
+  assert.notEqual(a, b)
+  assert.notEqual(a, c)
+})
+
+test("autoQuizId: answer/point 不进指纹——改答案/调分值是修订不是换题", () => {
+  const q = QUIZ_LIKE("1 + 1 = ?", ["2", "3"])
+  const withAnswer = { ...q, answer: 0, point: 7 }
+  assert.equal(autoQuizId(q), autoQuizId(withAnswer))
+})
+
+test("autoQuizId: type 进指纹、fill/essay 无选项也有稳定 id", () => {
+  const single = autoQuizId(QUIZ_LIKE("同一个题干", ["甲"]))
+  const multi = autoQuizId(QUIZ_LIKE("同一个题干", ["甲"], "multi"))
+  assert.notEqual(single, multi)
+  const fill = autoQuizId(QUIZ_LIKE("___ 是 Hadoop 的调度器。", []))
+  assert.match(fill, /^q-[0-9a-f]{12}$/)
+  assert.equal(fill, autoQuizId(QUIZ_LIKE("___ 是 Hadoop 的调度器。", [])))
 })

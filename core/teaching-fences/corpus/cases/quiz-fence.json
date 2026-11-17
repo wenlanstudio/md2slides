@@ -1,5 +1,4 @@
 {
-  "options": { "requireIds": true },
   "quizzes": [
     {
       "id": "sum-q1",

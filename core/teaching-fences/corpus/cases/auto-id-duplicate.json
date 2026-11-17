@@ -1,0 +1,10 @@
+{
+  "quizzes": [
+    { "id": "q-628608f94cee", "autoId": true, "stem": "1 + 1 = ?", "answer": 1, "options": ["2", "3"] },
+    { "id": "q-628608f94cee", "autoId": true, "stem": "1 + 1 = ?", "answer": 1, "options": ["2", "3"] }
+  ],
+  "problems": [
+    { "code": "QUIZ_DUPLICATE_ID", "line": 7, "verb": "quiz" }
+  ],
+  "warnings": []
+}

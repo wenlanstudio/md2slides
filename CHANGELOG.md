@@ -6,6 +6,20 @@
 > Typora 宿主壳已因合规评估从主仓库移出（代码、设计文档与专属测试单独备份）；下文历史
 > 记录中的 Typora 条目保留原貌，仅作历史参考，不代表当前支持。
 
+## [Unreleased] — quiz id 放开 + 内容寻址 + 围栏默认（ADR-26，2026-11-18）
+
+- **quiz 缺省 id 走内容寻址**（`core/teaching-fences/src/autoid.js`）：`q-` + 题面
+  指纹 12 位十六进制（双道 FNV-1a，纯 JS，浏览器/Node 同源同键）。题面相同 ⇒ 同键
+  （跨讲义同内容走查重复用），题面变 ⇒ 新键（旧题 retired），插入一题不再全体错位；
+  answer/point 不进指纹。同一文档完全同题面 → `QUIZ_DUPLICATE_ID` 拒发。
+- **发布不再强制 id**：`requireIds` 开关退役（`scan()`/engine `parseDocument`
+  兼容保留入参位），`ID_MISSING` 不再产生。
+- **id 与元数据单点收口**：`core/quiz/parse.js` 的 token 规则不再自带第二套自动
+  编号——按标记行 join `scan()` 结果（scan 是唯一权威），注释轨/围栏轨/发布链/deck
+  quizKeys 四处同键。「预览认得出的题，判分认不出」类漂移无处产生。
+- **```` ```quiz ```` 题面围栏定为默认形态**（SPEC §2.0 / 总纲 ADR-26），注释
+  标记族存量零迁移；`quizzes[]` 新增 `autoId` 字段。
+
 ## [Unreleased] — 空壳页爆炸根治 + 诚实溢出体系（2026-11-17 三拍板）
 
 - **空壳页爆炸根治**：flow 分支整搬前补 headingH 预检——「放得下一整页、放不下

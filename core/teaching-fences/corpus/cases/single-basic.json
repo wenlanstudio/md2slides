@@ -1,7 +1,8 @@
 {
   "quizzes": [
     {
-      "id": "q1",
+      "id": "q-6a683e9ed5db",
+      "autoId": true,
       "type": "single",
       "answer": 1,
       "point": 3,
@@ -11,7 +12,8 @@
       "options": ["数据存在内存", "计算靠近数据", "数据存到云上"]
     },
     {
-      "id": "q2",
+      "id": "q-9b17e3456b02",
+      "autoId": true,
       "type": "single",
       "answer": 2,
       "point": 5,

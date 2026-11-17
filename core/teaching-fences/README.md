@@ -55,7 +55,7 @@ const { scan, parseParams, stripOptionPrefix, normalizeAnswer,
         COMMAND_VERBS, FENCE_VERBS, QUIZ_FENCE_VERBS, FENCE_ACTIONS } =
   require("../teaching-fences")   // 包外经 @wenlanstudio/md2slides 深路径亦可
 
-const result = scan(mdText, { requireIds: true })   // 发布校验用；纯抢答讲义省 id 可不传
+const result = scan(mdText)   // id 可选（ADR-26）：quiz 缺省内容寻址 q-*，step/fill 顺序号
 ```
 
 `scan()` 一次扫描返回（行号均 1 基）：
@@ -64,7 +64,7 @@ const result = scan(mdText, { requireIds: true })   // 发布校验用；纯抢�
 | --- | --- |
 | `marks` | 全部教学注释标记 `{verb, params, line, raw}` |
 | `fences` | 教学**载荷**围栏 `{verb, params, body, lineStart, lineEnd}`（普通代码块与题面围栏都不进）；`[lineStart,lineEnd)` 是 1 基半开区间，**含闭合行**，派生按行整块删 |
-| `quizzes` | 组装完的题（**两轨归一**）：`{id, type, answer, point, limit, shuffle, stem, options:[{text, letter}], line, source, lineStart, lineEnd}`；`answer` 归一为 0 基序号 / 序号数组（multi）/ 文本（fill）。`source = "comment" \| "fence"`；围栏题的 `[lineStart,lineEnd)` 含闭合行，注释题为 `null` |
+| `quizzes` | 组装完的题（**两轨归一**）：`{id, autoId, type, answer, point, limit, shuffle, stem, options:[{text, letter}], line, source, lineStart, lineEnd}`；`id` 显式原样，缺省内容寻址 `q-*`（`autoId=true`，ADR-26）；`answer` 归一为 0 基序号 / 序号数组（multi）/ 文本（fill）。`source = "comment" \| "fence"`；围栏题的 `[lineStart,lineEnd)` 含闭合行，注释题为 `null` |
 | `steps` | `{id, name, point, line, asserts:[所属断言围栏]}` |
 | `fills` | `{id, min, max, line, contentLines}`（作答区行区间） |
 | `problems` | 校验失败 `{code, line, message, verb?}`——任一命中即拒发（SPEC §六） |

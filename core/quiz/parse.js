@@ -32,7 +32,7 @@
  * 编辑器无关：这一层不认识 Typora，也不认识 classbuzz——它只认识「题」。
  */
 
-const { parseParams, normalizeAnswer: normalizeAnswerBase } = require("../teaching-fences")
+const { parseParams, normalizeAnswer: normalizeAnswerBase, scan } = require("../teaching-fences")
 
 /** 标记必须是独占一行的注释（最多 3 空格缩进，和分栏标记同规矩）。 */
 const RE_MARKER = /^<!--\s*quiz\b([^>]*?)\s*-->$/i
@@ -106,6 +106,27 @@ function locate(tokens, from) {
 }
 
 /**
+ * scan 结果按「标记行号 → 题目记录」的索引缓存（键 = 文档原文）。
+ *
+ * 为什么 token 规则要 join scan：id 与元数据的唯一权威是 teaching-fences 的
+ * scan()（判分/发布链同源）；这里若自带第二套自动编号，两轨口径必然漂移。
+ * 同一份原文在编辑器里会被反复重渲染，缓存一份索引，命中即免重扫。
+ */
+const SCAN_INDEX_CACHE_MAX = 16
+const scanIndexCache = new Map()
+
+function scanIndexFor(src) {
+  let index = scanIndexCache.get(src)
+  if (!index) {
+    index = new Map()
+    for (const quiz of scan(src).quizzes) index.set(quiz.line, quiz)
+    if (scanIndexCache.size >= SCAN_INDEX_CACHE_MAX) scanIndexCache.clear()
+    scanIndexCache.set(src, index)
+  }
+  return index
+}
+
+/**
  * markdown-it core 规则：把 `<!--quiz ...-->` 标记消费掉，改写成题干/选项上的数据属性。
  *
  * 挂在 `block` 之后：此时段落与列表已经被解析成 token，标记本身是 html_block。
@@ -114,34 +135,37 @@ function locate(tokens, from) {
  * @returns {boolean} 恒 false（不改内容就不阻断后续规则）
  */
 function quizRule(state) {
+  // 题面围栏块体的二次解析不认题：scan 对围栏体内的标记一律无视（结构上是
+  // 题面的一部分），这里必须同口径，否则预览认得出的题判分认不出。
+  if (state.env && state.env.__quizFenceNested) return false
+
   const tokens = state.tokens
   const drop = []
-  let seq = 0
+  let index = null
 
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i]
     if (token.type !== "html_block") continue
     const text = String(token.content ?? "").trim()
-    const m = RE_MARKER.exec(text)
-    if (!m) continue
+    if (!RE_MARKER.test(text)) continue
 
-    const meta = parseQuizMeta(m[1])
-    // 参数读不出来（既不是 JSON 也不是 key=value）：把标记原样留着，别静默吞掉老师的笔误
-    if (!meta) continue
+    if (!index) index = scanIndexFor(state.src)
+    const line = token.map ? token.map[0] + 1 : null
+    const rec = line != null ? index.get(line) : null
+    // scan 不认（结构无效 / 缩进超限 / 围栏体内）→ 标记原样保留，与判分同口径
+    if (!rec) continue
 
     const { stem, options } = locate(tokens, i + 1)
-    // 没有可判的题干/选项：标记留着（当普通注释），面板不会认它 → 老师能看出来没生效
+    // 防御：scan 认了但 token 侧定位不到（两侧行为不一致时不该有题）
     if (stem < 0 || options < 0) continue
 
-    seq += 1
-    const qid = meta.id || `q${seq}`
-    tokens[stem].attrSet(ATTR_QUIZ, qid)
+    tokens[stem].attrSet(ATTR_QUIZ, rec.id)
     tokens[stem].attrSet(ATTR_META, JSON.stringify({
-      answer: meta.answer,
-      limit: meta.limit,
-      id: qid,
+      answer: rec.answer,
+      limit: rec.limit,
+      id: rec.id,
     }))
-    tokens[options].attrSet(ATTR_OPTIONS, qid)
+    tokens[options].attrSet(ATTR_OPTIONS, rec.id)
     drop.push(i)
   }
 

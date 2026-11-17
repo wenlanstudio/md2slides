@@ -16,6 +16,7 @@
  */
 
 const { parseCommand, RE_MARK } = require("./command")
+const { autoQuizId } = require("./autoid")
 const { parseFenceInfo } = require("./fence")
 const { parseParams, toInt } = require("./params")
 const { normalizeAnswer } = require("./answers")
@@ -33,14 +34,13 @@ const QUIZ_TYPES = new Set(["single", "multi", "fill", "essay"])
 
 /**
  * @param {string} md 讲义全文
- * @param {object} [opts]
- * @param {boolean} [opts.requireIds=false] 发布校验传 true：quiz/step/fill 缺 id 即
- *   problem（SPEC §一.3：发布态 id 必填，自动编号插一题全错位）；纯抢答讲义不传，
- *   缺 id 沿用自动编号（q1/q2…）。
+ * @param {object} [_opts] 保留位（曾经有 requireIds 开关——发布态强制 id。
+ *   ADR-26 后 quiz 缺省 id 改内容寻址、step/fill 缺省顺序号，位置错位与跨讲义
+ *   撞 key 两个根因都已消除，发布不再强制 id，开关整体退役）。
  * @returns {{marks: Array, fences: Array, quizzes: Array, steps: Array, fills: Array,
  *            problems: Array, warnings: Array}}
  */
-function scan(md, opts = {}) {
+function scan(md, _opts = {}) {
   const lines = String(md ?? "").replace(/\r\n?/g, "\n").split("\n")
   const out = { marks: [], fences: [], quizzes: [], steps: [], fills: [], problems: [], warnings: [] }
   const problem = (code, line, message, verb) =>
@@ -103,7 +103,7 @@ function scan(md, opts = {}) {
         }
         const rec = { verb: "quiz", params, line: startLine }
         collectQuiz(lines, startLine - 1, rec, out,
-          { opts, usedIds, seq, problem, warning },
+          { usedIds, seq, problem, warning },
           { from: bodyStart, stop: bodyEnd, source: "fence", lineStart: startLine, lineEnd })
         continue
       }
@@ -155,11 +155,12 @@ function scan(md, opts = {}) {
       validateParams(mark.verb, rec.params, rec.line, problem)
 
       if (mark.verb === "quiz") {
-        i = collectQuiz(lines, i, rec, out, { opts, usedIds, seq, problem, warning })
+        i = collectQuiz(lines, i, rec, out, { usedIds, seq, problem, warning })
         continue
       }
       if (mark.verb === "step") {
-        const id = takeId(rec, "step", opts, usedIds, seq, problem)
+        const { explicit, fallback } = takeId(rec, "step", usedIds, seq, problem)
+        const id = explicit ?? fallback
         const step = {
           id,
           name: rec.params.name ?? id,
@@ -173,7 +174,8 @@ function scan(md, opts = {}) {
         continue
       }
       if (mark.verb === "fill") {
-        const id = takeId(rec, "fill", opts, usedIds, seq, problem)
+        const { explicit, fallback } = takeId(rec, "fill", usedIds, seq, problem)
+        const id = explicit ?? fallback
         i = collectFill(lines, i, { id, params: rec.params, line: rec.line }, out)
         continue
       }
@@ -205,7 +207,7 @@ const isBlocker = l =>
  * 两种载体共用这一份组装逻辑，「预览认得出的题，判分认不出」的漂移无处产生。
  */
 function collectQuiz(lines, i, rec, out, ctx, span = {}) {
-  const { opts, usedIds, seq, problem, warning } = ctx
+  const { usedIds, seq, problem, warning } = ctx
   const from = span.from ?? i + 1
   const stop = span.stop ?? lines.length
   const params = rec.params
@@ -259,9 +261,11 @@ function collectQuiz(lines, i, rec, out, ctx, span = {}) {
   }
 
   // ---- 字段校验与组装 ----
-  const id = takeId(rec, "quiz", opts, usedIds, seq, problem)
+  // 显式 id 重复检查先行；缺省 id 的内容寻址要等题面组装完（指纹吃 stem/options），
+  // 先用占位号组装，下方立即换正身。
+  const { explicit, fallback } = takeId(rec, "quiz", usedIds, seq, problem)
   const quiz = {
-    id,
+    id: fallback,
     type,
     answer: null,
     point: toInt(params.point) ?? 5,
@@ -277,24 +281,38 @@ function collectQuiz(lines, i, rec, out, ctx, span = {}) {
     source: span.source ?? "comment",
     lineStart: span.lineStart ?? null,
     lineEnd: span.lineEnd ?? null,
+    // id 是教师起名（explicit）还是内容寻址（ADR-26）；下游（题库 UI）可据此展示
+    autoId: !explicit,
+  }
+  if (!explicit) {
+    quiz.id = autoQuizId(quiz)
+    // 防御：内容指纹撞上本文档某个显式 id（概率可忽略，撞了给可读错误不静默）
+    const prev = usedIds.quiz.get(quiz.id)
+    if (prev) {
+      problem("QUIZ_DUPLICATE_ID", rec.line, `quiz id「${quiz.id}」与第 ${prev} 行重复`, "quiz")
+    } else {
+      usedIds.quiz.set(quiz.id, rec.line)
+    }
+  } else {
+    quiz.id = explicit
   }
 
   const answer = normalizeAnswer(params.answer, type)
   if (answer === null && type !== "essay") {
     problem("QUIZ_NO_ANSWER", rec.line,
-      `quiz「${id}」缺 answer 或 answer 认不出（非 essay 必填，宁拒不猜）`, "quiz")
+      `quiz「${quiz.id}」缺 answer 或 answer 认不出（非 essay 必填，宁拒不猜）`, "quiz")
   } else {
     quiz.answer = answer
   }
   if (Array.isArray(answer) && answer.some(a => a >= options.length)) {
     problem("QUIZ_ANSWER_OUT_OF_RANGE", rec.line,
-      `quiz「${id}」answer 超出选项范围（${options.length} 个选项）`, "quiz")
+      `quiz「${quiz.id}」answer 超出选项范围（${options.length} 个选项）`, "quiz")
   } else if (typeof answer === "number" && options.length && answer >= options.length) {
     problem("QUIZ_ANSWER_OUT_OF_RANGE", rec.line,
-      `quiz「${id}」answer 超出选项范围（${options.length} 个选项）`, "quiz")
+      `quiz「${quiz.id}」answer 超出选项范围（${options.length} 个选项）`, "quiz")
   }
   if (!["yes", "no"].includes(quiz.shuffle)) {
-    problem("BAD_ENUM", rec.line, `quiz「${id}」shuffle 只认 yes/no`, "quiz")
+    problem("BAD_ENUM", rec.line, `quiz「${quiz.id}」shuffle 只认 yes/no`, "quiz")
     quiz.shuffle = "yes"
   }
 
@@ -302,7 +320,7 @@ function collectQuiz(lines, i, rec, out, ctx, span = {}) {
   if (quiz.shuffle !== "no" && (type === "single" || type === "multi") && options.length >= 3) {
     if (hasPositionDependency(options.map(o => o.text))) {
       warning("SHUFFLE_POSITION_DEPENDENT", rec.line,
-        `quiz「${id}」选项疑似依赖字母或位置（如「以上都对」），建议 shuffle=no`)
+        `quiz「${quiz.id}」选项疑似依赖字母或位置（如「以上都对」），建议 shuffle=no`)
     }
   }
 
@@ -343,29 +361,31 @@ function collectFill(lines, i, info, out) {
 // 公共校验
 // ---------------------------------------------------------------------------
 
-/** 自动编号前缀：quiz 沿用抢答态的 q1/q2…（SPEC §一.3），step/fill 各自独立计。 */
-const ID_PREFIX = { quiz: "q", step: "s", fill: "f" }
+/** 缺省 id 前缀：step/fill 按顺序号计（文档内唯一即可）；quiz 走内容寻址（autoid.js）。 */
+const ID_PREFIX = { step: "s", fill: "f" }
 
 /**
- * id 三规则（SPEC §一.3）：发布态必填（requireIds）、显式 id 文档内唯一、
- * 缺省自动编号（按「第几个」计——自动号要跟讲课顺序对得上，只数缺 id 的会错位）。
+ * id 两规则（SPEC §一.3，ADR-26 修订）：显式 id 文档内唯一、缺省走各自动词的
+ * 缺省策略。quiz 的内容寻址需要题面指纹，所以这里只做显式检查 + 顺序号占位，
+ * quiz 的正身在 collectQuiz 组装完题面后替换（autoQuizId）。
+ *
+ * 顺序号按「第几个」计——自动号要跟讲课顺序对得上，只数缺 id 的会错位。
+ *
+ * @returns {{explicit: string|null, fallback: string}} explicit = 教师起名；
+ *   fallback = 顺序占位号（quiz 用后即弃，step/fill 直接当正身）。
  */
-function takeId(rec, verb, opts, usedIds, seq, problem) {
+function takeId(rec, verb, usedIds, seq, problem) {
   seq[verb] += 1
   const explicit = rec.params.id ? String(rec.params.id) : null
-  if (!explicit && opts.requireIds) {
-    problem("ID_MISSING", rec.line, `${verb} 缺 id（发布态必填——自动编号插一题全错位）`, verb)
-  }
-  const id = explicit ?? `${ID_PREFIX[verb]}${seq[verb]}`
   if (explicit) {
-    const prev = usedIds[verb].get(id)
+    const prev = usedIds[verb].get(explicit)
     if (prev) {
-      problem(`${verb.toUpperCase()}_DUPLICATE_ID`, rec.line, `${verb} id「${id}」与第 ${prev} 行重复`, verb)
+      problem(`${verb.toUpperCase()}_DUPLICATE_ID`, rec.line, `${verb} id「${explicit}」与第 ${prev} 行重复`, verb)
     } else {
-      usedIds[verb].set(id, rec.line)
+      usedIds[verb].set(explicit, rec.line)
     }
   }
-  return id
+  return { explicit, fallback: `${ID_PREFIX[verb] ?? "q"}${seq[verb]}` }
 }
 
 function validateParams(verb, params, line, problem) {
