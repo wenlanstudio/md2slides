@@ -808,7 +808,7 @@
           },
           "runs": [
             {
-              "text": "2 / 20"
+              "text": "2 / 24"
             }
           ],
           "lines": 1,
@@ -990,7 +990,7 @@
           },
           "runs": [
             {
-              "text": "3 / 20"
+              "text": "3 / 24"
             }
           ],
           "lines": 1,
@@ -1513,7 +1513,7 @@
           },
           "runs": [
             {
-              "text": "4 / 20"
+              "text": "4 / 24"
             }
           ],
           "lines": 1,
@@ -1534,7 +1534,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.6565,
+            "y": 0.6445,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -1564,86 +1564,13 @@
           "singleLine": true
         },
         {
-          "type": "paragraph",
-          "geo": {
-            "x": 0.5833,
-            "y": 1.5897,
-            "w": 12.1667,
-            "h": 0.452
-          },
-          "style": {
-            "fontSizePt": 21,
-            "font": "Microsoft YaHei",
-            "color": "#23303f",
-            "lineSpacingPt": 32.55,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0.0875,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "下面这张表会超过一页。引擎不会把一行拆成两半，而是按行切，并在续页重复表头。"
-            }
-          ],
-          "srcRange": [
-            33,
-            33
-          ],
-          "lines": 1,
-          "singleLine": true
-        },
-        {
-          "type": "paragraph",
-          "geo": {
-            "x": 0.5833,
-            "y": 2.1292,
-            "w": 12.1667,
-            "h": 0.9074
-          },
-          "style": {
-            "fontSizePt": 21,
-            "font": "Microsoft YaHei",
-            "color": "#23303f",
-            "lineSpacingPt": 32.55,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0.0875,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "这份 demo 刻意不写 "
-            },
-            {
-              "text": "---",
-              "style": {
-                "color": "#b3401f",
-                "font": "Cascadia Mono"
-              }
-            },
-            {
-              "text": " 手动分页符——下面的长表格、长代码、长列表，都交给引擎自动切。"
-            }
-          ],
-          "srcRange": [
-            35,
-            35
-          ],
-          "lines": 2
-        },
-        {
           "type": "table",
           "colWidths": [
-            1.7604,
-            1.7604,
-            1.7604,
-            2.096,
-            4.7824
+            1.9147,
+            2.3534,
+            1.6082,
+            1.9147,
+            4.3687
           ],
           "rows": [
             {
@@ -1670,7 +1597,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 1.7604
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -1692,7 +1619,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 1.7604
+                  "w": 2.3534
                 },
                 {
                   "runs": [
@@ -1714,7 +1641,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 1.7604
+                  "w": 1.6082
                 },
                 {
                   "runs": [
@@ -1736,7 +1663,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 2.096
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -1758,7 +1685,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 4.7824
+                  "w": 4.3687
                 }
               ]
             },
@@ -1783,7 +1710,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -1803,7 +1730,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 2.3534
                 },
                 {
                   "runs": [
@@ -1823,7 +1750,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.6082
                 },
                 {
                   "runs": [
@@ -1843,7 +1770,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.096
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -1863,7 +1790,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.7824
+                  "w": 4.3687
                 }
               ]
             },
@@ -1888,7 +1815,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -1908,7 +1835,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 2.3534
                 },
                 {
                   "runs": [
@@ -1928,7 +1855,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.6082
                 },
                 {
                   "runs": [
@@ -1948,7 +1875,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.096
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -1968,7 +1895,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.7824
+                  "w": 4.3687
                 }
               ]
             },
@@ -1993,7 +1920,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2013,7 +1940,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 2.3534
                 },
                 {
                   "runs": [
@@ -2033,7 +1960,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.6082
                 },
                 {
                   "runs": [
@@ -2053,7 +1980,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.096
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2073,7 +2000,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.7824
+                  "w": 4.3687
                 }
               ]
             },
@@ -2098,7 +2025,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2118,7 +2045,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 2.3534
                 },
                 {
                   "runs": [
@@ -2138,7 +2065,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.6082
                 },
                 {
                   "runs": [
@@ -2158,7 +2085,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.096
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2178,7 +2105,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.7824
+                  "w": 4.3687
                 }
               ]
             },
@@ -2203,7 +2130,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2223,7 +2150,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 2.3534
                 },
                 {
                   "runs": [
@@ -2243,7 +2170,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.6082
                 },
                 {
                   "runs": [
@@ -2263,7 +2190,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.096
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2283,7 +2210,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.7824
+                  "w": 4.3687
                 }
               ]
             },
@@ -2308,7 +2235,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2328,7 +2255,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 2.3534
                 },
                 {
                   "runs": [
@@ -2348,7 +2275,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7604
+                  "w": 1.6082
                 },
                 {
                   "runs": [
@@ -2368,7 +2295,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.096
+                  "w": 1.9147
                 },
                 {
                   "runs": [
@@ -2388,16 +2315,331 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.7824
+                  "w": 4.3687
+                }
+              ]
+            },
+            {
+              "heightIn": 0.5194,
+              "cells": [
+                {
+                  "runs": [
+                    {
+                      "text": "引用"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.9147
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "可作结束语"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 2.3534
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "跟核心走"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.6082
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "不单独成核"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.9147
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "紧贴核心后才是结束语"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 4.3687
+                }
+              ]
+            },
+            {
+              "heightIn": 0.5194,
+              "cells": [
+                {
+                  "runs": [
+                    {
+                      "text": "段落"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.9147
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "可作引导/结束"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 2.3534
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "跟核心走"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.6082
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "不单独成核"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.9147
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "夹在两个核心之间归后一个"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 4.3687
+                }
+              ]
+            },
+            {
+              "heightIn": 0.5194,
+              "cells": [
+                {
+                  "runs": [
+                    {
+                      "text": "多核心对比"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.9147
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "1~4 个核心"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 2.3534
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "整组一页"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.6082
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "超过才切"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 1.9147
+                },
+                {
+                  "runs": [
+                    {
+                      "text": "对比、参照关系才允许"
+                    }
+                  ],
+                  "style": {
+                    "fontSizePt": 18,
+                    "font": "Microsoft YaHei",
+                    "color": "#23303f",
+                    "lineSpacingPt": 27.9,
+                    "spaceBeforeIn": 0,
+                    "spaceAfterIn": 0,
+                    "paddingLeftIn": 0.1528,
+                    "paddingRightIn": 0.1528,
+                    "paddingTopIn": 0.0625,
+                    "paddingBottomIn": 0.0625
+                  },
+                  "w": 4.3687
                 }
               ]
             }
           ],
           "geo": {
             "x": 0.5833,
-            "y": 3.1241,
+            "y": 1.5778,
             "w": 12.1667,
-            "h": 3.6568
+            "h": 5.2151
           },
           "style": {
             "fontSizePt": 18,
@@ -2413,7 +2655,7 @@
           },
           "srcRange": [
             37,
-            44
+            47
           ]
         },
         {
@@ -2497,7 +2739,7 @@
           },
           "runs": [
             {
-              "text": "5 / 20"
+              "text": "5 / 24"
             }
           ],
           "lines": 1,
@@ -2518,7 +2760,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.633,
+            "y": 1.4122,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -2550,11 +2792,11 @@
         {
           "type": "table",
           "colWidths": [
-            1.7233,
-            2.1182,
-            2.2755,
-            1.7233,
-            4.3194
+            1.5696,
+            1.5696,
+            2.4676,
+            1.8688,
+            4.6842
           ],
           "rows": [
             {
@@ -2581,7 +2823,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 1.7233
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -2603,7 +2845,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 2.1182
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -2625,7 +2867,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 2.2755
+                  "w": 2.4676
                 },
                 {
                   "runs": [
@@ -2647,7 +2889,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 1.7233
+                  "w": 1.8688
                 },
                 {
                   "runs": [
@@ -2669,322 +2911,7 @@
                     "paddingTopIn": 0.0694,
                     "paddingBottomIn": 0.0694
                   },
-                  "w": 4.3194
-                }
-              ]
-            },
-            {
-              "heightIn": 0.5194,
-              "cells": [
-                {
-                  "runs": [
-                    {
-                      "text": "引用"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 1.7233
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "可作结束语"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 2.1182
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "跟核心走"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 2.2755
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "不单独成核"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 1.7233
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "紧贴核心后才是结束语"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 4.3194
-                }
-              ]
-            },
-            {
-              "heightIn": 0.5194,
-              "cells": [
-                {
-                  "runs": [
-                    {
-                      "text": "段落"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 1.7233
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "可作引导/结束"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 2.1182
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "跟核心走"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 2.2755
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "不单独成核"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 1.7233
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "夹在两个核心之间归后一个"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 4.3194
-                }
-              ]
-            },
-            {
-              "heightIn": 0.5194,
-              "cells": [
-                {
-                  "runs": [
-                    {
-                      "text": "多核心对比"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 1.7233
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "1~4 个核心"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 2.1182
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "整组一页"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 2.2755
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "超过才切"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 1.7233
-                },
-                {
-                  "runs": [
-                    {
-                      "text": "对比、参照关系才允许"
-                    }
-                  ],
-                  "style": {
-                    "fontSizePt": 18,
-                    "font": "Microsoft YaHei",
-                    "color": "#23303f",
-                    "lineSpacingPt": 27.9,
-                    "spaceBeforeIn": 0,
-                    "spaceAfterIn": 0,
-                    "paddingLeftIn": 0.1528,
-                    "paddingRightIn": 0.1528,
-                    "paddingTopIn": 0.0625,
-                    "paddingBottomIn": 0.0625
-                  },
-                  "w": 4.3194
+                  "w": 4.6842
                 }
               ]
             },
@@ -3009,7 +2936,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3029,7 +2956,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.1182
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3049,7 +2976,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.2755
+                  "w": 2.4676
                 },
                 {
                   "runs": [
@@ -3069,7 +2996,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.8688
                 },
                 {
                   "runs": [
@@ -3089,7 +3016,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.3194
+                  "w": 4.6842
                 }
               ]
             },
@@ -3114,7 +3041,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3134,7 +3061,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.1182
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3154,7 +3081,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.2755
+                  "w": 2.4676
                 },
                 {
                   "runs": [
@@ -3174,7 +3101,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.8688
                 },
                 {
                   "runs": [
@@ -3208,7 +3135,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.3194
+                  "w": 4.6842
                 }
               ]
             },
@@ -3233,7 +3160,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3253,7 +3180,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.1182
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3273,7 +3200,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.2755
+                  "w": 2.4676
                 },
                 {
                   "runs": [
@@ -3293,7 +3220,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.8688
                 },
                 {
                   "runs": [
@@ -3313,7 +3240,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.3194
+                  "w": 4.6842
                 }
               ]
             },
@@ -3338,7 +3265,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3358,7 +3285,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.1182
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3378,7 +3305,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.2755
+                  "w": 2.4676
                 },
                 {
                   "runs": [
@@ -3398,7 +3325,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.8688
                 },
                 {
                   "runs": [
@@ -3418,7 +3345,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.3194
+                  "w": 4.6842
                 }
               ]
             },
@@ -3443,7 +3370,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3463,7 +3390,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.1182
+                  "w": 1.5696
                 },
                 {
                   "runs": [
@@ -3483,7 +3410,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 2.2755
+                  "w": 2.4676
                 },
                 {
                   "runs": [
@@ -3503,7 +3430,7 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 1.7233
+                  "w": 1.8688
                 },
                 {
                   "runs": [
@@ -3523,16 +3450,16 @@
                     "paddingTopIn": 0.0625,
                     "paddingBottomIn": 0.0625
                   },
-                  "w": 4.3194
+                  "w": 4.6842
                 }
               ]
             }
           ],
           "geo": {
             "x": 0.5833,
-            "y": 1.5663,
+            "y": 2.3455,
             "w": 12.1667,
-            "h": 4.6986
+            "h": 3.1403
           },
           "style": {
             "fontSizePt": 18,
@@ -3547,7 +3474,7 @@
             "paddingBottomIn": 0
           },
           "srcRange": [
-            45,
+            48,
             52
           ]
         },
@@ -3555,7 +3482,7 @@
           "type": "paragraph",
           "geo": {
             "x": 0.5833,
-            "y": 6.3274,
+            "y": 5.5483,
             "w": 12.1667,
             "h": 0.452
           },
@@ -3664,7 +3591,7 @@
           },
           "runs": [
             {
-              "text": "6 / 20"
+              "text": "6 / 24"
             }
           ],
           "lines": 1,
@@ -3675,6 +3602,329 @@
     {
       "index": 6,
       "pagination": 7,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.2105,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "（续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.75,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "下面这张表会超过一页。引擎不会把一行拆成两半，而是按行切，并在续页重复表头。"
+            }
+          ],
+          "srcRange": [
+            33,
+            33
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.4557,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "MD2Slides 演示"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 3.1923,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "长表格：按行切，表头跟着走 （续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "7 / 24"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "pagination": 8,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 2.9827,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "（续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.5222,
+            "w": 12.1667,
+            "h": 0.9074
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "这份 demo 刻意不写 "
+            },
+            {
+              "text": "---",
+              "style": {
+                "color": "#b3401f",
+                "font": "Cascadia Mono"
+              }
+            },
+            {
+              "text": " 手动分页符——下面的长表格、长代码、长列表，都交给引擎自动切。"
+            }
+          ],
+          "srcRange": [
+            35,
+            35
+          ],
+          "lines": 2
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.4557,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "MD2Slides 演示"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 3.1923,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "长表格：按行切，表头跟着走 （续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "8 / 24"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "pagination": 9,
       "layout": "code",
       "background": {
         "color": "#ffffff"
@@ -3685,7 +3935,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.5858,
+            "y": 0.5298,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -3715,44 +3965,12 @@
           "singleLine": true
         },
         {
-          "type": "paragraph",
-          "geo": {
-            "x": 0.5833,
-            "y": 1.5191,
-            "w": 12.1667,
-            "h": 0.452
-          },
-          "style": {
-            "fontSizePt": 21,
-            "font": "Microsoft YaHei",
-            "color": "#23303f",
-            "lineSpacingPt": 32.55,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0.0875,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "代码块也是一个核心。装不下时按行切，行号跨页连续，不会留下 1~2 行的碎片。"
-            }
-          ],
-          "srcRange": [
-            58,
-            58
-          ],
-          "lines": 1,
-          "singleLine": true
-        },
-        {
           "type": "code",
           "geo": {
             "x": 0.5833,
-            "y": 2.0586,
+            "y": 1.4631,
             "w": 12.1667,
-            "h": 4.7964
+            "h": 5.4479
           },
           "style": {
             "fontSizePt": 17,
@@ -3961,11 +4179,25 @@
               {
                 "text": "        pages.append(current)"
               }
+            ],
+            [
+              {
+                "text": "    "
+              },
+              {
+                "text": "return",
+                "style": {
+                  "color": "#8250df"
+                }
+              },
+              {
+                "text": " pages"
+              }
             ]
           ],
           "srcRange": [
             60,
-            74
+            77
           ]
         },
         {
@@ -4049,7 +4281,7 @@
           },
           "runs": [
             {
-              "text": "7 / 20"
+              "text": "9 / 24"
             }
           ],
           "lines": 1,
@@ -4058,8 +4290,8 @@
       ]
     },
     {
-      "index": 7,
-      "pagination": 8,
+      "index": 9,
+      "pagination": 10,
       "layout": "code",
       "background": {
         "color": "#ffffff"
@@ -4070,7 +4302,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.5298,
+            "y": 1.3442,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -4103,9 +4335,9 @@
           "type": "code",
           "geo": {
             "x": 0.5833,
-            "y": 1.4631,
+            "y": 2.2775,
             "w": 12.1667,
-            "h": 5.4479
+            "h": 3.8192
           },
           "style": {
             "fontSizePt": 17,
@@ -4120,20 +4352,6 @@
             "paddingBottomIn": 0
           },
           "lines": [
-            [
-              {
-                "text": "    "
-              },
-              {
-                "text": "return",
-                "style": {
-                  "color": "#8250df"
-                }
-              },
-              {
-                "text": " pages"
-              }
-            ],
             [
               {
                 "text": "def",
@@ -4305,32 +4523,11 @@
               {
                 "text": " [block]"
               }
-            ],
-            [
-              {
-                "text": "def",
-                "style": {
-                  "color": "#8250df"
-                }
-              },
-              {
-                "text": " "
-              },
-              {
-                "text": "split_table_rows",
-                "style": {
-                  "color": "#1f4e79",
-                  "bold": true
-                }
-              },
-              {
-                "text": "(table, page_height):"
-              }
             ]
           ],
           "srcRange": [
-            75,
-            91
+            78,
+            90
           ]
         },
         {
@@ -4395,9 +4592,9 @@
           "type": "paragraph",
           "role": "footer",
           "geo": {
-            "x": 12.2014,
+            "x": 12.0859,
             "y": 7.0528,
-            "w": 0.5486,
+            "w": 0.6641,
             "h": 0.3013
           },
           "style": {
@@ -4414,7 +4611,7 @@
           },
           "runs": [
             {
-              "text": "8 / 20"
+              "text": "10 / 24"
             }
           ],
           "lines": 1,
@@ -4423,8 +4620,8 @@
       ]
     },
     {
-      "index": 8,
-      "pagination": 9,
+      "index": 10,
+      "pagination": 11,
       "layout": "code",
       "background": {
         "color": "#ffffff"
@@ -4435,7 +4632,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.9099,
+            "y": 0.7471,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -4468,9 +4665,9 @@
           "type": "code",
           "geo": {
             "x": 0.5833,
-            "y": 1.8432,
+            "y": 1.6803,
             "w": 12.1667,
-            "h": 4.145
+            "h": 4.4707
           },
           "style": {
             "fontSizePt": 17,
@@ -4485,6 +4682,27 @@
             "paddingBottomIn": 0
           },
           "lines": [
+            [
+              {
+                "text": "def",
+                "style": {
+                  "color": "#8250df"
+                }
+              },
+              {
+                "text": " "
+              },
+              {
+                "text": "split_table_rows",
+                "style": {
+                  "color": "#1f4e79",
+                  "bold": true
+                }
+              },
+              {
+                "text": "(table, page_height):"
+              }
+            ],
             [
               {
                 "text": "    "
@@ -4725,7 +4943,7 @@
             ]
           ],
           "srcRange": [
-            92,
+            91,
             103
           ]
         },
@@ -4733,7 +4951,7 @@
           "type": "paragraph",
           "geo": {
             "x": 0.5833,
-            "y": 6.0472,
+            "y": 6.2101,
             "w": 12.1667,
             "h": 0.4554
           },
@@ -4843,9 +5061,9 @@
           "type": "paragraph",
           "role": "footer",
           "geo": {
-            "x": 12.2014,
+            "x": 12.0859,
             "y": 7.0528,
-            "w": 0.5486,
+            "w": 0.6641,
             "h": 0.3013
           },
           "style": {
@@ -4862,7 +5080,7 @@
           },
           "runs": [
             {
-              "text": "9 / 20"
+              "text": "11 / 24"
             }
           ],
           "lines": 1,
@@ -4871,8 +5089,165 @@
       ]
     },
     {
-      "index": 9,
-      "pagination": 10,
+      "index": 11,
+      "pagination": 12,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.2105,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "（续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.75,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "代码块也是一个核心。装不下时按行切，行号跨页连续，不会留下 1~2 行的碎片。"
+            }
+          ],
+          "srcRange": [
+            58,
+            58
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.4557,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "MD2Slides 演示"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 2.9965,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "长代码：按行切，行号不断 （续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.0859,
+            "y": 7.0528,
+            "w": 0.6641,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "12 / 24"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "pagination": 13,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -4883,7 +5258,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.5637,
+            "y": 0.5782,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -4913,44 +5288,13 @@
           "singleLine": true
         },
         {
-          "type": "paragraph",
-          "geo": {
-            "x": 0.5833,
-            "y": 1.497,
-            "w": 12.1667,
-            "h": 0.9041
-          },
-          "style": {
-            "fontSizePt": 21,
-            "font": "Microsoft YaHei",
-            "color": "#23303f",
-            "lineSpacingPt": 32.55,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0.0875,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "列表按项切，续页继续编号。下面这份清单会超过一页；注意第二页的第一项编号没有回到 1。"
-            }
-          ],
-          "srcRange": [
-            109,
-            109
-          ],
-          "lines": 2
-        },
-        {
           "type": "list",
           "ordered": true,
           "geo": {
             "x": 0.5833,
-            "y": 2.4885,
+            "y": 1.5115,
             "w": 12.1667,
-            "h": 4.3748
+            "h": 5.3372
           },
           "style": {
             "fontSizePt": 21,
@@ -5221,13 +5565,67 @@
                 119,
                 119
               ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "列表项不会被丢掉"
+                }
+              ],
+              "style": {
+                "fontSizePt": 21,
+                "font": "Microsoft YaHei",
+                "color": "#23303f",
+                "lineSpacingPt": 31.5,
+                "spaceBeforeIn": 0.0438,
+                "spaceAfterIn": 0.0438,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.3207,
+              "gapBeforeIn": 0.0437,
+              "srcRange": [
+                120,
+                120
+              ]
+            },
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "图片整体缩放"
+                }
+              ],
+              "style": {
+                "fontSizePt": 21,
+                "font": "Microsoft YaHei",
+                "color": "#23303f",
+                "lineSpacingPt": 31.5,
+                "spaceBeforeIn": 0.0438,
+                "spaceAfterIn": 0.0438,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.3207,
+              "gapBeforeIn": 0.0437,
+              "srcRange": [
+                121,
+                121
+              ]
             }
           ],
-          "lines": 9,
+          "lines": 11,
           "gapAfterIn": 0.0437,
           "srcRange": [
             111,
-            119
+            121
           ]
         },
         {
@@ -5311,7 +5709,7 @@
           },
           "runs": [
             {
-              "text": "10 / 20"
+              "text": "13 / 24"
             }
           ],
           "lines": 1,
@@ -5320,8 +5718,8 @@
       ]
     },
     {
-      "index": 10,
-      "pagination": 11,
+      "index": 13,
+      "pagination": 14,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -5332,7 +5730,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.7897,
+            "y": 1.2709,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -5366,9 +5764,9 @@
           "ordered": true,
           "geo": {
             "x": 0.5833,
-            "y": 1.723,
+            "y": 2.2042,
             "w": 12.1667,
-            "h": 4.3748
+            "h": 3.4123
           },
           "style": {
             "fontSizePt": 21,
@@ -5383,60 +5781,6 @@
             "paddingBottomIn": 0
           },
           "items": [
-            {
-              "level": 0,
-              "runs": [
-                {
-                  "text": "列表项不会被丢掉"
-                }
-              ],
-              "style": {
-                "fontSizePt": 21,
-                "font": "Microsoft YaHei",
-                "color": "#23303f",
-                "lineSpacingPt": 31.5,
-                "spaceBeforeIn": 0.0438,
-                "spaceAfterIn": 0.0438,
-                "paddingLeftIn": 0,
-                "paddingRightIn": 0,
-                "paddingTopIn": 0,
-                "paddingBottomIn": 0
-              },
-              "lines": 1,
-              "indentIn": 0.3207,
-              "gapBeforeIn": 0.0437,
-              "srcRange": [
-                120,
-                120
-              ]
-            },
-            {
-              "level": 0,
-              "runs": [
-                {
-                  "text": "图片整体缩放"
-                }
-              ],
-              "style": {
-                "fontSizePt": 21,
-                "font": "Microsoft YaHei",
-                "color": "#23303f",
-                "lineSpacingPt": 31.5,
-                "spaceBeforeIn": 0.0438,
-                "spaceAfterIn": 0.0438,
-                "paddingLeftIn": 0,
-                "paddingRightIn": 0,
-                "paddingTopIn": 0,
-                "paddingBottomIn": 0
-              },
-              "lines": 1,
-              "indentIn": 0.3207,
-              "gapBeforeIn": 0.0437,
-              "srcRange": [
-                121,
-                121
-              ]
-            },
             {
               "level": 0,
               "runs": [
@@ -5634,10 +5978,10 @@
               ]
             }
           ],
-          "lines": 9,
+          "lines": 7,
           "gapAfterIn": 0.0437,
           "srcRange": [
-            120,
+            122,
             129
           ]
         },
@@ -5645,7 +5989,7 @@
           "type": "paragraph",
           "geo": {
             "x": 0.5833,
-            "y": 6.1707,
+            "y": 5.6895,
             "w": 12.1667,
             "h": 0.452
           },
@@ -5754,7 +6098,7 @@
           },
           "runs": [
             {
-              "text": "11 / 20"
+              "text": "14 / 24"
             }
           ],
           "lines": 1,
@@ -5763,8 +6107,164 @@
       ]
     },
     {
-      "index": 11,
-      "pagination": 12,
+      "index": 14,
+      "pagination": 15,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 2.9845,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "（续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.524,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "列表按项切，续页继续编号。下面这份清单会超过一页；注意第二页的第一项编号没有回到 1。"
+            }
+          ],
+          "srcRange": [
+            109,
+            109
+          ],
+          "lines": 2
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.4557,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "MD2Slides 演示"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 0.5833,
+            "y": 7.0528,
+            "w": 2.9965,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "长列表：按项切，编号续上 （续）"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.0859,
+            "y": 7.0528,
+            "w": 0.6641,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "15 / 24"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "pagination": 16,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -6092,7 +6592,7 @@
           },
           "runs": [
             {
-              "text": "12 / 20"
+              "text": "16 / 24"
             }
           ],
           "lines": 1,
@@ -6101,8 +6601,8 @@
       ]
     },
     {
-      "index": 12,
-      "pagination": 13,
+      "index": 16,
+      "pagination": 17,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -6278,7 +6778,7 @@
           },
           "runs": [
             {
-              "text": "13 / 20"
+              "text": "17 / 24"
             }
           ],
           "lines": 1,
@@ -6287,8 +6787,8 @@
       ]
     },
     {
-      "index": 13,
-      "pagination": 14,
+      "index": 17,
+      "pagination": 18,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -6484,7 +6984,7 @@
           },
           "runs": [
             {
-              "text": "14 / 20"
+              "text": "18 / 24"
             }
           ],
           "lines": 1,
@@ -6493,8 +6993,8 @@
       ]
     },
     {
-      "index": 14,
-      "pagination": 15,
+      "index": 18,
+      "pagination": 19,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -6990,7 +7490,7 @@
           },
           "runs": [
             {
-              "text": "15 / 20"
+              "text": "19 / 24"
             }
           ],
           "lines": 1,
@@ -6999,8 +7499,8 @@
       ]
     },
     {
-      "index": 15,
-      "pagination": 16,
+      "index": 19,
+      "pagination": 20,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -7153,7 +7653,7 @@
           },
           "runs": [
             {
-              "text": "16 / 20"
+              "text": "20 / 24"
             }
           ],
           "lines": 1,
@@ -7162,8 +7662,8 @@
       ]
     },
     {
-      "index": 16,
-      "pagination": 17,
+      "index": 20,
+      "pagination": 21,
       "layout": "code",
       "background": {
         "color": "#ffffff"
@@ -7635,7 +8135,7 @@
           },
           "runs": [
             {
-              "text": "17 / 20"
+              "text": "21 / 24"
             }
           ],
           "lines": 1,
@@ -7644,8 +8144,8 @@
       ]
     },
     {
-      "index": 17,
-      "pagination": 18,
+      "index": 21,
+      "pagination": 22,
       "layout": "table",
       "background": {
         "color": "#ffffff"
@@ -8234,7 +8734,7 @@
           },
           "runs": [
             {
-              "text": "18 / 20"
+              "text": "22 / 24"
             }
           ],
           "lines": 1,
@@ -8243,8 +8743,8 @@
       ]
     },
     {
-      "index": 18,
-      "pagination": 19,
+      "index": 22,
+      "pagination": 23,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -8557,7 +9057,7 @@
           },
           "runs": [
             {
-              "text": "19 / 20"
+              "text": "23 / 24"
             }
           ],
           "lines": 1,
@@ -8566,8 +9066,8 @@
       ]
     },
     {
-      "index": 19,
-      "pagination": 20,
+      "index": 23,
+      "pagination": 24,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -8762,7 +9262,7 @@
           },
           "runs": [
             {
-              "text": "20 / 20"
+              "text": "24 / 24"
             }
           ],
           "lines": 1,

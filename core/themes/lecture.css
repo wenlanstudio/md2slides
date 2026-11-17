@@ -244,6 +244,14 @@ img {
   margin-right: auto;
 }
 
+/* 图表位图（引擎产物）豁免主题的高度钳制：大图（如 mermaid 时序图 900×1637）被
+   720 压小后引擎量不到「它想占多大」，永远轮不到裸页独占——图被腰斩在小框里
+   （2026-11-17 用户裁决：图片太大应独占一页）。豁免后高度归引擎的裸页媒体缩放链
+   管（上限=页高）。宽度仍钳 92% 防横向溢出。 */
+img.md2slides-diagram {
+  max-height: none;
+}
+
 /* 图题 */
 section p.figcap {
   text-align: center;

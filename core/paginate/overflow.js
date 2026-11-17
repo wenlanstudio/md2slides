@@ -245,6 +245,10 @@ function contentWidth(section) {
 function fitImagesInPlace(el, boxW, boxH, scale) {
   const imgs = el.tagName === "IMG" ? [el] : [...(el.querySelectorAll?.("img") ?? [])]
   let changed = 0
+  // 无空间可缩就不许写尺寸：boxH 被占满（裸页塞进放不下的尾部块）时照旧计算会
+  // 写出 0×0——回滚只回滚位置不回滚内联样式，图从此在页上消失（YARN-APPID 时序图
+  // 事故，2026-11-17）。宁可原尺寸溢出走红标，也绝不把图抹成 0。
+  if (boxW <= 0 || boxH <= 0) return false
   for (const img of imgs) {
     const r = img.getBoundingClientRect()
     const w = r.width / scale
@@ -561,11 +565,12 @@ function splitSection(section, opts) {
     if (unit.start === 0 || unitH > budget - headingH) {
       const el = movable[unit.start].el
       const isCols = el.classList?.contains("cols") === true
-      // 裸页搬「该单元起的整个尾部」而不是单块：只搬单块会把留在源页的后续块
-      // 甩到它前面，阅读顺序倒置。尾部整体放不下（源页会被掏成标题壳）时
-      // spillToBarePage 自己拒绝回滚，正好落到下面的红标。
+      // 裸页搬「该单元起的尾部前缀」而不是单块（保序）：只搬单块会把留在源页的
+      // 后续块甩到它前面；整包塞会把放不下的尾部一起搬空（图片被缩 0×0 的
+      // 事故源）。装不下的留在源页由后续 pass 继续拆；前缀为空（单块就放不下）
+      // 就落到下面的红标。
       if (unit.start > 0
-        && spillToBarePage(section, movable.slice(unit.start).map(row => row.el), opts, budget, !isCols)) return true
+        && spillToBarePage(section, barePrefixBlocks(movable, unit.start, budget), opts, budget, !isCols)) return true
       markHonestOverflow(section, opts, isCols
         ? `分栏内容放不下（高约 ${Math.round(unitH)}px > 页内可用 ${Math.round(Math.max(0, budget - headingH))}px），已按原样保留——请精简分栏内容（分栏不缩放、不切分）`
         : `内容块放不下（高约 ${Math.round(unitH)}px > 页内可用 ${Math.round(Math.max(0, budget - headingH))}px），已按原样保留——请拆分段落或精简内容（不缩放、不切分）`)
@@ -607,7 +612,10 @@ function splitSection(section, opts) {
       // 先试给它一张空白无标题的整页：放得下就不切碎（放不下会自己回滚，见函数注释）。
       // 超高媒体（图片）例外：裸页上只放媒体本身，引导语留在原页——原页成为
       // 「标题+引导语」的扉页形态，给整页大图让路是正当排版（2026-10-25 拍板）。
-      if (spillToBarePage(section, movable.slice(isMedia ? c : unit.start).map(row => row.el), opts, budget)) return true
+      // 裸页搬「前缀」而非整尾部：整包塞会把后面的块（下一段落的代码块等）拖进
+      // 图片裸页，occupied 吃满预算 → 图缩不进、整页红标（YARN 时序图事故）。
+      // 图片直入组由媒体缩放链管，其余按裸页预算截断。
+      if (spillToBarePage(section, barePrefixBlocks(movable, isMedia ? c : unit.start, budget), opts, budget)) return true
       const room = budget - movable[c].top
       if (room > 0 && canSplit(movable[c].el)) remainder = splitBlock(movable[c].el, room, opts)
       if (remainder) cut = c
@@ -724,7 +732,7 @@ function splitSection(section, opts) {
       }
     }
     const isCols = el.classList?.contains("cols") === true
-    if (spillToBarePage(section, movable.slice(from).map(row => row.el), opts, budget, !isCols)) return true
+    if (spillToBarePage(section, barePrefixBlocks(movable, from, budget), opts, budget, !isCols)) return true
     markHonestOverflow(section, opts, isCols
       ? `分栏内容放不下（高约 ${Math.round(movable[unit.end].bottom - movable[unit.start].top)}px），已按原样保留——请精简分栏内容（分栏不缩放、不切分）`
       : `内容块放不下（高约 ${Math.round(movable[unit.end].bottom - movable[unit.start].top)}px），已按原样保留——请拆分段落或精简内容（不缩放、不切分）`)
@@ -775,7 +783,34 @@ function applyHeadingPath(doc, separator = " > ") {
  *
  * @returns {boolean} true 表示已成功分出一张页
  */
+/**
+ * 裸页搬的前缀：从 from 起顺序取块，只取**裸页放得下的**（留出「（续）」标记的位）。
+ * 整包塞尾部会把放不下的后续块一起搬空——occupied 吃满预算、图片被缩成 0×0
+ * （YARN-APPID 时序图事故）；装不下的留给下一轮 pass 继续拆。图片块进组即停：
+ * 它会被媒体缩放适配，其后不再预留给别的块。
+ */
+const barePrefixBlocks = (movable, from, budget, slack = 46) => {
+  const out = []
+  let used = 0
+  const room = budget - slack
+  for (let i = from; i < movable.length; i++) {
+    const el = movable[i].el
+    const h = movable[i].bottom - movable[i].top
+    // 图片进组即停、不占高度预算：spillToBarePage 的媒体缩放链会把它缩到放得下
+    // （不先排除——图片多高都该由它自己的裸页链管，而不是拖上后面的块）。
+    const isImg = el.tagName === "IMG" || !!el.querySelector?.("img")
+    if (isImg) { out.push(el); break }
+    if (used + h > room) break
+    out.push(el)
+    used += h
+  }
+  return out
+}
+
 function spillToBarePage(section, blocks, opts, budget, mediaFit = true) {
+  // 空前缀（首块连裸页都放不下、前缀截断为空）不配开页：开出来就是一张只有
+  // 「（续）」标记的空壳，settle 每轮再生一张（61 壳事故）。调用方落到红标。
+  if (!blocks.length) return false
   const cont = newSlideAfter(section)
   if (!cont) return false
   cont.classList.remove(OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS)

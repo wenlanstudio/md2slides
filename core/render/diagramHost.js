@@ -157,6 +157,22 @@ const settle = async (doc, frames = 2) => {
 }
 
 /**
+ * 等图表位图 decode + 一帧布局（物理分页前的最后一道闸）。
+ *
+ * 位图 dataURL 注入后 img.decode 才完成内在尺寸解析；此前 getBoundingClientRect
+ * 报的是 0 或容器钳制的假尺寸——分页按假几何决策，大图（如 mermaid 时序图）被
+ * 塞进「标题+图」同页、最终被 overflow:hidden 裁掉大半（YARN-APPID 事故，
+ * 2026-11-17）。rAF 等不到 decode，必须等 decode 本身。
+ */
+const settleImages = async (doc) => {
+  const imgs = [...(doc?.body ?? doc).querySelectorAll("img.md2slides-diagram")]
+  if (!imgs.length) return
+  await Promise.all(imgs.map(im =>
+    typeof im.decode === "function" ? im.decode().catch(() => {}) : null))
+  await settle(doc, 1)
+}
+
+/**
  * 图表预通行：跑在**物理分页实测之前**。
  *
  * 分环境跑多遍是常态：graphviz 是 CLI，只能在 Node 侧渲染；mermaid 是浏览器运行时，
@@ -241,7 +257,10 @@ const renderDiagrams = async (doc, opts = {}) => {
     done.push(block.type)
   }
 
-  if (opts.settle !== false) await settle(doc, opts.frames ?? 2)
+  if (opts.settle !== false) {
+    await settle(doc, opts.frames ?? 2)
+    await settleImages(doc)   // decode + 一帧布局：分页要量真高，见 settleImages
+  }
 
   return { rendered: done.length, types: [...new Set(done)], pending: [...new Set(deferred)] }
 }
