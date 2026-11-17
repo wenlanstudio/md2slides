@@ -508,6 +508,7 @@ const buildHtml = async (msg, started) => {
     mode,
     browse,
     stepLines,
+    onOpenExternal: url => post({ type: "md2s:link-open", url }),
     startIndex,
     view,
     skipBuild: true,
@@ -594,6 +595,7 @@ const doBuild = async msg => {
       mode,
       browse,
       stepLines,
+      onOpenExternal: url => post({ type: "md2s:link-open", url }),
       startIndex,
       view,
     })

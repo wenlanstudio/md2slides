@@ -426,11 +426,19 @@ function createDeckPlayer(root, opts = {}) {
    * （那是 IR 的 skipSelector，打了图就会从导出里消失），也不套 wrapper。
    * 裸 IMG 的 click() 会被 kit/lightbox 在 document capture 上的委托接住，
    * 于是 player 完全不需要知道查看器存在——零耦合、图片 DOM 零改动。
+   *
+   * 超链接同理（2026-11-17）：裸 `<a href>` 不打任何标记，click() 由
+   * kit/linkbox 的事件委托接住开网页浮层。Enter 命中它 = 打开链接。
    */
   const findImage = el => {
     if (!el) return null
     if (el.tagName === "IMG") return el
     return el.querySelector?.("img") ?? null
+  }
+  const findLink = el => {
+    if (!el) return null
+    if (el.tagName === "A" && el.getAttribute?.("href")) return el
+    return el.querySelector?.("a[href]") ?? null
   }
   const activate = () => {
     const section = sections[index - 1]
@@ -439,11 +447,14 @@ function createDeckPlayer(root, opts = {}) {
     if (stepping()) {
       const step = planFor(index - 1)[shownOf(index - 1) - 1]
       for (const t of step ? [step.el, ...(step.extra ?? [])] : []) {
-        target = findActivatable(t) ?? findImage(t)
+        // activatable 优先（▶/run-line 是他自己的执行语义），其次图片、再链接。
+        target = findActivatable(t) ?? findImage(t) ?? findLink(t)
         if (target) break
       }
     } else {
-      target = section.querySelector("[data-md2s-activatable]") ?? section.querySelector("img")
+      target = section.querySelector("[data-md2s-activatable]")
+        ?? section.querySelector("img")
+        ?? section.querySelector("a[href]")
     }
     if (!target) return false
     target.click()

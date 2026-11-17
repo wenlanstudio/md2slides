@@ -22,6 +22,7 @@ const { renderDiagram: pageRenderDiagram, BROWSER_TYPES } = require("./index")
 const { sectionsOf } = require("../../core/section")
 const { createDeckPlayer } = require("../../kit/player")
 const { mountLightbox } = require("../../kit/lightbox")
+const { mountLinkbox } = require("../../kit/linkbox")
 const { extractIr } = require("../../export/pptx/ir")
 const { checkIr } = require("../../export/pptx/check")
 
@@ -88,6 +89,14 @@ let player = null
 let lightbox = null
 
 /**
+ * 超链接浮层（kit/linkbox.js，2026-11-17）：Enter 命中链接 → iframe 显示网页，
+ * 翻页笔开关。「在浏览器打开」交给宿主回调（wenlan 用 shell.openExternal）。
+ * 同一 iframe 只 mount 一次（run 可能被重调）。对外经 opts.onOpenExternal 注入，
+ * 与宿主解耦——Typora 形态不传就只预览、按钮点了无动作。
+ */
+let linkbox = null
+
+/**
  * 图表预通行：mermaid / echarts 是浏览器运行时，svg 栅格要 canvas，
  * 页面侧用 host/browser 的真渲染器画。
  *
@@ -122,6 +131,8 @@ const diagramPass = async (opts = {}) => {
  * @param {"page"|"element"} [opts.mode] 放映形态，默认 page（"slide" 旧键 = page+browse:false）
  * @param {boolean} [opts.browse]  仅 page 形态：true（默认）逐元素游走 / false 纯整页翻
  * @param {boolean} [opts.stepLines] 代码块行粒度遍历（front-matter stepLines: true），透传 player
+ * @param {Function} [opts.onOpenExternal] (url) => void——链接浮层「在浏览器打开」回调；宿主用
+ *   shell.openExternal 实现。不传则该按钮点了无动作（浮层内 iframe 预览仍可用）。
  * @param {Function} [opts.onChange] 翻页/步进回调（宿主状态栏用；list 视图不触发）
  * @param {number} [opts.startIndex] 起始页（1 基，P3-c 光标锚点用；list 视图忽略）
  * @param {Function} [opts.renderDiagramHost] 见 diagramPass（marktext 形态）
@@ -175,6 +186,10 @@ const run = async (opts = {}) => {
       // 放映的当前步本来就停在打开时那张图上，游标无需恢复。
       onClose: () => rootOf()?.focus?.(),
     })
+    linkbox = linkbox ?? mountLinkbox(document, {
+      onOpenExternal: url => opts.onOpenExternal?.(url),
+      onClose: () => rootOf()?.focus?.(),
+    })
     const count = sectionsOf(document).length
     return { pages: count, index: 1, total: count, steps: 0, diagrams: diagram.rendered, player: null, diags }
   }
@@ -190,6 +205,10 @@ const run = async (opts = {}) => {
   player = created
   lightbox = lightbox ?? mountLightbox(document, {
     maxScale: 12,
+    onClose: () => rootOf()?.focus?.(),
+  })
+  linkbox = linkbox ?? mountLinkbox(document, {
+    onOpenExternal: url => opts.onOpenExternal?.(url),
     onClose: () => rootOf()?.focus?.(),
   })
   return {

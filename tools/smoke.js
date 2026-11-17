@@ -1417,6 +1417,70 @@ check("翻页笔：Enter 开图 → 上/下一页遍历 → Enter 关闭 → 焦
   root.remove()
 })
 
+check("翻页笔：Enter 开链接浮层 → 切链接 → 浏览器打开 → Enter 关闭 → 焦点归还", () => {
+  const { createDeckPlayer } = require("../kit/player")
+  const { mountLinkbox } = require("../kit/linkbox")
+  const win = document.defaultView
+  const root = document.createElement("div")
+  document.body.appendChild(root)
+  root.innerHTML = '<section data-slide class="md2s-current"><p>见 <a href="https://a.example">甲站</a> 和 <a href="https://b.example">乙站</a>。</p></section>'
+    + "<section data-slide>B</section>"
+
+  let closedWith = null
+  const openedExternal = []
+  const lb = mountLinkbox(document, {
+    onOpenExternal: url => openedExternal.push(url),
+    onClose: a => { closedWith = a; root.focus() },
+  })
+  const p = createDeckPlayer(root, { mode: "page", browse: true })
+  const linkEls = [...root.querySelectorAll("a[href]")]
+  const frame = () => document.querySelector(".md2s-linkbox-frame")
+  const actOf = () => document.activeElement?.getAttribute?.("data-act")
+  const keyAt = (k, extra) => root.dispatchEvent(new win.KeyboardEvent("keydown", {
+    key: k, bubbles: true, cancelable: true, ...(extra ?? {}),
+  }))
+
+  // Enter 命中当前步里的第一个链接 → 委托接住 → 开浮层（不翻页、不推进步）
+  keyAt("ArrowDown")
+  assert.strictEqual(p.step, 1, "先步进到段落元素")
+  keyAt("Enter")
+  assert.strictEqual(lb.isOpen, true, "当前步含链接时 Enter 应打开浮层")
+  assert.strictEqual(p.index, 1, "打开链接浮层不该翻页")
+  assert.strictEqual(frame().getAttribute("src"), "https://a.example", "应加载第一个链接")
+  assert.strictEqual(actOf(), "close", "打开后焦点默认落在 ✕（最短闭环）")
+
+  // ← 在工具条按钮间移动（✕ 前一个应是 ↗ 浏览器打开）
+  keyAt("PageUp")
+  assert.strictEqual(actOf(), "external", "上一页应退到 ↗ 浏览器打开")
+  keyAt("Enter")
+  assert.deepStrictEqual(openedExternal, ["https://a.example"], "确定键应触发浏览器打开回调")
+
+  // 工具条按钮序 [prev, next, external, close]。从 external 上一格 = next。
+  keyAt("PageUp")
+  assert.strictEqual(actOf(), "next", "external 上一格应到下一链接")
+  keyAt("Enter")
+  assert.strictEqual(frame().getAttribute("src"), "https://b.example", "切到第二个链接")
+
+  // 确定键按下当前聚焦按钮：此刻焦点在 next（刚切完链接），空格会再切一次而非关闭。
+  keyAt(" ")
+  assert.strictEqual(lb.isOpen, true, "焦点在 next 时确定键应重复切链接，不关闭")
+  // 把焦点挪回末项 ✕（按钮序 prev,next,external,close；next→external→close 两格），空格关闭。
+  keyAt("PageDown"); keyAt("PageDown")
+  assert.strictEqual(actOf(), "close", "焦点应回到 ✕")
+  keyAt(" ")
+  assert.strictEqual(lb.isOpen, false, "空格在 ✕ 上作为确定键应关闭浮层")
+  assert.strictEqual(closedWith, linkEls[0], "onClose 带回打开时的那个链接")
+  assert.strictEqual(document.activeElement, root, "焦点应还给播放器容器")
+
+  // 关闭后翻页笔继续走原遍历链
+  keyAt("ArrowDown")
+  assert.strictEqual(p.index, 2, "关闭后下一步照常溢出翻页")
+
+  lb.destroy()
+  p.destroy()
+  root.remove()
+})
+
 check("焦点在原生按钮上时 player 不抢键（确定键不双触发）", () => {
   const { createDeckPlayer } = require("../kit/player")
   const win = document.defaultView
