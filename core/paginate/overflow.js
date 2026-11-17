@@ -565,12 +565,13 @@ function splitSection(section, opts) {
     if (unit.start === 0 || unitH > budget - headingH) {
       const el = movable[unit.start].el
       const isCols = el.classList?.contains("cols") === true
-      // 裸页搬「该单元起的尾部前缀」而不是单块（保序）：只搬单块会把留在源页的
-      // 后续块甩到它前面；整包塞会把放不下的尾部一起搬空（图片被缩 0×0 的
-      // 事故源）。装不下的留在源页由后续 pass 继续拆；前缀为空（单块就放不下）
-      // 就落到下面的红标。
+      // 裸页搬「该块起的整个尾部」，**一次搬完、绝不拆成两页**：裸页插在源页后面，
+      // 源页里留下的块都在它之前——只搬中间一块，被搬的块就跑到后面去了
+      // （YARN 讲义的两段引语被顶到整节末尾即是此病）；拆「前缀 + 余页」还会
+      // 在余页留下空壳。整尾放得下 → 成页；放不下 → 红标（源页只剩标题壳时
+      // spillToBarePage 自己拒绝回滚，同样落红标）。
       if (unit.start > 0
-        && spillToBarePage(section, barePrefixBlocks(movable, unit.start, budget), opts, budget, !isCols)) return true
+        && spillToBarePage(section, movable.slice(unit.start).map(row => row.el), opts, budget, !isCols)) return true
       markHonestOverflow(section, opts, isCols
         ? `分栏内容放不下（高约 ${Math.round(unitH)}px > 页内可用 ${Math.round(Math.max(0, budget - headingH))}px），已按原样保留——请精简分栏内容（分栏不缩放、不切分）`
         : `内容块放不下（高约 ${Math.round(unitH)}px > 页内可用 ${Math.round(Math.max(0, budget - headingH))}px），已按原样保留——请拆分段落或精简内容（不缩放、不切分）`)
@@ -612,10 +613,15 @@ function splitSection(section, opts) {
       // 先试给它一张空白无标题的整页：放得下就不切碎（放不下会自己回滚，见函数注释）。
       // 超高媒体（图片）例外：裸页上只放媒体本身，引导语留在原页——原页成为
       // 「标题+引导语」的扉页形态，给整页大图让路是正当排版（2026-10-25 拍板）。
-      // 裸页搬「前缀」而非整尾部：整包塞会把后面的块（下一段落的代码块等）拖进
-      // 图片裸页，occupied 吃满预算 → 图缩不进、整页红标（YARN 时序图事故）。
-      // 图片直入组由媒体缩放链管，其余按裸页预算截断。
-      if (spillToBarePage(section, barePrefixBlocks(movable, isMedia ? c : unit.start, budget), opts, budget)) return true
+      // 裸页整组搬：**整组**=引语+核心+结束语（核心的语义单元，拆开引语就成了
+      // 无人认领的孤段）；图片例外——只搬图本身，引导语留在原页（原页成为
+      // 「标题+引导语」的扉页，给整页大图让路，2026-10-25 拍板）。此前的
+      // 「前缀截断」会把引语单独搬出去，而源页后续切分出的新页又插在裸页之前，
+      // 引语就被顶到整节末尾（YARN 讲义事故）。
+      const group = isMedia
+        ? [movable[c].el]
+        : movable.slice(unit.start).map(row => row.el)
+      if (spillToBarePage(section, group, opts, budget)) return true
       const room = budget - movable[c].top
       if (room > 0 && canSplit(movable[c].el)) remainder = splitBlock(movable[c].el, room, opts)
       if (remainder) cut = c
@@ -732,7 +738,8 @@ function splitSection(section, opts) {
       }
     }
     const isCols = el.classList?.contains("cols") === true
-    if (spillToBarePage(section, barePrefixBlocks(movable, from, budget), opts, budget, !isCols)) return true
+    // 整尾搬（理由同 flow 分支：拆前缀会让源页/裸页之间夹空壳，且顺序必错）。
+    if (spillToBarePage(section, movable.slice(from).map(row => row.el), opts, budget, !isCols)) return true
     markHonestOverflow(section, opts, isCols
       ? `分栏内容放不下（高约 ${Math.round(movable[unit.end].bottom - movable[unit.start].top)}px），已按原样保留——请精简分栏内容（分栏不缩放、不切分）`
       : `内容块放不下（高约 ${Math.round(movable[unit.end].bottom - movable[unit.start].top)}px），已按原样保留——请拆分段落或精简内容（不缩放、不切分）`)
@@ -783,30 +790,6 @@ function applyHeadingPath(doc, separator = " > ") {
  *
  * @returns {boolean} true 表示已成功分出一张页
  */
-/**
- * 裸页搬的前缀：从 from 起顺序取块，只取**裸页放得下的**（留出「（续）」标记的位）。
- * 整包塞尾部会把放不下的后续块一起搬空——occupied 吃满预算、图片被缩成 0×0
- * （YARN-APPID 时序图事故）；装不下的留给下一轮 pass 继续拆。图片块进组即停：
- * 它会被媒体缩放适配，其后不再预留给别的块。
- */
-const barePrefixBlocks = (movable, from, budget, slack = 46) => {
-  const out = []
-  let used = 0
-  const room = budget - slack
-  for (let i = from; i < movable.length; i++) {
-    const el = movable[i].el
-    const h = movable[i].bottom - movable[i].top
-    // 图片进组即停、不占高度预算：spillToBarePage 的媒体缩放链会把它缩到放得下
-    // （不先排除——图片多高都该由它自己的裸页链管，而不是拖上后面的块）。
-    const isImg = el.tagName === "IMG" || !!el.querySelector?.("img")
-    if (isImg) { out.push(el); break }
-    if (used + h > room) break
-    out.push(el)
-    used += h
-  }
-  return out
-}
-
 function spillToBarePage(section, blocks, opts, budget, mediaFit = true) {
   // 空前缀（首块连裸页都放不下、前缀截断为空）不配开页：开出来就是一张只有
   // 「（续）」标记的空壳，settle 每轮再生一张（61 壳事故）。调用方落到红标。
