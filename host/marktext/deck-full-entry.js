@@ -197,6 +197,14 @@ const rewriteImages = (doc, mdDir) => {
 
 let buildChain = Promise.resolve()
 
+/* 构建期隐藏 #deck：内容注入后到 deckCore.run() 应用 transform/单页显示之间有一帧
+   裸渲染——封面 h1 按 1920 设计画布铺开，缩放未生效时看着偏右偏大（用户 2026-11-16
+   截图）。ready 后显示，rebuild 时再隐藏；出错/空稿也必须恢复，别把放映留成白屏。 */
+const setDeckBuilding = (on) => {
+  const root = document.getElementById("deck")
+  if (root) root.style.visibility = on ? "hidden" : ""
+}
+
 /** 与 build 同链串行：导出取数不许和重建交叉写 DOM。 */
 const enqueue = job => {
   buildChain = buildChain.then(job)
@@ -423,6 +431,7 @@ const buildHtml = async (msg, started) => {
   // ② 校验：硬契约，有任何 error 就拒绝（P7）。
   const verdict = validateHtmlDeck(parsed)
   if (!verdict.ok) {
+    setDeckBuilding(false) // doBuild 已置隐藏，校验失败也要放行（宿主会显示错误）
     post({
       type: "md2s:error",
       stage: "validate",
@@ -485,6 +494,7 @@ const buildHtml = async (msg, started) => {
   }
   if (notes.length) post({ type: "md2s:warn", message: notes.join("；") })
 
+  setDeckBuilding(false) // 缩放/单页已就位，此刻才放行显示（避免裸渲染偏位标题闪现）
   post({
     type: "md2s:ready",
     pages: result.pages,
@@ -505,6 +515,7 @@ const buildHtml = async (msg, started) => {
 const doBuild = async msg => {
   const started = performance.now()
   missingImages = []
+  setDeckBuilding(true)
   try {
     // 第三方 HTML 放映稿：绕开 compose，已编排好的 DOM 直接建播放器。
     if (msg.html != null) {
@@ -563,6 +574,7 @@ const doBuild = async msg => {
       notes.push(`缺图 ${missingImages.length} 张，已用占位图：${[...new Set(missingImages)].join("、")}`)
     }
     if (notes.length) post({ type: "md2s:warn", message: notes.join("；") })
+    setDeckBuilding(false) // 缩放/单页已就位，此刻才放行显示（避免裸渲染偏位标题闪现）
     post({
       type: "md2s:ready",
       pages: result.pages,
@@ -582,6 +594,7 @@ const doBuild = async msg => {
   } catch (error) {
     // 协议只带人话 message；堆栈留给宿主日志——没有它，构建失败就只剩一句
     // "Cannot read properties of undefined"，排障得靠猜。
+    setDeckBuilding(false) // 出错也要放行，别把放映留成永久白屏
     console.error("[deck] build failed:", error)
     post({ type: "md2s:error", stage: "build", message: describeError(error) })
   }
