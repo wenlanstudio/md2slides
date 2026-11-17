@@ -322,6 +322,10 @@ function splitTable(table, room, opts) {
  * block itself after each change. That is ~log2(n) reflows, and only for blocks that really
  * overflow. Highlighting spans are dropped by slicing; the caller re-runs the highlighter
  * over the deck afterwards.
+ *
+ * 2026-11-17 用户裁决：**优先在空行边界切**（代码自己的"段落"边界——import 块、
+ * try 体内分组、catch 之间），逻辑分组不被腰斩；没有放得下的空行边界才退回纯
+ * 容量二分。空行归头部（作分组的收尾行），尾部从空行后的内容行开始。
  */
 function splitCodeBlock(pre, room, opts) {
   const scale = opts.scale ?? 1
@@ -342,28 +346,39 @@ function splitCodeBlock(pre, room, opts) {
     code.textContent = source
     return null
   }
-  // 前缀二分（layout-core bisectMaxFit）：换行让"行数 ↔ 视觉高"不可解析，
-  // 只能逐次实测；~log2(n) 次 reflow，只发生在真溢出的块上。
-  const best = bisectMaxFit(lines.length, fits)
-  if (best >= lines.length) {
+  // 空行优先：fits 随 k 单调（行越多越高），放不下的空行边界后面的只会更高，
+  // 直接停。空行不取首位（i=0 的头部会只剩空白行）。空行归头部 = 头部以
+  // 空行收尾、尾部从下一行内容开始——分组完整，切痕就是段落边界。
+  let keep = -1
+  for (let i = 1; i < lines.length - 1; i++) {
+    if (lines[i].trim() !== "") continue
+    if (!fits(i + 1)) break
+    keep = i + 1
+  }
+  if (keep < 0) {
+    // 没有能放下的空行边界：前缀二分（layout-core bisectMaxFit）兜底——
+    // 换行让"行数 ↔ 视觉高"不可解析，只能逐次实测；~log2(n) 次 reflow。
+    keep = bisectMaxFit(lines.length, fits)
+  }
+  if (keep >= lines.length) {
     code.textContent = source
     return null
   }
 
-  const tail = lines.slice(best).join("\n")
-  code.textContent = lines.slice(0, best).join("\n")
+  const tail = lines.slice(keep).join("\n")
+  code.textContent = lines.slice(0, keep).join("\n")
 
   const cont = pre.cloneNode(false)
   const contCode = code.cloneNode(false)
   contCode.textContent = tail
   cont.appendChild(contCode)
   // 行号按算术收缩（围栏块内部没有带行号的子元素，restampSrcRange 帮不上）：
-  // 内容行从 src-start+1（跳过起始围栏）数起，best 行留头，其余归尾。
+  // 内容行从 src-start+1（跳过起始围栏）数起，keep 行留头，其余归尾。
   // 尾的 end 封到 start + lines.length——lines 已弹掉尾随空行，不去认领围栏前的空白。
   const srcStart = Number(pre.getAttribute("data-src-start"))
   if (srcStart > 0) {
-    pre.setAttribute("data-src-end", String(srcStart + best))
-    cont.setAttribute("data-src-start", String(srcStart + best + 1))
+    pre.setAttribute("data-src-end", String(srcStart + keep))
+    cont.setAttribute("data-src-start", String(srcStart + keep + 1))
     cont.setAttribute("data-src-end", String(srcStart + lines.length))
   }
   return cont

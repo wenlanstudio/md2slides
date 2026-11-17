@@ -603,10 +603,13 @@ const doBuild = async msg => {
     if (missingImages.length) {
       notes.push(`缺图 ${missingImages.length} 张，已用占位图：${[...new Set(missingImages)].join("、")}`)
     }
-    // 分页警告（诚实溢出/图片缩放，deck-core 收集）：放映态没有览视图的红框，
-    // 胶囊是作者看见「哪里装不下」的唯一渠道。
-    for (const d of result.diags ?? []) {
-      if (d.level === "warning" && !notes.includes(d.message)) notes.push(d.message)
+    // 分页警告（诚实溢出/图片缩放，deck-core 收集）只在**览视图**显示（2026-11-17
+    // 用户拍板）：映视图是讲授面，不放作者侧诊断——览视图页上的红框/徽章已经
+    // 指了位置，胶囊再给文字细节。console.warn 照发，排障日志不受影响。
+    if (view === "list") {
+      for (const d of result.diags ?? []) {
+        if (d.level === "warning" && !notes.includes(d.message)) notes.push(d.message)
+      }
     }
     if (notes.length) post({ type: "md2s:warn", message: notes.join("；") })
     setDeckBuilding(false) // 缩放/单页已就位，此刻才放行显示（避免裸渲染偏位标题闪现）
