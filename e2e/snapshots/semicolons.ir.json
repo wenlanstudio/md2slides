@@ -193,7 +193,7 @@
               "level": 0,
               "runs": [
                 {
-                  "text": "护栏样例9",
+                  "text": "护栏样例8",
                   "style": {
                     "color": "#8a97a5"
                   }
@@ -250,7 +250,7 @@
           },
           "runs": [
             {
-              "text": "2 / 9"
+              "text": "2 / 8"
             }
           ],
           "lines": 1,
@@ -550,7 +550,7 @@
           },
           "runs": [
             {
-              "text": "3 / 9"
+              "text": "3 / 8"
             }
           ],
           "lines": 1,
@@ -693,7 +693,7 @@
               "level": 0,
               "runs": [
                 {
-                  "text": "护栏样例9",
+                  "text": "护栏样例8",
                   "style": {
                     "color": "#8a97a5"
                   }
@@ -750,7 +750,7 @@
           },
           "runs": [
             {
-              "text": "4 / 9"
+              "text": "4 / 8"
             }
           ],
           "lines": 1,
@@ -770,7 +770,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 0.5782,
+            "y": 0.5492,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -800,13 +800,45 @@
           "singleLine": true
         },
         {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 1.4824,
+            "w": 12.1667,
+            "h": 0.452
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "特性清单包括："
+            }
+          ],
+          "srcRange": [
+            12,
+            12
+          ],
+          "lines": 1,
+          "singleLine": true
+        },
+        {
           "type": "list",
           "ordered": false,
           "geo": {
             "x": 0.5833,
-            "y": 1.5115,
+            "y": 2.0219,
             "w": 12.1667,
-            "h": 5.3372
+            "h": 4.856
           },
           "style": {
             "fontSizePt": 21,
@@ -1090,40 +1122,13 @@
                 22,
                 22
               ]
-            },
-            {
-              "level": 0,
-              "runs": [
-                {
-                  "text": "列式存储引擎"
-                }
-              ],
-              "style": {
-                "fontSizePt": 21,
-                "font": "Microsoft YaHei",
-                "color": "#23303f",
-                "lineSpacingPt": 31.5,
-                "spaceBeforeIn": 0.0438,
-                "spaceAfterIn": 0.0438,
-                "paddingLeftIn": 0,
-                "paddingRightIn": 0,
-                "paddingTopIn": 0,
-                "paddingBottomIn": 0
-              },
-              "lines": 1,
-              "indentIn": 0.3207,
-              "gapBeforeIn": 0.0437,
-              "srcRange": [
-                23,
-                23
-              ]
             }
           ],
-          "lines": 11,
+          "lines": 10,
           "gapAfterIn": 0.0437,
           "srcRange": [
             13,
-            23
+            22
           ]
         },
         {
@@ -1207,7 +1212,7 @@
           },
           "runs": [
             {
-              "text": "5 / 9"
+              "text": "5 / 8"
             }
           ],
           "lines": 1,
@@ -1227,7 +1232,7 @@
           "level": 2,
           "geo": {
             "x": 0.5833,
-            "y": 2.9844,
+            "y": 2.7438,
             "w": 12.1667,
             "h": 0.7292
           },
@@ -1261,9 +1266,9 @@
           "ordered": false,
           "geo": {
             "x": 0.5833,
-            "y": 3.9176,
+            "y": 3.6771,
             "w": 12.1667,
-            "h": 0.525
+            "h": 1.0062
           },
           "style": {
             "fontSizePt": 21,
@@ -1278,6 +1283,33 @@
             "paddingBottomIn": 0
           },
           "items": [
+            {
+              "level": 0,
+              "runs": [
+                {
+                  "text": "列式存储引擎"
+                }
+              ],
+              "style": {
+                "fontSizePt": 21,
+                "font": "Microsoft YaHei",
+                "color": "#23303f",
+                "lineSpacingPt": 31.5,
+                "spaceBeforeIn": 0.0438,
+                "spaceAfterIn": 0.0438,
+                "paddingLeftIn": 0,
+                "paddingRightIn": 0,
+                "paddingTopIn": 0,
+                "paddingBottomIn": 0
+              },
+              "lines": 1,
+              "indentIn": 0.3207,
+              "gapBeforeIn": 0.0437,
+              "srcRange": [
+                23,
+                23
+              ]
+            },
             {
               "level": 0,
               "runs": [
@@ -1306,10 +1338,10 @@
               ]
             }
           ],
-          "lines": 1,
+          "lines": 2,
           "gapAfterIn": 0.0437,
           "srcRange": [
-            24,
+            23,
             25
           ]
         },
@@ -1394,7 +1426,7 @@
           },
           "runs": [
             {
-              "text": "6 / 9"
+              "text": "6 / 8"
             }
           ],
           "lines": 1,
@@ -1404,162 +1436,6 @@
     },
     {
       "index": 6,
-      "layout": "mixed",
-      "background": {
-        "color": "#ffffff"
-      },
-      "blocks": [
-        {
-          "type": "paragraph",
-          "geo": {
-            "x": 0.5833,
-            "y": 3.2105,
-            "w": 12.1667,
-            "h": 0.452
-          },
-          "style": {
-            "fontSizePt": 21,
-            "font": "Microsoft YaHei",
-            "color": "#23303f",
-            "lineSpacingPt": 32.55,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0.0875,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "（续）"
-            }
-          ],
-          "lines": 1,
-          "singleLine": true
-        },
-        {
-          "type": "paragraph",
-          "geo": {
-            "x": 0.5833,
-            "y": 3.75,
-            "w": 12.1667,
-            "h": 0.452
-          },
-          "style": {
-            "fontSizePt": 21,
-            "font": "Microsoft YaHei",
-            "color": "#23303f",
-            "lineSpacingPt": 32.55,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0.0875,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "特性清单包括："
-            }
-          ],
-          "srcRange": [
-            12,
-            12
-          ],
-          "lines": 1,
-          "singleLine": true
-        },
-        {
-          "type": "paragraph",
-          "role": "header",
-          "geo": {
-            "x": 0.5833,
-            "y": 0.1667,
-            "w": 0.7834,
-            "h": 0.3013
-          },
-          "style": {
-            "fontSizePt": 14,
-            "font": "Microsoft YaHei",
-            "color": "#8a97a5",
-            "lineSpacingPt": 21.7,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "回归夹具"
-            }
-          ],
-          "lines": 1,
-          "singleLine": true
-        },
-        {
-          "type": "paragraph",
-          "role": "footer",
-          "geo": {
-            "x": 0.5833,
-            "y": 7.0528,
-            "w": 1.6257,
-            "h": 0.3013
-          },
-          "style": {
-            "fontSizePt": 14,
-            "font": "Microsoft YaHei",
-            "color": "#8a97a5",
-            "lineSpacingPt": 21.7,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "长清单分页 （续）"
-            }
-          ],
-          "lines": 1,
-          "singleLine": true
-        },
-        {
-          "type": "paragraph",
-          "role": "footer",
-          "geo": {
-            "x": 12.3168,
-            "y": 7.0528,
-            "w": 0.4332,
-            "h": 0.3013
-          },
-          "style": {
-            "fontSizePt": 14,
-            "font": "Microsoft YaHei",
-            "color": "#8a97a5",
-            "lineSpacingPt": 21.7,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "7 / 9"
-            }
-          ],
-          "lines": 1,
-          "singleLine": true
-        }
-      ]
-    },
-    {
-      "index": 7,
       "layout": "mixed",
       "background": {
         "color": "#ffffff"
@@ -1691,7 +1567,7 @@
                   }
                 },
                 {
-                  "text": "9",
+                  "text": "8",
                   "style": {
                     "color": "#2e75b6",
                     "bold": true
@@ -1750,7 +1626,7 @@
           },
           "runs": [
             {
-              "text": "8 / 9"
+              "text": "7 / 8"
             }
           ],
           "lines": 1,
@@ -1759,7 +1635,7 @@
       ]
     },
     {
-      "index": 8,
+      "index": 7,
       "layout": "title+body",
       "background": {
         "color": "#ffffff"
@@ -1991,7 +1867,7 @@
           },
           "runs": [
             {
-              "text": "9 / 9"
+              "text": "8 / 8"
             }
           ],
           "lines": 1,
