@@ -641,7 +641,10 @@ function createDeckPlayer(root, opts = {}) {
       ro?.disconnect()
       clearSteps()
       freezeAnims()   // 文稿节点搬回原位前复位到静态终态
-      for (const s of sections) root.appendChild(s)   // 原序搬回
+      // 只搬还连在文档上的（isConnected）：deck-full 的 rebuild 先 innerHTML 清空
+      // 旧 deck，旧 section 那时已 detached——照搬回去就是旧页复活叠加（132 页 deck
+      // 重建变 264、翻页走进重复旧页的根因，2026-11-17）。detached 的交给 GC。
+      for (const s of sections) if (s.isConnected) root.appendChild(s)   // 原序搬回
       stage.remove()
       root.classList.remove("md2s-player")
     },

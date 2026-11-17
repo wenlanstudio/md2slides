@@ -43,7 +43,7 @@
 const deckCore = require("../browser/deck-core")
 const { compose } = require("../../core/compose")
 const { sectionsOf } = require("../../core/section")
-const { CONT_CLASS } = require("../../core/paginate/overflow")
+const { CONT_CLASS, OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS } = require("../../core/paginate/overflow")
 const {
   validateHtmlDeck,
   formatIssues,
@@ -242,6 +242,12 @@ html.md2s-list #deck > section.md2s-cont-page {
   outline: calc(3px / var(--md2s-list-zoom, 0.3)) dashed #d97706;
   outline-offset: calc(-6px / var(--md2s-list-zoom, 0.3));
 }
+/* 诚实溢出页（2026-11-17 拍板：放不下就原样保留）：红实线比切分的琥珀虚线更重——
+   切分是引擎办妥了的事，溢出是等作者办的事。 */
+html.md2s-list #deck > section.${OVERFLOW_CLASS} {
+  outline: calc(3px / var(--md2s-list-zoom, 0.3)) solid #dc2626;
+  outline-offset: calc(-6px / var(--md2s-list-zoom, 0.3));
+}
 .md2s-list-warn {
   position: absolute; top: 24px; right: 24px; z-index: 3;
   padding: 6px 18px; border-radius: 24px;
@@ -249,6 +255,10 @@ html.md2s-list #deck > section.md2s-cont-page {
   font-size: 26px; font-family: system-ui, sans-serif; font-weight: 600;
   zoom: calc(1 / var(--md2s-list-zoom, 0.3));
 }
+/* 「超出」红徽章放左上，避开右上切分组的「N页」琥珀徽章（同页可两者兼有）；
+   「图已缩」蓝徽章再往下错一层。 */
+.md2s-overflow-warn { top: 24px; right: auto; left: 24px; background: #dc2626; }
+.md2s-shrunk-warn { top: 88px; right: auto; left: 24px; background: #0369a1; }
 `
   document.head.appendChild(el)
 }
@@ -272,7 +282,9 @@ const applyListView = slideWidth => {
 }
 
 /** 溢出警告：按（续）连片分组，返回被切成多页的逻辑页数。幂等（每次 build 后
- *  在全新 section 集上重打）。 */
+ *  在全新 section 集上重打）。另打两类单页标记（2026-11-17 拍板的提醒体系）：
+ *  诚实溢出页红实线 + 「超出」（内容按原样留在这一页、底部被裁，等作者改文档）；
+ *  图片被分页缩放过的页挂「图已缩」蓝徽章（缩放是认可的正路，只提示）。 */
 const markOverflowWarnings = () => {
   const sections = sectionsOf(document)
   let warned = 0
@@ -290,6 +302,21 @@ const markOverflowWarnings = () => {
       for (let k = i; k <= j; k++) sections[k].classList.add("md2s-cont-page")
     }
     i = j + 1
+  }
+  for (const s of sections) {
+    if (!s.classList.contains(OVERFLOW_CLASS)) continue
+    const badge = document.createElement("div")
+    badge.className = "md2s-list-warn md2s-overflow-warn"
+    badge.textContent = "超出"
+    s.appendChild(badge)
+    warned += 1
+  }
+  for (const s of sections) {
+    if (!s.classList.contains(MEDIA_SHRUNK_CLASS)) continue
+    const badge = document.createElement("div")
+    badge.className = "md2s-list-warn md2s-shrunk-warn"
+    badge.textContent = "图已缩"
+    s.appendChild(badge)
   }
   return warned
 }
@@ -355,6 +382,9 @@ const markMissingImages = () => {
   for (const img of document.images) {
     if (img.dataset.md2sMissing) continue
     if (img.src.startsWith("data:")) continue
+    // lightbox 浮层自己的 <img> 没有 src 是常态，不是缺图——空 src 会被解析成
+    // 页面自身（"deck.html"），曾把「缺图 1 张：deck.html」的假警告刷给每份讲义。
+    if (img.closest(".md2s-lb")) continue
     if (!img.complete || img.naturalWidth > 0) continue
     img.dataset.md2sMissing = "1"
     const label = labelOfSrc(img.getAttribute("src") ?? img.src)
@@ -572,6 +602,11 @@ const doBuild = async msg => {
     if (deck.themeWarning) notes.push(deck.themeWarning)
     if (missingImages.length) {
       notes.push(`缺图 ${missingImages.length} 张，已用占位图：${[...new Set(missingImages)].join("、")}`)
+    }
+    // 分页警告（诚实溢出/图片缩放，deck-core 收集）：放映态没有览视图的红框，
+    // 胶囊是作者看见「哪里装不下」的唯一渠道。
+    for (const d of result.diags ?? []) {
+      if (d.level === "warning" && !notes.includes(d.message)) notes.push(d.message)
     }
     if (notes.length) post({ type: "md2s:warn", message: notes.join("；") })
     setDeckBuilding(false) // 缩放/单页已就位，此刻才放行显示（避免裸渲染偏位标题闪现）

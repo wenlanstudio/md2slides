@@ -10,7 +10,7 @@
  * 那样失败信息才带得全（哪一页、溢出多少像素、页里有什么）。
  */
 
-const { splitOverflow } = require("../core/paginate/overflow")
+const { splitOverflow, OVERFLOW_CLASS } = require("../core/paginate/overflow")
 const { FURNITURE_CLASS, SLOT_LEFT_CLASS, SLOT_RIGHT_CLASS } = require("../core/paginate/furniture")
 const { highlightCode } = require("../core/render/highlight")
 const { sectionsOf, beginMeasure, endMeasure } = require("../core/section")
@@ -149,6 +149,9 @@ const report = (opts = {}) => {
         })),
         // 一页里出现两个「（续）」，说明克隆标题时没把旧的剥掉，页越拆标记越多。
         contMarks: section.querySelectorAll(".md2s-cont").length,
+        // 诚实溢出页（2026-11-17 拍板）：内容按原样保留、底部被裁，页打红标。
+        // check.js 的「无溢出」断言只认未标记的——标记过的由 oversize 夹具专门断言。
+        overflowMarked: section.classList.contains(OVERFLOW_CLASS),
       }
     })
     // 扉页重复：本页是扉页，而下页把头上的标题**原样再摆一遍**（repeatHeading 克隆）——
@@ -163,12 +166,14 @@ const report = (opts = {}) => {
     endMeasure(document)
   }
 
-  const overflowing = pages.filter(p => p.overflow > 0)
+  const overflowing = pages.filter(p => p.overflow > 0 && !p.overflowMarked)
   return {
     pages,
     summary: {
       total: pages.length,
       overflowing: overflowing.length,
+      // 诚实溢出页（打红标、原样保留）：不是缺陷，是等作者改文档的提醒。
+      honestOverflow: pages.filter(p => p.overflow > 0 && p.overflowMarked).length,
       maxOverflow: overflowing.reduce((m, p) => Math.max(m, p.overflow), 0),
       dividerRepeats: pages.filter(p => p.dividerRepeat).map(p => p.index || pages.indexOf(p) + 1),
       empties: pages.filter(p => p.empty).map(p => p.index || pages.indexOf(p) + 1),

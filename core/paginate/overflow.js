@@ -28,6 +28,20 @@ const CONT_CSS = `
 section .${CONT_CLASS} { font-size: 0.7em; font-weight: normal; opacity: 0.7; }
 `
 
+/** 诚实溢出页（2026-11-17 拍板：段落/分栏永不缩放、永不切分，放不下就原样保留、
+ * 底部裁切）。类是给览视图打红框的依据；内容原样留在 DOM，导出/IR 不受影响。 */
+const OVERFLOW_CLASS = "md2s-overflow"
+
+/** 页内有图片被分页等比缩放过（原位适配 / 裸页补缝轮生效）。览视图「图已缩」
+ * 角标的依据——图片缩放是认可的正路（2026-11-17 拍板），只提示不告警框。 */
+const MEDIA_SHRUNK_CLASS = "md2s-media-shrunk"
+
+/** 诚实溢出的版面配合：页面裁掉放不下的部分。与 CONT_CSS 同一注入槽
+ * （deck-core 加载即注入）。 */
+const OVERFLOW_CSS = `
+section[data-slide] { overflow: hidden; }
+`
+
 const {
   sectionsOf,
   newSlideAfter,
@@ -205,6 +219,18 @@ function warnDiag(opts, message) {
   console.warn(`[md2slides] ${message}`)
 }
 
+/** 诚实溢出页标记：类 + 一次性诊断。幂等（同一页反复 pass 不重复告警）。 */
+function markHonestOverflow(section, opts, message) {
+  if (section.classList.contains(OVERFLOW_CLASS)) return
+  section.classList.add(OVERFLOW_CLASS)
+  warnDiag(opts, message)
+}
+
+/** 图片被分页缩放过的页标记（览视图「图已缩」角标）。幂等。 */
+function markMediaShrunk(section) {
+  section.classList.add(MEDIA_SHRUNK_CLASS)
+}
+
 /** 版面内容区宽度（图片缩放的横向边界；纵向边界就是 budget）。 */
 function contentWidth(section) {
   const cs = section.ownerDocument.defaultView.getComputedStyle(section)
@@ -232,37 +258,6 @@ function fitImagesInPlace(el, boxW, boxH, scale) {
     changed += 1
   }
   return changed > 0
-}
-
-/**
- * 超高文本原位缩字号（段落 / 块级公式——KaTeX 全是 em 单位，随字号等比缩）。
- * 二分到刚好放进 room；下限 8px（1920 画布），缩到下限仍放不下返回 null
- * （物理极限，调用方决定进一步动作并告警）。返回缩放百分比（整数）。
- */
-function shrinkTextToFit(el, room, scale, floor = STRATEGY.textShrinkFloor) {
-  const view = el.ownerDocument?.defaultView
-  const cs = view?.getComputedStyle?.(el)
-  const original = parseFloat(cs?.fontSize)
-  if (!Number.isFinite(original) || original <= floor) return null
-  const measure = () => el.getBoundingClientRect().height / scale
-  if (measure() <= room) return 100
-  const fits = size => {
-    el.style.fontSize = `${size}px`
-    return measure() <= room
-  }
-  if (!fits(floor)) {
-    el.style.fontSize = ""
-    return null
-  }
-  let lo = floor
-  let hi = original
-  let chosen = floor
-  for (let i = 0; i < 12; i++) {
-    const mid = (lo + hi) / 2
-    if (fits(mid)) { chosen = mid; hi = mid } else { lo = mid }
-  }
-  el.style.fontSize = `${chosen}px`
-  return Math.round((chosen / original) * 100)
 }
 
 /**
@@ -532,22 +527,35 @@ function splitSection(section, opts) {
   let remainder = null
 
   if (unit.role === "flow") {
-    // 2026-10-25 拍板：整块高于一整页的段落不再认输——原位缩字号顺排（warning），
-    // 不允许溢出。仅对"高于整页"的块生效：放得下整页的块照旧整块搬运（顺排/孤段控制
-    // 的语义不能被缩放劫持）。
+    // 2026-11-17 拍板：文本/分栏永不缩放、永不切分（8px 蚂蚁字废除）。出口三个：
+    //   a) 续页（克隆标题 + 块）放得下 → 整块搬过去（与旧行为一致）；
+    //   b) 搬不动 → 裸页只放它自己（放得下、且原页仍有内容时成页；分栏禁图缩）；
+    //   c) 都不行 → 诚实溢出：原样保留、打红标（览视图红框），交给作者改文档。
+    // 旧代码只看「块高 ≤ 整页」就无条件整搬——对「放得下一整页、放不下 标题+块」
+    // 的块，续页几何与本页完全相同，每轮白搬一次、各留一张只有标题的空壳页
+    // （GraphViz.md 132 页事故；18 行表格的同族病，core 分支早有 headingH 守卫）。
     const unitH = movable[unit.end].bottom - movable[unit.start].top
-    if (unitH > budget) {
-      const el = movable[unit.start].el
-      const room = budget - movable[unit.start].top
-      const pct = room > 0 ? shrinkTextToFit(el, room, opts.scale ?? 1) : null
-      if (pct != null) {
-        warnDiag(opts, `段落过高（约 ${Math.round(unitH)}px > 页高 ${Math.round(budget)}px），字号已缩至 ${pct}% 顺排`)
-        return true
-      }
-      warnDiag(opts, "段落过高且缩至字号下限仍放不下（罕见，请反馈文档）")
-      if (unit.start === 0) return false
+    const first = firstContent(section)
+    let headingH = 0
+    if (first && isHeading(first)) {
+      const cs = section.ownerDocument.defaultView.getComputedStyle(first)
+      headingH = (first.getBoundingClientRect().height
+        + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0)
+      ) / scaleOf(section)
     }
-    if (unit.start === 0) return false
+    if (unit.start === 0 || unitH > budget - headingH) {
+      const el = movable[unit.start].el
+      const isCols = el.classList?.contains("cols") === true
+      // 裸页搬「该单元起的整个尾部」而不是单块：只搬单块会把留在源页的后续块
+      // 甩到它前面，阅读顺序倒置。尾部整体放不下（源页会被掏成标题壳）时
+      // spillToBarePage 自己拒绝回滚，正好落到下面的红标。
+      if (unit.start > 0
+        && spillToBarePage(section, movable.slice(unit.start).map(row => row.el), opts, budget, !isCols)) return true
+      markHonestOverflow(section, opts, isCols
+        ? `分栏内容放不下（高约 ${Math.round(unitH)}px > 页内可用 ${Math.round(Math.max(0, budget - headingH))}px），已按原样保留——请精简分栏内容（分栏不缩放、不切分）`
+        : `内容块放不下（高约 ${Math.round(unitH)}px > 页内可用 ${Math.round(Math.max(0, budget - headingH))}px），已按原样保留——请拆分段落或精简内容（不缩放、不切分）`)
+      return false
+    }
     cut = unit.start
   } else if (unit.start > 0) {
     // 中心内容放不下 → 整块新起一张，绝不为填满本页而把它拆开。
@@ -590,13 +598,15 @@ function splitSection(section, opts) {
       if (remainder) cut = c
       else if (unit.intro >= 0) cut = c   // 核心不可切 → 引语独占本页、核心整块去新页
       else {
-        // 裸页被拒（原页会成空壳）且核心不可切：原位缩放/缩字到剩余空间——不允许溢出。
+        // 裸页被拒（原页会成空壳）且核心不可切：图片仍可原位等比缩（2026-11-17 拍板，
+        // 缩图标给览视图）；文本/公式不再缩字号——诚实溢出，红标交给作者。
         const el = movable[c].el
         const room = budget - movable[c].top
         if (room > 0) {
           const prevStyle = el.getAttribute("style")
           const fitted = fitImagesInPlace(el, contentWidth(section), room, opts.scale ?? 1)
           if (fitted && !overflows(section, budget)) {
+            markMediaShrunk(section)
             warnDiag(opts, "超高图片已缩放适配本页剩余空间")
             return true
           }
@@ -604,12 +614,9 @@ function splitSection(section, opts) {
           if (prevStyle == null) el.removeAttribute("style")
           else el.setAttribute("style", prevStyle)
         }
-        const pct = room > 0 ? shrinkTextToFit(el, room, opts.scale ?? 1) : null
-        if (pct != null) {
-          warnDiag(opts, `超高内容块已缩至 ${pct}% 适配本页剩余空间`)
-          return true
-        }
-        return false                       // 物理极限：缩到下限仍放不下（罕见，请反馈）
+        markHonestOverflow(section, opts,
+          `内容块放不下（高约 ${Math.round(movable[c].bottom - movable[c].top)}px），已按原样保留——请精简该块（不缩放、不切分）`)
+        return false
       }
     } else {
       cut = unit.start                       // 新页放得下 → 整块搬走
@@ -623,24 +630,23 @@ function splitSection(section, opts) {
       if (remainder) cut = c                    // 16 行：过长切分，头部与引语同属首页
       else if (unit.intro >= 0) cut = c         // 15 行：核心不可切 → 引语独占本页
       else {
-        // 同上：不可切的核心独占整页仍放不下 → 原位缩放/缩字，不允许溢出。
+        // 同上：不可切的核心独占整页仍放不下 → 图片原位等比缩（打缩图标）；
+        // 文本/公式不再缩字号——诚实溢出，红标交给作者（2026-11-17 拍板）。
         const el = movable[c].el
         const room = budget - movable[c].top
         if (room > 0) {
           const prevStyle = el.getAttribute("style")
           const fitted = fitImagesInPlace(el, contentWidth(section), room, opts.scale ?? 1)
           if (fitted && !overflows(section, budget)) {
+            markMediaShrunk(section)
             warnDiag(opts, "超高图片已缩放适配整页")
             return true
           }
           if (prevStyle == null) el.removeAttribute("style")
           else el.setAttribute("style", prevStyle)
         }
-        const pct = room > 0 ? shrinkTextToFit(el, room, opts.scale ?? 1) : null
-        if (pct != null) {
-          warnDiag(opts, `超高内容块已缩至 ${pct}% 适配整页`)
-          return true
-        }
+        markHonestOverflow(section, opts,
+          `内容块放不下（高约 ${Math.round(movable[c].bottom - movable[c].top)}px），已按原样保留——请精简该块（不缩放、不切分）`)
         return false
       }
     } else if (unit.outro >= 0) {
@@ -665,14 +671,49 @@ function splitSection(section, opts) {
   const moving = remainder ? [remainder] : [movable[cut].el]
   for (let i = cut + 1; i < movable.length; i++) moving.push(movable[i].el)
 
+  const restore = moving.map(el => ({ el, parent: el.parentNode, next: el.nextSibling }))
   const cont = newSlideAfter(section)
   if (!cont) return false
+  // 续页不继承红标/缩图标：那是源页的诊疗记录，不是每页的家底。
+  cont.classList.remove(OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS)
   appendContinuationMarker(cont, section, moving, opts)
   for (const el of moving) cont.appendChild(el)
   // 页眉页脚克隆放**最后**：IR 块序必须与 PPTX 形状序一致（fill_deck 的文本
   // 校验按序拼接），而内容在前、家具在后是注入器定下的块序约定。
   for (const el of [...section.children]) {
     if (isFixed(el)) cont.appendChild(el.cloneNode(true))
+  }
+  // 通用保险丝（2026-11-17）：整块搬运后实测——「源页被掏成空壳 且 续页仍溢出」
+  // 才回滚。这是几何复制死循环的精确形状（空壳源页 + 同构溢出续页，每轮再搬一
+  // 次各留一张壳）；源页还有内容的搬运都是真进展，续页的溢出交给下一轮继续拆
+  // （表格先整搬、下轮在续页搬走尾块，正是多轮收敛的合法路径，别误杀）。
+  // 切分类（remainder）不走这里：尾部块严格小于原块，逐轮推进正是它的收敛方式。
+  // 回滚后的出口链：原地切分 → 裸页（保序搬尾部；分栏禁图缩）→ 红标认输。
+  if (!remainder && !leavesContent(section) && overflows(cont, budget)) {
+    restoreBlocks(restore)
+    cont.remove()
+    const from = unit.core >= 0 ? unit.core : unit.start
+    const el = movable[from].el
+    const room = budget - movable[from].top
+    if (room > 0 && canSplit(el)) {
+      const tail = splitBlock(el, room, opts)
+      if (tail) {
+        const slice = newSlideAfter(section)
+        slice.classList.remove(OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS)
+        appendContinuationMarker(slice, section, [tail], opts)
+        slice.appendChild(tail)
+        for (const e2 of [...section.children]) {
+          if (isFixed(e2)) slice.appendChild(e2.cloneNode(true))
+        }
+        return true
+      }
+    }
+    const isCols = el.classList?.contains("cols") === true
+    if (spillToBarePage(section, movable.slice(from).map(row => row.el), opts, budget, !isCols)) return true
+    markHonestOverflow(section, opts, isCols
+      ? `分栏内容放不下（高约 ${Math.round(movable[unit.end].bottom - movable[unit.start].top)}px），已按原样保留——请精简分栏内容（分栏不缩放、不切分）`
+      : `内容块放不下（高约 ${Math.round(movable[unit.end].bottom - movable[unit.start].top)}px），已按原样保留——请拆分段落或精简内容（不缩放、不切分）`)
+    return false
   }
   return true
 }
@@ -719,9 +760,10 @@ function applyHeadingPath(doc, separator = " > ") {
  *
  * @returns {boolean} true 表示已成功分出一张页
  */
-function spillToBarePage(section, blocks, opts, budget) {
+function spillToBarePage(section, blocks, opts, budget, mediaFit = true) {
   const cont = newSlideAfter(section)
   if (!cont) return false
+  cont.classList.remove(OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS)
   appendContinuationMarker(cont, section, blocks, opts, true, true)
 
   const restore = blocks.map(el => ({ el, parent: el.parentNode, next: el.nextSibling }))
@@ -736,7 +778,9 @@ function spillToBarePage(section, blocks, opts, budget) {
   // 2026-10-25 拍板：超高媒体在裸页上等比缩放、充分使用整个版面——不允许溢出。
   // 可缩高度要扣掉裸页上非图片内容（裸页开头的「（续）」标记段）已占的高度——
   // 否则永远"差几十像素"缩不进，兜底永不生效。
-  if (overflows(cont, budget)) {
+  // mediaFit=false（分栏，2026-11-17 拍板）：分栏是作者手动排的版，里面的图
+  // 不补缝不缩放——放不下就让调用方走诚实溢出。
+  if (overflows(cont, budget) && mediaFit) {
     // 可缩高度要扣掉裸页上非图片内容（裸页开头的「（续）」标记段）已占的高度。
     // 亚像素/外边距残差：单次贴合可能仍差零点几像素，最多四轮、每轮再收 5%。
     let occupied = 0
@@ -752,6 +796,7 @@ function spillToBarePage(section, blocks, opts, budget) {
       if (boxH <= 0) break
     }
     if (!overflows(cont, budget) && leavesContent(section)) {
+      markMediaShrunk(cont)
       warnDiag(opts, "超高图片已在整页缩放适配（无标题裸页，不溢出）")
       return true
     }
@@ -954,4 +999,7 @@ function splitOverflow(doc, opts = {}) {
 
 // isFixed / coreTypeOf 同时是 kit/steps.js（步进表）的判块词汇：家具白名单与
 // 「什么算内容块」全工程只此一份，分页与步进不许可各漂各的。
-module.exports = { splitOverflow, CONT_CSS, CONT_CLASS, coreTypeOf, isFixed }
+module.exports = {
+  splitOverflow, CONT_CSS, CONT_CLASS, coreTypeOf, isFixed,
+  OVERFLOW_CSS, OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS,
+}

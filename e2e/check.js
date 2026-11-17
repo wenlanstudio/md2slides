@@ -84,8 +84,8 @@ const audit = async input => {
     )
   })
 
-  await check("收敛后无溢出页", () => {
-    const bad = report.pages.filter(p => p.overflow > 0)
+  await check("收敛后无未标记溢出页（红标页=诚实溢出，等作者改文档，不算缺陷）", () => {
+    const bad = report.pages.filter(p => p.overflow > 0 && !p.overflowMarked)
     const detail = bad.map(p => `第${p.index || "?"}页溢出 ${p.overflow}px（内容 ${p.bottom} / 可用 ${p.avail}）`)
     assert.strictEqual(s.overflowing, 0, `${s.overflowing} 页溢出，最大 ${s.maxOverflow}px\n        ${detail.join("\n        ")}`)
   })
@@ -342,13 +342,24 @@ const audit = async input => {
   // ---- 4. IR（管线末端） --------------------------------------------------
 
   // `checkIr` 把所有问题塞进一个字符串数组，这里按类别拆开，好让断言各自精准报。
+  // 红标页（诚实溢出，2026-11-17 拍板）的块真就越出画布——那是等作者改文档的
+  // 提醒态，不是管线缺陷；与「无未标记溢出页」同一条豁免哲学。IR 照报真实几何，
+  // 这里按 issue 的「第 N 页：」前缀识别后放行（尺寸非正不豁免：那是抽取缺陷）。
+  const markedPages = new Set(
+    report.pages.filter(p => p.overflowMarked).map(p => p.index || report.pages.indexOf(p) + 1),
+  )
+  const onMarkedPage = issue => {
+    const m = /^第 (\d+) 页：/.exec(issue)
+    return !!m && markedPages.has(Number(m[1]))
+  }
   const kinds = {
     崩溃: ["校验过程异常"],
     文本: ["文本不一致"],
     几何: ["越界", "尺寸非正"],
     图片: ["图片未落盘"],
   }
-  const ofKind = keys => ir.issues.filter(i => keys.some(k => i.includes(k)))
+  const ofKind = keys => ir.issues.filter(i =>
+    keys.some(k => i.includes(k)) && !(i.includes("越界") && onMarkedPage(i)))
   const irCrash = ofKind(kinds.崩溃)
   const irText = ofKind(kinds.文本)
   const irGeo = ofKind(kinds.几何)
@@ -452,13 +463,15 @@ const audit = async input => {
     })
 
     // IR 的几何对了不算完：sidecar 还要把英寸换算成 EMU、照绝对坐标摆下去。
+    // 红标页（诚实溢出）的形状照 IR 的真实几何摆放、真就越界——同上豁免。
     await check("成品里每个形状都落在画布内", () => {
-      assert.deepStrictEqual(r.shapes?.issues ?? [], [], (r.shapes?.issues ?? []).join("\n        "))
+      const issues = (r.shapes?.issues ?? []).filter(i => !onMarkedPage(i))
+      assert.deepStrictEqual(issues, [], issues.join("\n        "))
     })
 
     // 只比英寸：IR 的 canvas 还带一份 pxWidth/pxHeight（成品里没有），全键比必挂。
     await check("成品形状之间不重叠（叠字类破版的亡羊补牢）", () => {
-    const overlaps = (r.shapes?.issues ?? []).filter(i => i.includes("重叠"))
+    const overlaps = (r.shapes?.issues ?? []).filter(i => i.includes("重叠") && !onMarkedPage(i))
     assert.deepStrictEqual(overlaps, [], overlaps.join("\n        "))
   })
 
@@ -528,8 +541,9 @@ const audit = async input => {
   }
 
   // ---- 6d. 夹具专用断言 ----------------------------------------------------
-  // oversize：超高内容兜底（2026-10-25 拍板——图片裸页缩放铺满、段落缩字顺排，
-  // 不允许溢出；警告必须真实发生，否则上面的"无溢出"可能只是巧合）。
+  // oversize：超高内容兜底（2026-11-17 拍板——图片裸页缩放铺满打「图已缩」标；
+  // 段落永不缩放不切分，放不下就诚实溢出打红标 + 警告，交给作者改文档。
+  // 警告与标记必须真实发生，否则上面的"无未标记溢出"可能只是巧合）。
   if (deck.name === "oversize") {
     console.log("超高内容兜底（oversize 专用）")
     await check("超高图片：裸页缩放适配（警告已发）", () => {
@@ -539,10 +553,16 @@ const audit = async input => {
           r.console.filter(l => l.includes("md2slides")).join(" | "),
       )
     })
-    await check("超高段落：缩字号顺排（警告已发）", () => {
+    await check("超高段落：诚实溢出（红标已打、警告已发、字号未缩）", () => {
       assert.ok(
-        r.console.some(l => l.includes("字号已缩至")),
-        "段落缩字警告没出现",
+        r.console.some(l => l.includes("已按原样保留")),
+        "诚实溢出警告没出现；实际 [md2slides] 日志：" +
+          r.console.filter(l => l.includes("md2slides")).join(" | "),
+      )
+      assert.ok(s.honestOverflow >= 1, `应有 ≥1 页诚实溢出红标页，实际 ${s.honestOverflow}`)
+      assert.ok(
+        !r.console.some(l => l.includes("字号已缩至")),
+        "段落不应再缩字号（2026-11-17 拍板：缩了就看不清）",
       )
     })
   }

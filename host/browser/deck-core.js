@@ -14,7 +14,7 @@
  * 的版本**走，父侧只传 deck.css——样式与实现漂移是旧壳的老毛病。
  */
 
-const { splitOverflow, CONT_CSS } = require("../../core/paginate/overflow")
+const { splitOverflow, CONT_CSS, OVERFLOW_CSS } = require("../../core/paginate/overflow")
 const { TOC_CSS } = require("../../core/paginate/toc")
 const { highlightCode } = require("../../core/render/highlight")
 const { renderDiagrams, assertDiagramsRendered } = require("../../core/render/diagramHost")
@@ -39,6 +39,9 @@ injectStyle("md2slides-cont-css", CONT_CSS)
 // 目录页（章节目录，core/paginate/toc.js）：同续页标记——引擎产物的兜底样式跟着
 // 代码版本走。主题里也有一份完整的，那边是"长什么样"，靠 :where() 让主题必赢。
 injectStyle("md2slides-toc-css", TOC_CSS)
+// 诚实溢出（2026-11-17 拍板：段落/分栏放不下就原样保留）：页面裁掉放不下的部分，
+// 内容仍在 DOM 里。同为引擎产物的兜底样式，跟着代码版本走。
+injectStyle("md2slides-overflow-css", OVERFLOW_CSS)
 
 /**
  * 反复分页直到没活干（`splitOverflow` 返回 0）。
@@ -139,6 +142,9 @@ const run = async (opts = {}) => {
   // 第三方 HTML 放映稿：DOM 已由作者编排（<section data-slide> + 画布排版），
   // 跳过改写 DOM 的三道工序（图表预通行 / 物理分页 / 代码染色），直接建播放器。
   const skipBuild = opts.skipBuild === true
+  // 分页警告（诚实溢出/图片缩放…）收集于此，随 run() 结果回宿主——宿主聚合进
+  // md2s:warn，放映态也看得见哪里装不下。skipBuild（HTML 放映稿）不分页，恒空。
+  const diags = []
   // 图表预通行先行：浏览器类型图先画完（外加宿主托渲染的类型），再谈测量。
   const diagram = skipBuild ? { rendered: 0 } : await diagramPass(opts)
   if (!skipBuild) {
@@ -148,6 +154,7 @@ const run = async (opts = {}) => {
       meta: opts.meta ?? null,
       contMarker: opts.contMarker ?? "（续）",
       margin: opts.margin ?? 1,
+      diags,
     }
     paginate(paginateOpts)
     // 切页会丢高亮 span，收敛后必须补染（API.md 时序铁律 2）
@@ -168,7 +175,7 @@ const run = async (opts = {}) => {
       onClose: () => rootOf()?.focus?.(),
     })
     const count = sectionsOf(document).length
-    return { pages: count, index: 1, total: count, steps: 0, diagrams: diagram.rendered, player: null }
+    return { pages: count, index: 1, total: count, steps: 0, diagrams: diagram.rendered, player: null, diags }
   }
   const created = createDeckPlayer(rootOf(), {
     slideWidth: opts.slideWidth,
@@ -189,6 +196,7 @@ const run = async (opts = {}) => {
     total: created.total,
     steps: created.steps,
     diagrams: diagram.rendered,
+    diags,
     // 承接面（P4-a）：run() resolve 就是"deck 就绪"——分页收敛、补染、播放器全就位，
     // 装饰器（挂 data-md2s-activatable 的 ▶）从此刻起可以动手，不需要另立事件。
     player: created,
