@@ -303,9 +303,9 @@ check("$ 后跟空格不是公式（价格不误伤）", () =>
   assert.ok(/\$ 100/.test(mathHtml), "价格文本被当成公式吃掉了"))
 check("代码块里的 $ 不算公式", () => assert.ok(!/<code[^>]*>[^<]*katex/.test(mathHtml)))
 
-// ---- 3.7 文档元数据（front-matter 八键）--------------------------------------
+// ---- 3.7 文档元数据（front-matter 九键）--------------------------------------
 
-check("deckMeta：八键全解析", () => {
+check("deckMeta：九键全解析", () => {
   const md = [
     "---",
     "title: 第2章 使用matplotlib绘制简单图表",
@@ -318,6 +318,7 @@ check("deckMeta：八键全解析", () => {
     "keywords: 直方图, 分布拟合",
     "show: element",
     "page: false",
+    "stepLines: true",
     "---",
     "",
     "# T",
@@ -334,6 +335,7 @@ check("deckMeta：八键全解析", () => {
     show: "element",
     page: false,
     toc: true,
+    stepLines: true,
   })
 })
 check("deckMeta：keywords 三种写法 + 去重，缺省为空数组", () => {
@@ -355,7 +357,7 @@ check("deckMeta：date 主键优先于 datetime", () => {
 check("deckMeta：header/footer 缺省开", () => {
   assert.deepStrictEqual(deckMeta("---\ntitle: x\n---\n\n# T"), {
     title: "x", subtitle: null, author: null, date: null, book: null,
-    header: true, footer: true, keywords: [], show: null, page: null, toc: true,
+    header: true, footer: true, keywords: [], show: null, page: null, toc: true, stepLines: false,
   })
 })
 check("deckMeta：header/footer 可自定义文本（三态）", () => {
@@ -363,11 +365,16 @@ check("deckMeta：header/footer 可自定义文本（三态）", () => {
   assert.strictEqual(m.header, "第 %page% 页")
   assert.strictEqual(m.footer, "内部资料")
 })
-check("deckMeta：无 front-matter 不抛，八键全缺省", () => {
+check("deckMeta：无 front-matter 不抛，九键全缺省", () => {
   assert.deepStrictEqual(deckMeta("# 只有正文"), {
     title: null, subtitle: null, author: null, date: null, book: null,
-    header: true, footer: true, keywords: [], show: null, page: null, toc: true,
+    header: true, footer: true, keywords: [], show: null, page: null, toc: true, stepLines: false,
   })
+})
+check("deckMeta：stepLines 缺省 false / true 开", () => {
+  assert.strictEqual(deckMeta("---\ntoc: 3\n---\n\n# T").stepLines, false)
+  assert.strictEqual(deckMeta("---\nstepLines: true\n---\n\n# T").stepLines, true)
+  assert.strictEqual(deckMeta("---\nstepLines: false\n---\n\n# T").stepLines, false)
 })
 check("deckMeta：toc 三态（缺省开 / false 关 / 数字=子项列到几级）", () => {
   assert.strictEqual(deckMeta("---\ntoc: false\n---\n\n# T").toc, false)
@@ -1038,6 +1045,41 @@ check("steppers 钩子：图表切分 / 无钩子回退整块一步", () => {
   const p2 = createDeckPlayer(root2, { mode: "element" })
   assert.strictEqual(p2.steps, 1, "无钩子图表应整块一步")
   p2.destroy(); root2.remove()
+})
+check("stepLines：代码块逐行拆步 / 缺省整块一步 / 行包装幂等", () => {
+  const { createDeckPlayer } = require("../kit/player")
+  const mk = html => { const r = document.createElement("div"); document.body.appendChild(r); r.innerHTML = html; return r }
+
+  // stepLines=true：三行代码 → 3 个 codeline 步（标题不算步）
+  const root = mk('<section data-slide><h2>T</h2><pre><code class="language-python">a = 1\nb = 2\nc = 3</code></pre></section>')
+  const p = createDeckPlayer(root, { mode: "element", stepLines: true })
+  assert.strictEqual(p.steps, 3, "三行代码应拆成 3 步")
+  assert.strictEqual(root.querySelectorAll(".code-line").length, 3, "应注入 3 个行包装 span")
+  assert.strictEqual(root.querySelectorAll("[data-md2s-run-line]").length, 3, "每行应挂行级可运行标记")
+  assert.strictEqual(root.querySelector("code").textContent, "a = 1\nb = 2\nc = 3", "textContent 保持逐字一致")
+  p.stepFwd()
+  const cur = root.querySelector(".md2s-step-current")
+  assert.ok(cur?.classList.contains("code-line"), "当前步应是第一行")
+  // 行级可运行：Enter 应派发该行的 click（activate 命中 run-line）
+  let clicked = null
+  root.querySelector(".code-line").addEventListener("click", () => { clicked = "line0" })
+  p.activate()
+  assert.strictEqual(clicked, "line0", "activate 应命中 run-line 行并派发 click")
+  p.destroy(); root.remove()
+
+  // stepLines=false（缺省）：整块一步，不注入行包装
+  const root2 = mk('<section data-slide><h2>T</h2><pre><code class="language-python">a = 1\nb = 2\nc = 3</code></pre></section>')
+  const p2 = createDeckPlayer(root2, { mode: "element" })
+  assert.strictEqual(p2.steps, 1, "缺省应整块一步")
+  assert.strictEqual(root2.querySelectorAll(".code-line").length, 0, "缺省不注入行包装")
+  assert.strictEqual(root2.querySelectorAll("[data-md2s-run-line]").length, 0, "缺省不挂行级标记")
+  p2.destroy(); root2.remove()
+
+  // 单行代码：切不出 >1 行，退回整块一步（不空转）
+  const root3 = mk('<section data-slide><h2>T</h2><pre><code class="language-python">x = 1</code></pre></section>')
+  const p3 = createDeckPlayer(root3, { mode: "element", stepLines: true })
+  assert.strictEqual(p3.steps, 1, "单行代码应整块一步")
+  p3.destroy(); root3.remove()
 })
 check("触屏手势：左右翻页 / 上下步进，与键盘同一语义", () => {
   const { createDeckPlayer } = require("../kit/player")

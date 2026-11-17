@@ -107,6 +107,10 @@ const parseKeywords = value => {
  *                                              true（缺省）= 每章前一页目录、当前章高亮 /
  *                                              false = 关 / 数字 1–6 = 子项列到该级。
  *                                              章节数 < 2 时任何写法都不插（那种目录页零信息量）。
+ *   遍历组     `stepLines`                     → 代码块行粒度遍历（2026-11-17 拍板）：
+ *                                              true = 放映态把代码块逐行拆成一步（逐行讲解）
+ *                                              / false（缺省）= 整块一步。逐行运行与否由宿主
+ *                                              exec 桥按语言族判定，此键只决定遍历粒度。
  *
  * `date` 主键、`datetime` 别名（marp 兼容）：两边都写时主键优先。
  * 未声明的键不补默认值（标量键为 `null`，`keywords` 为 `[]`）——文件属性缺一项比塞默认标题好。
@@ -127,6 +131,10 @@ const deckMeta = text => {
     page: fm.page === undefined ? null : fm.page === true,
     // 章节目录页：true（缺省）开 / false 关 / 数字 = 子项列到几级（< 章级+1 即不列子项）
     toc: fm.toc === undefined ? true : fm.toc,
+    // 代码块行粒度遍历（2026-11-17 拍板）：stepLines: true 时，放映态把代码块逐行
+    // 拆成一步（老师逐行讲解）；缺省 false = 整块一步（现状不回退）。逐行**运行**
+    // 由宿主 exec 桥按语言族另行判定（会话族才逐行跑），此处只决定遍历粒度。
+    stepLines: fm.stepLines === undefined ? false : fm.stepLines === true,
   }
 }
 

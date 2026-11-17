@@ -497,7 +497,7 @@ const buildHtml = async (msg, started) => {
   // 缺图必须赶在测量前换成占位（坏图 0 宽 vs 占位有真实几何）。
   await waitForDeckImages()
 
-  const { mode, browse, startIndex, view } = msg.runOpts ?? {}
+  const { mode, browse, startIndex, view, stepLines } = msg.runOpts ?? {}
   const result = await deckCore.run({
     slideWidth: sw,
     slideHeight: sh,
@@ -507,6 +507,7 @@ const buildHtml = async (msg, started) => {
       post({ type: "md2s:change", index, total, step, steps, mode: m, quizKeys: currentPageQuizKeys() }),
     mode,
     browse,
+    stepLines,
     startIndex,
     view,
     skipBuild: true,
@@ -582,7 +583,7 @@ const doBuild = async msg => {
     // 缺图必须赶在分页前换成占位（坏图 0 宽 vs 占位有真实几何，量晚了页就错）。
     await waitForDeckImages()
 
-    const { mode, browse, startIndex, view } = msg.runOpts ?? {}
+    const { mode, browse, startIndex, view, stepLines } = msg.runOpts ?? {}
     const result = await deckCore.run({
       slideWidth: deck.slideWidth,
       slideHeight: deck.slideHeight,
@@ -592,6 +593,7 @@ const doBuild = async msg => {
         post({ type: "md2s:change", index, total, step, steps, mode: m, quizKeys: currentPageQuizKeys() }),
       mode,
       browse,
+      stepLines,
       startIndex,
       view,
     })

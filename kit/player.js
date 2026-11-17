@@ -80,6 +80,9 @@ const TAP_IGNORE = [
   "a[href]", "button", "input", "textarea", "select", "label",
   "img", "svg", "video", "audio",
   "[data-md2s-activatable]",
+  // 行级可运行（代码块行，stepLines 逐行讲解）：翻页笔点行不该顺手翻页——
+  // 行有自己的 Enter 运行语义（见 findActivatable 的 run-line 契约）。
+  "[data-md2s-run-line]",
   ".md2s-lb", ".md2s-exec-run", ".md2s-quiz-send", ".md2s-quiz-panel",
 ].join(",")
 
@@ -144,6 +147,8 @@ const PLAYER_CSS = `
  * @param {boolean} [opts.browse]  仅 page 形态有意义：true（默认）逐元素游走（全显 + 高亮
  *   步进，翻页笔可达 ▶）/ false 纯整页翻
  * @param {Array}   [opts.steppers]    图表切分钩子 [{match(el), create(el)→{count,show,hide}}]
+ * @param {boolean} [opts.stepLines]    代码块行粒度遍历（front-matter stepLines: true）：true 时
+ *   代码块逐行拆成一步（老师逐行讲解）；缺省 false = 整块一步
  * @param {Function}[opts.onChange]    翻页/步进回调 ({index,total,step,steps,mode})；1 基
  * @param {boolean} [opts.keys]        键盘导航，默认开
  * @param {EventTarget}[opts.keyTarget] 键盘监听挂哪（默认 root；编辑器宿主可传自己的容器）
@@ -180,6 +185,8 @@ function createDeckPlayer(root, opts = {}) {
   const W = Number(opts.slideWidth) > 0 ? Number(opts.slideWidth) : 1920
   const H = Number(opts.slideHeight) > 0 ? Number(opts.slideHeight) : 1080
   const steppers = Array.isArray(opts.steppers) ? opts.steppers : null
+  // 代码块行粒度遍历（front-matter stepLines）：true 时 buildStepPlan 把代码块逐行拆步。
+  const stepLines = opts.stepLines === true
   // 轻点导航：false 关掉；"page" 恒定整页翻；其余（默认 / true / "step"）走 navKey 的
   // ↓↑ 语义——browse / element 下先步进、步尽才翻页（点一下继续讲）。
   const tapNav = opts.tapNav === false ? false
@@ -223,7 +230,7 @@ function createDeckPlayer(root, opts = {}) {
   const planFor = i => {
     if (plans.has(i)) return plans.get(i)
     const plan = stepping()
-      ? buildStepPlan(sections[i], { steppers, issues: stepIssues })
+      ? buildStepPlan(sections[i], { steppers, issues: stepIssues, stepLines })
       : []
     for (const step of plan) {
       step.el.classList.add("md2s-step")
@@ -407,8 +414,12 @@ function createDeckPlayer(root, opts = {}) {
   //    键盘层据此决定拦不拦 Enter。 ——
   const findActivatable = el => {
     if (!el) return null
-    if (el.matches?.("[data-md2s-activatable]")) return el
-    return el.querySelector?.("[data-md2s-activatable]") ?? null
+    // 行级可运行（宿主契约 2026-11-17）：代码块行（.code-line）挂 data-md2s-run-line，
+    // Enter 命中即触发 click——放映态老师逐行讲解、逐行执行（会话族）。它与
+    // data-md2s-activatable（▶ 按钮）不同：行是**内容**，进 IR/PPTX，故用独立属性
+    // 免得被导出的 skipSelector（只剔 activatable）误删代码。
+    if (el.matches?.("[data-md2s-activatable], [data-md2s-run-line]")) return el
+    return el.querySelector?.("[data-md2s-activatable], [data-md2s-run-line]") ?? null
   }
   /**
    * 图片是「可看」而不是「可执行」：绝不给它打 `data-md2s-activatable`

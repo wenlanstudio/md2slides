@@ -27,6 +27,7 @@
 
 const { isFixed } = require("../core/paginate/overflow")
 const { isTocSlide } = require("../core/paginate/toc")
+const { wrapCodeLines, isCodeBlock } = require("./codeLines")
 
 const isHeading = el => /^H[1-6]$/.test(el.tagName)
 const isCols = el => !!el.classList?.contains("cols")
@@ -64,8 +65,8 @@ function chartSteps(el, steppers, issues) {
 }
 
 /** 一个内容块 → 步（列表 / 表格 / 分栏展开；其余先问钩子，再整块一步）。 */
-function stepsOfBlock(el, steppers, issues) {
-  const steps = baseStepsOfBlock(el, steppers, issues)
+function stepsOfBlock(el, steppers, issues, opts = {}) {
+  const steps = baseStepsOfBlock(el, steppers, issues, opts)
   // 可激活元素（宿主契约，如 exec 桥的 ▶/⏩）各成一步，附在所属块的最后一步之后：
   // 翻页笔逐元素讲完代码块，再翻一下"落到"按钮上（md2s-step-current 高亮），
   // Enter 即运行（player.activate 命中当前步）。按钮未轮到时 visibility:hidden——
@@ -77,7 +78,7 @@ function stepsOfBlock(el, steppers, issues) {
 }
 
 /** 基本步（不含可激活元素）：列表 / 表格 / 分栏展开；其余先问钩子，再整块一步。 */
-function baseStepsOfBlock(el, steppers, issues) {
+function baseStepsOfBlock(el, steppers, issues, opts = {}) {
   const range = srcRangeOf(el)
 
   // 列表：每项一步。嵌套列表是 li 的子树——visibility 继承让父项出现时整体出现。
@@ -113,7 +114,7 @@ function baseStepsOfBlock(el, steppers, issues) {
     const out = []
     for (const col of cols) {
       for (const child of col.children) {
-        if (!isFixed(child)) out.push(...stepsOfBlock(child, steppers, issues))
+        if (!isFixed(child)) out.push(...stepsOfBlock(child, steppers, issues, opts))
       }
     }
     return out.length ? out : [{ kind: "block", el, srcRange: range }]
@@ -121,12 +122,31 @@ function baseStepsOfBlock(el, steppers, issues) {
 
   const chart = chartSteps(el, steppers, issues)
   if (chart) return chart
+
+  // 代码块行粒度（front-matter stepLines: true，2026-11-17 拍板）：老师逐行讲解。
+  // 缺省 false 保持「整块一步」不回退。行包装（codeLines.js）是惰性的、幂等的，
+  // 在染色/分页收敛后的 buildStepPlan 里才做——highlight 的 innerHTML 覆盖与
+  // overflow 的 textContent 重建都碰不到它。行是纯展示步（kind:"codeline"），
+  // 挂 data-md2s-run-line 标记「行级可运行」——player 的 activate 命中它即派发
+  // click，逐行**运行**与否由宿主 exec 桥按语言族判定（会话族才逐行跑，一次性族
+  // 忽略）。用独立属性而非 data-md2s-activatable：行是**内容**，得进 IR/PPTX，
+  // activatable 会被导出的 skipSelector 误删。
+  if (opts.stepLines && isCodeBlock(el)) {
+    const code = el.querySelector("code")
+    const lineEls = wrapCodeLines(code)
+    if (lineEls.length > 1) {
+      for (const li of lineEls) li.setAttribute("data-md2s-run-line", "")
+      return lineEls.map(li => ({ kind: "codeline", el: li, srcRange: range }))
+    }
+  }
+
   return [{ kind: "block", el, srcRange: range }]
 }
 
 /**
  * @param {Element} section 一页（section[data-slide]）
- * @param {object} [opts] { steppers, issues }  issues：钩子异常收集数组（可缺省）
+ * @param {object} [opts] { steppers, issues, stepLines }  issues：钩子异常收集数组（可缺省）；
+ *   stepLines：代码块行粒度遍历开关（front-matter stepLines: true，缺省 false）
  * @returns {Array<{kind: string, el: Element, extra?: Element[], handle?: object,
  *                   k?: number, srcRange?: [number, number]}>}
  */
@@ -146,7 +166,7 @@ function buildStepPlan(section, opts = {}) {
   for (const el of section.children) {
     if (isFixed(el)) continue
     if (isHeading(el)) continue
-    out.push(...stepsOfBlock(el, opts.steppers, issues))
+    out.push(...stepsOfBlock(el, opts.steppers, issues, opts))
   }
   return out
 }

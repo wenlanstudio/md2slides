@@ -121,6 +121,7 @@ const diagramPass = async (opts = {}) => {
  * @param {object} [opts.meta]     八键元数据（页眉页脚的输入）
  * @param {"page"|"element"} [opts.mode] 放映形态，默认 page（"slide" 旧键 = page+browse:false）
  * @param {boolean} [opts.browse]  仅 page 形态：true（默认）逐元素游走 / false 纯整页翻
+ * @param {boolean} [opts.stepLines] 代码块行粒度遍历（front-matter stepLines: true），透传 player
  * @param {Function} [opts.onChange] 翻页/步进回调（宿主状态栏用；list 视图不触发）
  * @param {number} [opts.startIndex] 起始页（1 基，P3-c 光标锚点用；list 视图忽略）
  * @param {Function} [opts.renderDiagramHost] 见 diagramPass（marktext 形态）
@@ -182,6 +183,7 @@ const run = async (opts = {}) => {
     slideHeight: opts.slideHeight,
     mode: opts.mode ?? "page",
     browse: opts.browse,
+    stepLines: opts.stepLines,
     onChange: opts.onChange,
     startIndex: opts.startIndex ?? 1,
   })
