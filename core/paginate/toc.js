@@ -245,6 +245,11 @@ function planToc(doc, opts = {}) {
     return Number.isInteger(n) && n > 0 ? n : 1
   }
   const plan = []
+  // 第一章的目录插在**正文最前**（封面之后），不紧贴章起始页：章前常有孤立小节
+  // （首个章级标题之前的 h3 引子，如 `### 向 RM 申请一个应用` 这种开场白），
+  // 紧贴插入会让引子跑到目录前面。目录是导航前置物料，必须排在所有正文之前
+  // （2026-11-18 用户裁定）。后续各章仍紧贴各自章起始页。
+  const contentStart = sectionsOf(doc).find(s => !s.querySelector(":scope > .cover")) ?? null
 
   for (const chapter of chapters) {
     const items = []
@@ -272,8 +277,10 @@ function planToc(doc, opts = {}) {
       slide.setAttribute(TOC_PAGE_ATTR, String(k + 1))
       slide.setAttribute(TOC_PAGES_ATTR, String(groups.length))
       slide.className = TOC_CLASS
-      // 依次插在章起始页之前：insertBefore 到同一 ref 前保持插入序
-      chapter.slide.parentNode?.insertBefore(slide, chapter.slide)
+      // 依次插在锚点页之前：insertBefore 到同一 ref 前保持插入序。
+      // 第一章的锚点=正文最前（章前孤立小节之前）；其余章=各自的章起始页。
+      const anchor = chapter === chapters[0] && contentStart ? contentStart : chapter.slide
+      anchor.parentNode?.insertBefore(slide, anchor)
       plan.push({ slide, items: group, chapter, page: k + 1, pages: groups.length })
     }
   }

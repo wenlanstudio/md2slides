@@ -71,105 +71,6 @@
           "type": "paragraph",
           "geo": {
             "x": 0.5833,
-            "y": 3.2542,
-            "w": 12.1667,
-            "h": 0.9041
-          },
-          "style": {
-            "fontSizePt": 21,
-            "font": "Microsoft YaHei",
-            "color": "#23303f",
-            "lineSpacingPt": 32.55,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0.0875,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "这一份专打「图表由宿主渲染」那条链路：预通行必须跑在物理分页实测之前， 这样 IR 量到的图高度才是真的。"
-            }
-          ],
-          "srcRange": [
-            2,
-            3
-          ],
-          "lines": 2
-        },
-        {
-          "type": "paragraph",
-          "role": "header",
-          "geo": {
-            "x": 0.5833,
-            "y": 0.1667,
-            "w": 1.175,
-            "h": 0.3013
-          },
-          "style": {
-            "fontSizePt": 14,
-            "font": "Microsoft YaHei",
-            "color": "#8a97a5",
-            "lineSpacingPt": 21.7,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "图表渲染回归"
-            }
-          ],
-          "lines": 1,
-          "singleLine": true
-        },
-        {
-          "type": "paragraph",
-          "role": "footer",
-          "geo": {
-            "x": 12.2014,
-            "y": 7.0528,
-            "w": 0.5486,
-            "h": 0.3013
-          },
-          "style": {
-            "fontSizePt": 14,
-            "font": "Microsoft YaHei",
-            "color": "#8a97a5",
-            "lineSpacingPt": 21.7,
-            "spaceBeforeIn": 0,
-            "spaceAfterIn": 0,
-            "paddingLeftIn": 0,
-            "paddingRightIn": 0,
-            "paddingTopIn": 0,
-            "paddingBottomIn": 0
-          },
-          "runs": [
-            {
-              "text": "2 / 14"
-            }
-          ],
-          "lines": 1,
-          "singleLine": true
-        }
-      ]
-    },
-    {
-      "index": 2,
-      "pagination": 3,
-      "layout": "mixed",
-      "background": {
-        "color": "#ffffff"
-      },
-      "blocks": [
-        {
-          "type": "paragraph",
-          "geo": {
-            "x": 0.5833,
             "y": 1.133,
             "w": 12.1667,
             "h": 0.9041
@@ -417,6 +318,105 @@
             5,
             5
           ]
+        },
+        {
+          "type": "paragraph",
+          "role": "footer",
+          "geo": {
+            "x": 12.2014,
+            "y": 7.0528,
+            "w": 0.5486,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "2 / 14"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "pagination": 3,
+      "layout": "mixed",
+      "background": {
+        "color": "#ffffff"
+      },
+      "blocks": [
+        {
+          "type": "paragraph",
+          "geo": {
+            "x": 0.5833,
+            "y": 3.2542,
+            "w": 12.1667,
+            "h": 0.9041
+          },
+          "style": {
+            "fontSizePt": 21,
+            "font": "Microsoft YaHei",
+            "color": "#23303f",
+            "lineSpacingPt": 32.55,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0.0875,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "这一份专打「图表由宿主渲染」那条链路：预通行必须跑在物理分页实测之前， 这样 IR 量到的图高度才是真的。"
+            }
+          ],
+          "srcRange": [
+            2,
+            3
+          ],
+          "lines": 2
+        },
+        {
+          "type": "paragraph",
+          "role": "header",
+          "geo": {
+            "x": 0.5833,
+            "y": 0.1667,
+            "w": 1.175,
+            "h": 0.3013
+          },
+          "style": {
+            "fontSizePt": 14,
+            "font": "Microsoft YaHei",
+            "color": "#8a97a5",
+            "lineSpacingPt": 21.7,
+            "spaceBeforeIn": 0,
+            "spaceAfterIn": 0,
+            "paddingLeftIn": 0,
+            "paddingRightIn": 0,
+            "paddingTopIn": 0,
+            "paddingBottomIn": 0
+          },
+          "runs": [
+            {
+              "text": "图表渲染回归"
+            }
+          ],
+          "lines": 1,
+          "singleLine": true
         },
         {
           "type": "paragraph",
