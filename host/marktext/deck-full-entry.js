@@ -29,8 +29,8 @@
  *   大位图不过桥：逐页 POST 到宿主服务的 /x 旁路落盘（数百 MB 过 postMessage→IPC
  *   会把 Electron 卡死——2026-10-31 真机 79 页讲义的教训），桥上只走目录路径。
  *   页面 → 宿主  {type:"md2s:esc"}                     焦点在 deck 内的 Esc 转发
- *   宿主 → 页面  {type:"md2s:locate", line}             行位定位（列表态滚到该页；放映态 player.go）
- *   页面 → 宿主  {type:"md2s:locate-up", line}          列表态用户滚动上报（页首现标注行，页变更才发）
+ *   宿主 → 页面  {type:"md2s:locate", line}             行位定位（实数行位；列表态按页行域插值滚到页内位置，放映态 player.go）
+ *   页面 → 宿主  {type:"md2s:locate-up", line, frac}    列表态用户滚动上报（首现页行域内插值的实数行位，量化 0.3 行）
  *
  * 图表三级策略在本形态的落法：
  *   mermaid / echarts → 页面自己画（运行时按需从服务加载，见 ensureDiagramLibs）；
@@ -501,6 +501,10 @@ const buildHtml = async (msg, started) => {
   if (msg.mdDir) rewriteImages(document, msg.mdDir)
   // 缺图必须赶在测量前换成占位（坏图 0 宽 vs 占位有真实几何）。
   await waitForDeckImages()
+  // 字体晚到会改文字度量 → 页高重排 → 行位映射漂移。测量前等字体就绪。
+  try {
+    await document.fonts.ready
+  } catch {}
 
   const { mode, browse, startIndex, view, stepLines } = msg.runOpts ?? {}
   const result = await deckCore.run({
@@ -652,31 +656,31 @@ const build = msg =>
     await doBuild(msg)
     // 重建换页：行位页表缓存失效（§6.2 locate 切片）。
     locatePages = null
-    lastUpLine = null
-    lastLocatedPage = -1
+    lastUpReal = null
   })
 
 // ---------------------------------------------------------------------------
-// 行位定位（视图模型 §6.2 双向滚动同步 / M3 切片）：宿主发 md2s:locate{line}，
-// 列表态按「页首现标注」行→页（页的最小 data-src-start；续页克隆件与首片
-// 同值不影响最小值），平滑滚到该页；列表态用户滚动经 md2s:locate-up 上报
-// ——**页变更才发**：页是映的最细可迁移粒度（块可被分页切开，块内插值在
-// 这一级无定义，view-model §6.0）。放映态（一次一页）走 player.go。
+// 行位定位（视图模型 §6.2 双向滚动同步 / M3 切片）：宿主发 md2s:locate{line}
+// （**实数**行位：整数部分=行、小数部分=行内进度），列表态按页行域线性插值
+// 滚到页内对应位置；列表态用户滚动经 md2s:locate-up{line, frac} 上报实数
+// 行位（量化 0.3 行防抖）。页行域 = 该页**首现**标注的 [minStart, maxEnd]
+// ——续页克隆件（重复标题/续片外壳继承原标注）同区间已在前面页出现、不计
+// 入。页内插值 + 页矩形几何活读：两个方向都精确到页内比例，不再只有页首
+// 对齐（文×览双向精度）。放映态（一次一页）走 player.go。
 // ---------------------------------------------------------------------------
 
-let locatePages = null // 页序（文档序）的页首行缓存；0 = 该页无源码标注
-let selfLocateUntil = 0 // 程序定位后短窗：动画中途帧不上报（跨页动画逐页上报会拖文连跳）
-let lastUpLine = null // 最近上报的行（页变更量化基线）
+let locatePages = null // [{start, end}] 页行域；start=0 = 该页无首现标注
+let selfLocateUntil = 0 // 程序定位后短窗：动画中途帧不上报（跨页动画逐帧上报会拖文连跳）
+let lastUpReal = null // 最近上报的实数行位（量化基线）
 let locateRaf = 0
+let lastDocHeight = -1 // 布局静默守卫：页高在变（字体/图片晚到重排）期间不上报
 
 const locatePagesOf = () => {
   if (locatePages) return locatePages
-  // 页首行 = 该页**首现**标注的最小起始行（§6.2/§6.3 首现规则）：续页的克隆
-  // 件（重复标题整枚克隆、续片外壳）继承原块标注——同区间已在前面页出现过
-  // 的不算本页的，否则每页 min 都被拖回首页值、页表全退化。
   const seen = new Set()
   locatePages = sectionsOf(document).map(sec => {
-    let min = 0
+    let start = 0
+    let end = 0
     for (const el of sec.querySelectorAll("[data-src-start]")) {
       const s = Number(el.getAttribute("data-src-start"))
       const e = Number(el.getAttribute("data-src-end"))
@@ -684,50 +688,52 @@ const locatePagesOf = () => {
       const key = s + ":" + e
       if (seen.has(key)) continue
       seen.add(key)
-      if (min === 0 || s < min) min = s
+      if (start === 0 || s < start) start = s
+      if (e > end) end = e
     }
-    return min
+    if (end < start) end = start
+    return { start, end }
   })
   return locatePages
 }
 
-/** 行 → 页下标：文档序里最后一个有标注且 minStart ≤ line 的页（页序与源文
- *  行序单调一致；line 早于首页标注返回 -1）。 */
-const pageIndexOfLine = line => {
+/** 实数行位 → 所在页（页行域含 real 的最后一页）+ 页内比例。 */
+const locatePageOf = real => {
   const pages = locatePagesOf()
   let idx = -1
   for (let i = 0; i < pages.length; i++) {
-    const s = pages[i]
-    if (s > 0 && s <= line) idx = i
+    const p = pages[i]
+    if (p.start > 0 && p.start <= real) idx = i
   }
-  return idx
+  if (idx < 0) return null
+  const p = pages[idx]
+  const span = Math.max(1, p.end - p.start + 1)
+  const progress = Math.min(1, Math.max(0, (real - p.start) / span))
+  return { idx, progress }
 }
 
-let lastLocatedPage = -1
-
 const locateLine = line => {
-  const pages = locatePagesOf()
-  const idx = pageIndexOfLine(Number(line))
-  if (idx < 0) return
-  if (idx === lastLocatedPage) return // 同页重复定位 no-op（幂等 §6.2）
-  const sec = sectionsOf(document)[idx]
+  const hit = locatePageOf(Number(line))
+  if (!hit) return
+  const secs = sectionsOf(document)
+  const sec = secs[hit.idx]
   if (!sec) return
   if (!document.documentElement.classList.contains("md2s-list")) {
     // 放映态（一次一页）走 player；列表态才是滚动同步的主场。
     const player = deckCore.getPlayer()
-    if (player && typeof player.go === "function") player.go(idx)
-    lastLocatedPage = idx
+    if (player && typeof player.go === "function") player.go(hit.idx)
     return
   }
-  lastLocatedPage = idx
+  const rect = sec.getBoundingClientRect()
+  const target = rect.top + window.scrollY + hit.progress * rect.height - 24
+  if (Math.abs(target - window.scrollY) < 2) return // ε 幂等（§6.2）
   selfLocateUntil = Date.now() + 600
-  lastUpLine = pages[idx]
-  const top = sec.getBoundingClientRect().top + window.scrollY
-  window.scrollTo({ top: Math.max(0, top - 24), behavior: "smooth" })
+  lastUpReal = Number(line)
+  window.scrollTo({ top: Math.max(0, target), behavior: "smooth" })
 }
 
-// 列表态用户滚动上报：rAF 合帧、页变更才发。程序定位窗内（600ms 动画途中）
-// 不上报——跨页动画逐页上报会拖着文连跳；窗后用户抢滚立即生效。
+// 列表态用户滚动上报：rAF 合帧、量化 0.3 行。程序定位窗内（600ms 动画途中）
+// 不上报——跨页动画逐帧上报会拖着文连跳；窗后用户抢滚立即生效。
 window.addEventListener(
   "scroll",
   () => {
@@ -735,7 +741,12 @@ window.addEventListener(
     locateRaf = requestAnimationFrame(() => {
       locateRaf = 0
       if (!document.documentElement.classList.contains("md2s-list")) return
-      const pages = locatePagesOf()
+      // 布局静默守卫：页高在变（字体晚到/重排）期间，同一 scrollY 会映射到
+      // 不同的行——上报会把文拽着重排跑。页高稳定一帧后才认。
+      const docH = document.documentElement.scrollHeight
+      const stable = docH === lastDocHeight
+      lastDocHeight = docH
+      if (!stable) return
       const secs = sectionsOf(document)
       if (!secs.length) return
       const viewTop = window.scrollY + 1
@@ -752,12 +763,20 @@ window.addEventListener(
       if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
         idx = secs.length - 1
       }
-      const line = pages[idx]
-      if (!line) return
-      if (lastUpLine === line) return
+      const page = locatePagesOf()[idx]
+      if (!page || !page.start) return
+      const rect = secs[idx].getBoundingClientRect()
+      const span = Math.max(1, page.end - page.start + 1)
+      const progress = Math.min(1, Math.max(0, (viewTop - rect.top) / rect.height))
+      const real = page.start + progress * span
+      if (lastUpReal != null && Math.abs(real - lastUpReal) < 0.3) return
       if (Date.now() < selfLocateUntil) return
-      lastUpLine = line
-      post({ type: "md2s:locate-up", line })
+      lastUpReal = real
+      post({
+        type: "md2s:locate-up",
+        line: Math.floor(real),
+        frac: real - Math.floor(real),
+      })
     })
   },
   { passive: true }
