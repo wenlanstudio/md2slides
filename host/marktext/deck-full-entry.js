@@ -233,7 +233,10 @@ const ensureListCss = () => {
 html.md2s-list, html.md2s-list body { overflow: auto; height: auto; background: #23252b; }
 html.md2s-list #deck {
   position: static; inset: auto;
-  padding: 24px 24px 60vh;
+  /* 不要把末页顶到视口顶部而预留整屏下缓冲：那会在列表底部留一大块空背景。
+     翻到文末时末页停在视口下沿即可；反向同步由下面 scroll 监听的「到底 →
+     末页」判据兜住。 */
+  padding: 24px;
   display: flex; flex-direction: column; align-items: center; gap: 24px;
 }
 html.md2s-list #deck > section {
@@ -744,6 +747,11 @@ window.addEventListener(
         }
       }
       if (idx === -1) idx = secs.length - 1
+      // 滚到内容底部：末页只能贴在视口下沿（没有 60vh 下缓冲了），按「顶线
+      // 所在页」会误报倒数第二页；到底即认末页。
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+        idx = secs.length - 1
+      }
       const line = pages[idx]
       if (!line) return
       if (lastUpLine === line) return
