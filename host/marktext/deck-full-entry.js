@@ -29,6 +29,8 @@
  *   大位图不过桥：逐页 POST 到宿主服务的 /x 旁路落盘（数百 MB 过 postMessage→IPC
  *   会把 Electron 卡死——2026-10-31 真机 79 页讲义的教训），桥上只走目录路径。
  *   页面 → 宿主  {type:"md2s:esc"}                     焦点在 deck 内的 Esc 转发
+ *   宿主 → 页面  {type:"md2s:locate", line}             行位定位（列表态滚到该页；放映态 player.go）
+ *   页面 → 宿主  {type:"md2s:locate-up", line}          列表态用户滚动上报（页首现标注行，页变更才发）
  *
  * 图表三级策略在本形态的落法：
  *   mermaid / echarts → 页面自己画（运行时按需从服务加载，见 ensureDiagramLibs）；
@@ -642,7 +644,116 @@ const doBuild = async msg => {
   }
 }
 
-const build = msg => enqueue(() => doBuild(msg))
+const build = msg =>
+  enqueue(async () => {
+    await doBuild(msg)
+    // 重建换页：行位页表缓存失效（§6.2 locate 切片）。
+    locatePages = null
+    lastUpLine = null
+    lastLocatedPage = -1
+  })
+
+// ---------------------------------------------------------------------------
+// 行位定位（视图模型 §6.2 双向滚动同步 / M3 切片）：宿主发 md2s:locate{line}，
+// 列表态按「页首现标注」行→页（页的最小 data-src-start；续页克隆件与首片
+// 同值不影响最小值），平滑滚到该页；列表态用户滚动经 md2s:locate-up 上报
+// ——**页变更才发**：页是映的最细可迁移粒度（块可被分页切开，块内插值在
+// 这一级无定义，view-model §6.0）。放映态（一次一页）走 player.go。
+// ---------------------------------------------------------------------------
+
+let locatePages = null // 页序（文档序）的页首行缓存；0 = 该页无源码标注
+let selfLocateUntil = 0 // 程序定位后短窗：动画中途帧不上报（跨页动画逐页上报会拖文连跳）
+let lastUpLine = null // 最近上报的行（页变更量化基线）
+let locateRaf = 0
+
+const locatePagesOf = () => {
+  if (locatePages) return locatePages
+  // 页首行 = 该页**首现**标注的最小起始行（§6.2/§6.3 首现规则）：续页的克隆
+  // 件（重复标题整枚克隆、续片外壳）继承原块标注——同区间已在前面页出现过
+  // 的不算本页的，否则每页 min 都被拖回首页值、页表全退化。
+  const seen = new Set()
+  locatePages = sectionsOf(document).map(sec => {
+    let min = 0
+    for (const el of sec.querySelectorAll("[data-src-start]")) {
+      const s = Number(el.getAttribute("data-src-start"))
+      const e = Number(el.getAttribute("data-src-end"))
+      if (!Number.isFinite(s) || s <= 0) continue
+      const key = s + ":" + e
+      if (seen.has(key)) continue
+      seen.add(key)
+      if (min === 0 || s < min) min = s
+    }
+    return min
+  })
+  return locatePages
+}
+
+/** 行 → 页下标：文档序里最后一个有标注且 minStart ≤ line 的页（页序与源文
+ *  行序单调一致；line 早于首页标注返回 -1）。 */
+const pageIndexOfLine = line => {
+  const pages = locatePagesOf()
+  let idx = -1
+  for (let i = 0; i < pages.length; i++) {
+    const s = pages[i]
+    if (s > 0 && s <= line) idx = i
+  }
+  return idx
+}
+
+let lastLocatedPage = -1
+
+const locateLine = line => {
+  const pages = locatePagesOf()
+  const idx = pageIndexOfLine(Number(line))
+  if (idx < 0) return
+  if (idx === lastLocatedPage) return // 同页重复定位 no-op（幂等 §6.2）
+  const sec = sectionsOf(document)[idx]
+  if (!sec) return
+  if (!document.documentElement.classList.contains("md2s-list")) {
+    // 放映态（一次一页）走 player；列表态才是滚动同步的主场。
+    const player = deckCore.getPlayer()
+    if (player && typeof player.go === "function") player.go(idx)
+    lastLocatedPage = idx
+    return
+  }
+  lastLocatedPage = idx
+  selfLocateUntil = Date.now() + 600
+  lastUpLine = pages[idx]
+  const top = sec.getBoundingClientRect().top + window.scrollY
+  window.scrollTo({ top: Math.max(0, top - 24), behavior: "smooth" })
+}
+
+// 列表态用户滚动上报：rAF 合帧、页变更才发。程序定位窗内（600ms 动画途中）
+// 不上报——跨页动画逐页上报会拖着文连跳；窗后用户抢滚立即生效。
+window.addEventListener(
+  "scroll",
+  () => {
+    if (locateRaf) return
+    locateRaf = requestAnimationFrame(() => {
+      locateRaf = 0
+      if (!document.documentElement.classList.contains("md2s-list")) return
+      const pages = locatePagesOf()
+      const secs = sectionsOf(document)
+      if (!secs.length) return
+      const viewTop = window.scrollY + 1
+      let idx = -1
+      for (let i = 0; i < secs.length; i++) {
+        if (secs[i].getBoundingClientRect().bottom > viewTop) {
+          idx = i
+          break
+        }
+      }
+      if (idx === -1) idx = secs.length - 1
+      const line = pages[idx]
+      if (!line) return
+      if (lastUpLine === line) return
+      if (Date.now() < selfLocateUntil) return
+      lastUpLine = line
+      post({ type: "md2s:locate-up", line })
+    })
+  },
+  { passive: true }
+)
 
 // ---------------------------------------------------------------------------
 // 导出取数（M2）：宿主发 md2s:export，页面跑 deck-core 的 exportImages()/ir()，
@@ -731,6 +842,7 @@ window.addEventListener("message", ev => {
   if (!data || typeof data !== "object") return
   if (ev.source !== window.parent) return
   if (data.type === "md2s:build") void build(data)
+  else if (data.type === "md2s:locate") locateLine(data.line)
   else if (data.type === "md2s:export") void enqueue(() => doExport(data))
   else if (data.type === "md2s:rpc-result" && pending.has(data.id)) {
     const p = pending.get(data.id)
