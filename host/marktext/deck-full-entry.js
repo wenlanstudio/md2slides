@@ -707,7 +707,9 @@ const locatePageOf = real => {
   return { idx, progress }
 }
 
+let locateLastLine = null
 const locateLine = line => {
+  locateLastLine = Number(line)
   const hit = locatePageOf(Number(line))
   if (!hit) return
   const secs = sectionsOf(document)
@@ -719,9 +721,13 @@ const locateLine = line => {
     if (player && typeof player.go === "function") player.go(hit.idx)
     return
   }
+  // CSS zoom 坐标系修正：Chromium 对 `zoom` 变换文档的 scrollTo 目标按
+  // 1/zoom 二次缩放（真机实测落点 = 目标 ÷ zoom，随距离比例性过冲）——
+  // 传入值乘回 zoom 系数。zoom 从节自身的 computed style 读（fit() 动态调）。
+  const zoom = Number(window.getComputedStyle(sec).zoom) || 1
   const rect = sec.getBoundingClientRect()
-  const target = rect.top + window.scrollY + hit.progress * rect.height - 24
-  if (Math.abs(target - window.scrollY) < 2) return // ε 幂等（§6.2）
+  const target = (rect.top + window.scrollY + hit.progress * rect.height - 24) * zoom
+  if (Math.abs(target - window.scrollY * zoom) < 2 * zoom) return // ε 幂等
   window.scrollTo({ top: Math.max(0, target), behavior: "smooth" })
 }
 
@@ -839,7 +845,12 @@ window.addEventListener("message", ev => {
 })
 
 // 同源调试面（宿主/测试可直调）；跨源宿主一律走 postMessage。
-window.deckFull = { build, getPlayer: deckCore.getPlayer }
+window.deckFull = {
+  build,
+  getPlayer: deckCore.getPlayer,
+  // §6.2 locate 诊断：宿主页表与最近一次解析结果。
+  locateDebug: () => ({ pages: locatePages ? locatePages.map(p => p.start + '-' + p.end) : null, lastLine: locateLastLine }),
+}
 
 // Esc 转发：焦点在 deck 里时退出键到不了宿主（跨源，键盘事件不过来），转成
 // md2s:esc 让宿主退场。lightbox / exec 浮层会在 window 捕获层吃掉自己的 Esc
