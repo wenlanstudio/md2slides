@@ -30,7 +30,7 @@
  *   会把 Electron 卡死——2026-10-31 真机 79 页讲义的教训），桥上只走目录路径。
  *   页面 → 宿主  {type:"md2s:esc"}                     焦点在 deck 内的 Esc 转发
  *   宿主 → 页面  {type:"md2s:locate", line}             行位定位（实数行位；列表态按页行域插值滚到页内位置，放映态 player.go）
- *   页面 → 宿主  {type:"md2s:locate-up", line, frac}    列表态用户滚动上报（首现页行域内插值的实数行位，量化 0.3 行）
+ *   页面 → 宿主  {type:"md2s:locate-up", line, click}   列表态点击某页上报（首现行位；§6.2 降级后点击是唯一同步触发）
  *
  * 图表三级策略在本形态的落法：
  *   mermaid / echarts → 页面自己画（运行时按需从服务加载，见 ensureDiagramLibs）；
@@ -656,7 +656,6 @@ const build = msg =>
     await doBuild(msg)
     // 重建换页：行位页表缓存失效（§6.2 locate 切片）。
     locatePages = null
-    lastUpReal = null
   })
 
 // ---------------------------------------------------------------------------
@@ -670,10 +669,6 @@ const build = msg =>
 // ---------------------------------------------------------------------------
 
 let locatePages = null // [{start, end}] 页行域；start=0 = 该页无首现标注
-let selfLocateUntil = 0 // 程序定位后短窗：动画中途帧不上报（跨页动画逐帧上报会拖文连跳）
-let lastUpReal = null // 最近上报的实数行位（量化基线）
-let locateRaf = 0
-let lastDocHeight = -1 // 布局静默守卫：页高在变（字体/图片晚到重排）期间不上报
 
 const locatePagesOf = () => {
   if (locatePages) return locatePages
@@ -727,60 +722,23 @@ const locateLine = line => {
   const rect = sec.getBoundingClientRect()
   const target = rect.top + window.scrollY + hit.progress * rect.height - 24
   if (Math.abs(target - window.scrollY) < 2) return // ε 幂等（§6.2）
-  selfLocateUntil = Date.now() + 600
-  lastUpReal = Number(line)
   window.scrollTo({ top: Math.max(0, target), behavior: "smooth" })
 }
 
-// 列表态用户滚动上报：rAF 合帧、量化 0.3 行。程序定位窗内（600ms 动画途中）
-// 不上报——跨页动画逐帧上报会拖着文连跳；窗后用户抢滚立即生效。
-window.addEventListener(
-  "scroll",
-  () => {
-    if (locateRaf) return
-    locateRaf = requestAnimationFrame(() => {
-      locateRaf = 0
-      if (!document.documentElement.classList.contains("md2s-list")) return
-      // 布局静默守卫：页高在变（字体晚到/重排）期间，同一 scrollY 会映射到
-      // 不同的行——上报会把文拽着重排跑。页高稳定一帧后才认。
-      const docH = document.documentElement.scrollHeight
-      const stable = docH === lastDocHeight
-      lastDocHeight = docH
-      if (!stable) return
-      const secs = sectionsOf(document)
-      if (!secs.length) return
-      const viewTop = window.scrollY + 1
-      let idx = -1
-      for (let i = 0; i < secs.length; i++) {
-        if (secs[i].getBoundingClientRect().bottom > viewTop) {
-          idx = i
-          break
-        }
-      }
-      if (idx === -1) idx = secs.length - 1
-      // 滚到内容底部：末页只能贴在视口下沿（没有 60vh 下缓冲了），按「顶线
-      // 所在页」会误报倒数第二页；到底即认末页。
-      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
-        idx = secs.length - 1
-      }
-      const page = locatePagesOf()[idx]
-      if (!page || !page.start) return
-      const rect = secs[idx].getBoundingClientRect()
-      const span = Math.max(1, page.end - page.start + 1)
-      const progress = Math.min(1, Math.max(0, (viewTop - rect.top) / rect.height))
-      const real = page.start + progress * span
-      if (lastUpReal != null && Math.abs(real - lastUpReal) < 0.3) return
-      if (Date.now() < selfLocateUntil) return
-      lastUpReal = real
-      post({
-        type: "md2s:locate-up",
-        line: Math.floor(real),
-        frac: real - Math.floor(real),
-      })
-    })
-  },
-  { passive: true }
-)
+// 列表态**点击某页**上报（§6.2 降级 2026-11-21）：点页 = 「到这」——发该页
+// 首现行位（click 标记），宿主文/栏按 reverse 语义对齐；滚动不再上报（降级
+// 后没有任何面跟随滚动）。放映态走 player，不参与。
+document.addEventListener("click", ev => {
+  if (!document.documentElement.classList.contains("md2s-list")) return
+  const target = ev.target instanceof Element ? ev.target : null
+  if (!target) return
+  const secs = sectionsOf(document)
+  const sec = secs.find(s => s.contains(target))
+  if (!sec) return
+  const page = locatePagesOf()[secs.indexOf(sec)]
+  if (!page || !page.start) return
+  post({ type: "md2s:locate-up", line: page.start, click: true })
+})
 
 // ---------------------------------------------------------------------------
 // 导出取数（M2）：宿主发 md2s:export，页面跑 deck-core 的 exportImages()/ir()，
