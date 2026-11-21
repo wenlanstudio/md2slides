@@ -733,18 +733,28 @@ const locateLine = line => {
 
 // 列表态**点击某页**上报（§6.2 降级 2026-11-21）：点页 = 「到这」——发该页
 // 首现行位（click 标记），宿主文/栏按 reverse 语义对齐；滚动不再上报（降级
-// 后没有任何面跟随滚动）。放映态走 player，不参与。
+// 后没有任何面跟随滚动）。放映态走 player，不参与。**捕获阶段**：quiz 浮层
+// （deck-overlay）对自己的 click stopPropagation——冒泡监听在 quiz 页收不
+// 到（真实讲义全是 quiz 块，「点览不跟随」的文档相关差异根因）。
 document.addEventListener("click", ev => {
   if (!document.documentElement.classList.contains("md2s-list")) return
   const target = ev.target instanceof Element ? ev.target : null
   if (!target) return
   const secs = sectionsOf(document)
-  const sec = secs.find(s => s.contains(target))
+  let sec = secs.find(s => s.contains(target))
+  if (!sec && ev.clientX != null) {
+    // 坐标兜底：点在浮层（quiz 徽标/发题按钮等 overlay）上时 target 不属于
+    // 任何页——按点击坐标找被覆盖的页（用户点的是「这页」的意图不变）。
+    sec = secs.find(s => {
+      const r = s.getBoundingClientRect()
+      return ev.clientX >= r.left && ev.clientX < r.right && ev.clientY >= r.top && ev.clientY < r.bottom
+    })
+  }
   if (!sec) return
   const page = locatePagesOf()[secs.indexOf(sec)]
   if (!page || !page.start) return
   post({ type: "md2s:locate-up", line: page.start, click: true })
-})
+}, true)
 
 // ---------------------------------------------------------------------------
 // 导出取数（M2）：宿主发 md2s:export，页面跑 deck-core 的 exportImages()/ir()，
