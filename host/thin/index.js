@@ -24,7 +24,7 @@ const { renderMatplotlib } = require("./matplotlib")
 
 /**
  * @param {{type: string, source: string, lang: string}} block
- * @returns {Promise<{png?: Buffer, dataUrl?: string, svg?: string, width?: number, height?: number}>}
+ * @returns {Promise<{mime?: string, bitmap?: Buffer, png?: Buffer, dataUrl?: string, svg?: string, width?: number, height?: number}>}
  * @throws {Error} 没有对应渲染器 → 硬失败（图表必须真渲染，不接受占位降级）
  */
 const renderDiagram = async block => {

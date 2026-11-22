@@ -261,10 +261,21 @@ const ir = async (opts = {}) => {
   await inlineImages()
   const items = []
   let n = 0
+  // 扩展名跟 mime 走，别把 GIF 咬死成 .png（matplotlib 动画块现在是 GIF 位图）。
+  // 与 export/pptx/media.js 的 EXT_OF 同口径，那边管独立宿主落盘，这里管浏览器侧收集。
+  const EXT_BY_MIME = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/gif": ".gif",
+    "image/webp": ".webp",
+    "image/bmp": ".bmp",
+    "image/svg+xml": ".svg",
+  }
   const media = {
     add: (dataUrl, kind) => {
       n += 1
-      const name = `${kind ?? "fig"}-${n}.png`
+      const mime = /^data:([^;,]+)[;,]/.exec(String(dataUrl ?? ""))?.[1]?.toLowerCase()
+      const name = `${kind ?? "fig"}-${n}${(mime && EXT_BY_MIME[mime]) || ".png"}`
       items.push({ name, dataUrl })
       return name
     },

@@ -46,10 +46,49 @@ test("真出 PNG（含中文标题）", t => {
       'plt.xlabel("x 轴")',
     ].join("\n"),
   )
-  assert.equal(result.png.readUInt32BE(0), 0x89504e47, "必须是 PNG 文件头")
-  assert.ok(result.png.length > 1000, "不能是空白图")
+  assert.equal(result.mime, "image/png")
+  assert.equal(result.bitmap.readUInt32BE(0), 0x89504e47, "必须是 PNG 文件头")
+  assert.ok(result.bitmap.length > 1000, "不能是空白图")
   assert.ok(result.dataUrl.startsWith("data:image/png;base64,"))
   assert.ok(result.width > 100 && result.height > 100, `尺寸异常：${result.width}x${result.height}`)
+})
+
+test("动画围栏出 GIF（FuncAnimation，帧帽与魔数）", t => {
+  if (needPython(t)) return
+  const result = renderMatplotlib(
+    [
+      "import numpy as np",
+      "import matplotlib.pyplot as plt",
+      "from matplotlib.animation import FuncAnimation",
+      "x = np.arange(0, 2 * np.pi, 0.01)",
+      "fig, ax = plt.subplots()",
+      "line, = ax.plot(x, np.sin(x))",
+      "def animate(i):",
+      "    line.set_ydata(np.sin(x + i / 10.0))",
+      "    return line",
+      "def init():",
+      "    line.set_ydata(np.sin(x))",
+      "    return line",
+      "ani = FuncAnimation(fig=fig, func=animate, frames=6, init_func=init, interval=50, blit=False)",
+    ].join("\n"),
+  )
+  assert.equal(result.mime, "image/gif", "动画块必须回 GIF")
+  assert.ok(result.dataUrl.startsWith("data:image/gif;base64,"))
+  assert.ok(result.bitmap.toString("latin1", 0, 3) === "GIF", "必须是 GIF 文件头")
+  assert.ok(result.width > 100 && result.height > 100, `尺寸异常：${result.width}x${result.height}`)
+})
+
+test("静态代码不受动画分支影响，仍是 PNG", t => {
+  if (needPython(t)) return
+  // 有 Animation import 但只建了图没建动画：不能误判成 GIF。
+  const result = renderMatplotlib(
+    [
+      "import matplotlib.pyplot as plt",
+      "from matplotlib.animation import FuncAnimation  # noqa: F401",
+      "plt.plot([1, 2], [1, 2])",
+    ].join("\n"),
+  )
+  assert.equal(result.mime, "image/png")
 })
 
 test("没有画图的代码给出人话错误", t => {

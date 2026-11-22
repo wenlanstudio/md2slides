@@ -25,7 +25,8 @@ const RESULT_PREFIX = "__MD2S_MATPLOTLIB__"
 
 /**
  * 与文览 `main/ipc/matplotlib.ts` 的 BOOTSTRAP 同源（同一套字体与 UTF-8 处理），
- * 差别只在输出：文览要 SVG 交给编辑器，这里要 PNG 直接进 deck / PPTX。
+ * 差别只在输出：文览要 SVG 交给编辑器，这里要 PNG 直接进 deck / PPTX；snippet
+ * 注册了 matplotlib Animation 时两边都改出 GIF（Pillow 直写，帧数/体积双帽）。
  *
  * 几个必须自己兜的坑：
  *  - stdin 必须按 **bytes** 读、按 UTF-8 解：中文 Windows 的文本层会按 GBK 解，
@@ -34,7 +35,7 @@ const RESULT_PREFIX = "__MD2S_MATPLOTLIB__"
  *  - `np` / `plt` 预先注入命名空间：生态里的 matplotlib 片段普遍不 import 就直接用。
  */
 const HARNESS = `
-import base64, io, json, sys
+import base64, io, json, os, sys, tempfile, time
 
 def read_source():
     return sys.stdin.buffer.read().decode("utf-8", errors="replace")
@@ -76,10 +77,103 @@ try:
 except Exception:
     namespace = {"__name__": "__diagram__", "plt": plt}
 
+# 动画（FuncAnimation / ArtistAnimation）自己不画任何东西：走下面的静态导出只会
+# 定格首帧。登记 snippet 注册的每个 Animation，把整块改写成 GIF——顺手持一份强
+# 引用，没赋值的 FuncAnimation(...) 不会再被垃圾回收掉（这是官方文档都要提的坑）。
+GIF_MAX_FRAMES = 200
+# 慢动画需要的帧数远少于快动画：20ms 的 snippet 200 帧合适，1s 的闪烁 24 帧就读得
+# 完，而 3D figure 每帧重投影要半秒。帧帽随 interval 走，让 frames=None 的闪烁落在
+# ~20 秒循环上，别烧穿渲染预算。
+GIF_TARGET_LOOP_MS = 20000
+# 第二道闸：单帧渲染慢时不能把 save 拖过宿主超时（本侧 60s），抓帧超预算即截断。
+GIF_TIME_BUDGET_S = 45
+GIF_MAX_BYTES = 8 * 1024 * 1024
+ANIMATIONS = []
+try:
+    import matplotlib.animation as _anim
+
+    _orig_anim_init = _anim.Animation.__init__
+
+    def _record_anim_init(self, fig, *args, **kwargs):
+        ANIMATIONS.append((self, fig))
+        return _orig_anim_init(self, fig, *args, **kwargs)
+
+    _anim.Animation.__init__ = _record_anim_init
+except Exception:
+    pass
+
 try:
     exec(compile(code, "<matplotlib>", "exec"), namespace)
 except Exception as err:
     fail(type(err).__name__ + ": " + str(err))
+
+if ANIMATIONS:
+    ani, anim_fig = ANIMATIONS[-1]
+    interval = getattr(ani, "_interval", None) or 200
+    # 1s-间隔的闪烁要按 1s 播，fps 下限放宽到 1（GIF 延迟是 10ms 整数倍，1fps=100cs）。
+    fps = max(1, min(50, int(round(1000.0 / float(interval)))))
+    frame_cap = max(24, min(GIF_MAX_FRAMES, int(round(GIF_TARGET_LOOP_MS / float(interval)))))
+    base_dpi = float(getattr(anim_fig, "dpi", None) or 100)
+
+    if not hasattr(_anim, "PillowWriter"):
+        fail("matplotlib 版本太旧（< 3.2），缺 PillowWriter，画不了动画")
+
+    class _GifFrameCap(Exception):
+        pass
+
+    class _CappedPillowWriter(_anim.PillowWriter):
+        # 双闸防病态帧源：frames=None 是 itertools.count 无限帧（帧帽），单帧
+        # 渲染慢则不能拖过宿主超时（时间帽）。
+        def __init__(self, fps, cap):
+            super().__init__(fps=fps)
+            self._mt_cap = cap
+            self._mt_count = 0
+            self._mt_start = None
+
+        def grab_frame(self, **kwargs):
+            now = time.monotonic()
+            if self._mt_start is None:
+                self._mt_start = now
+            self._mt_count += 1
+            if self._mt_count > self._mt_cap or now - self._mt_start > GIF_TIME_BUDGET_S:
+                raise _GifFrameCap()
+            return super().grab_frame(**kwargs)
+
+    def write_gif(scale):
+        writer = _CappedPillowWriter(fps=fps, cap=frame_cap)
+        try:
+            ani.save(tmp_path, writer=writer, dpi=base_dpi * scale)
+        except _GifFrameCap:
+            # MovieWriter.saving 在 finally 里跑 finish()，所以盘上的文件已经
+            # 是装着已画帧的合法 GIF。
+            pass
+        with open(tmp_path, "rb") as handle:
+            return handle.read()
+
+    tmp = tempfile.NamedTemporaryFile(suffix=".gif", delete=False)
+    tmp.close()
+    tmp_path = tmp.name
+    try:
+        try:
+            gif = write_gif(1.0)
+            if len(gif) > GIF_MAX_BYTES:
+                gif = write_gif(0.6)
+                if len(gif) > GIF_MAX_BYTES:
+                    fail("动画 GIF 超出大小上限——减少帧数或缩小 figure 再试")
+        except Exception as err:
+            fail("动画序列化失败：" + str(err))
+
+        emit({
+            "ok": True,
+            "mime": "image/gif",
+            "data": base64.b64encode(gif).decode("ascii")
+        })
+        sys.exit(0)
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
 
 figures = [plt.figure(n) for n in plt.get_fignums()]
 if not figures:
@@ -105,6 +199,23 @@ const pngSize = buf => {
   if (!Buffer.isBuffer(buf) || buf.length < 24) return null
   if (buf.readUInt32BE(0) !== 0x89504e47) return null
   return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) }
+}
+
+/** GIF 头（GIF87a/GIF89a）里的宽高（逻辑屏幕描述符，小端）；同上拿不到返 null。 */
+const gifSize = buf => {
+  if (!Buffer.isBuffer(buf) || buf.length < 10) return null
+  const header = buf.toString("latin1", 0, 6)
+  if (header !== "GIF87a" && header !== "GIF89a") return null
+  return { width: buf.readUInt16LE(6), height: buf.readUInt16LE(8) }
+}
+
+/** 魔数认 mime：动图块回 GIF，静态块回 PNG，别的都不收。 */
+const sniffMime = buf => {
+  if (!Buffer.isBuffer(buf) || buf.length < 6) return null
+  const header = buf.toString("latin1", 0, 6)
+  if (header === "GIF87a" || header === "GIF89a") return "image/gif"
+  if (buf.readUInt32BE(0) === 0x89504e47) return "image/png"
+  return null
 }
 
 /**
@@ -234,8 +345,9 @@ const parseResult = stdout => {
  * @param {object} [opts]
  * @param {number} [opts.dpi=192]  输出分辨率（与 graphviz 的 192 同口径）
  * @param {number} [opts.timeout=60000] 单块执行上限（毫秒）
- * @returns {{ png: Buffer, dataUrl: string, width?: number, height?: number }}
- * @throws {Error} 没解释器 / 执行出错 / 没画图 / 没吐 PNG —— 一律硬失败，不降级
+ * @returns {{ mime: string, bitmap: Buffer, dataUrl: string, width?: number, height?: number }}
+ *   动画块 mime=image/gif，静态块 image/png；width/height 解析自图片头
+ * @throws {Error} 没解释器 / 执行出错 / 没画图 / 没吐位图 —— 一律硬失败，不降级
  */
 const renderMatplotlib = (source, opts = {}) => {
   const text = String(source ?? "")
@@ -267,14 +379,16 @@ const renderMatplotlib = (source, opts = {}) => {
   }
   if (!parsed.ok) throw new Error(parsed.error || "matplotlib 渲染失败")
 
-  const png = Buffer.from(String(parsed.data ?? ""), "base64")
-  if (!png.length || png.readUInt32BE(0) !== 0x89504e47) {
-    throw new Error("matplotlib 没吐出 PNG（输出不是 PNG 文件头）")
+  const bitmap = Buffer.from(String(parsed.data ?? ""), "base64")
+  const mime = sniffMime(bitmap)
+  if (!bitmap.length || !mime) {
+    throw new Error("matplotlib 没吐出位图（既不是 PNG 也不是 GIF 文件头）")
   }
-  const size = pngSize(png) ?? {}
+  const size = (mime === "image/gif" ? gifSize(bitmap) : pngSize(bitmap)) ?? {}
   return {
-    png,
-    dataUrl: `data:image/png;base64,${png.toString("base64")}`,
+    mime,
+    bitmap,
+    dataUrl: `data:${mime};base64,${bitmap.toString("base64")}`,
     width: size.width,
     height: size.height,
   }
@@ -286,4 +400,5 @@ module.exports = {
   pythonCandidates,
   parseResult,
   pngSize,
+  gifSize,
 }
