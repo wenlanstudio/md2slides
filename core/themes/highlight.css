@@ -5,8 +5,10 @@
  * span 有没有颜色完全取决于 CSS 里有没有对应规则，而主题通常只给 comment/quote 上色，
  * 其余 token 全是默认文本色 —— 于是代码看起来"根本没有高亮"。
  *
- * 追加在主题 CSS 之后：主题自己定义的同名 `.hljs-*` 规则按层叠顺序仍然优先，
- * 这里只填补空缺。
+ * 拼装在主题 CSS **之前**（compose.js cssParts：兜底 → 主题 → katex → code）：
+ * 同特异性规则层叠后者赢，主题压轴 = 主题自己定义的同名 `.hljs-*` 规则优先，
+ * 这里只填补主题没写的 token。反过来的顺序会把主题配色整个压掉——曾隐形
+ * 一年多，因为兜底配色照着 lecture 抄、两者完全相同（2026-11-22 sunset 抓出）。
  */
 
 .hljs-comment, .hljs-quote { color: #7a8b99; font-style: italic; }

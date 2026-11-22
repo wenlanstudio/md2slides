@@ -149,7 +149,8 @@ const renderSvg = async (block, opts = {}) => {
   }
 
   const scale = opts.scale ?? 2
-  const dataUrl = await rasterizeSvg(svg, scale)
+  // fill 缺省白：分派点（index.js）会注入实测的 section 背景色，深色主题位图不再白疤。
+  const dataUrl = await rasterizeSvg(svg, scale, opts.fill ?? "#ffffff")
   if (!dataUrl) {
     throw new Error(
       "SVG 栅格出来是空白：多半用了外链图片、外部字体或 foreignObject（SVG-as-image 不加载外部资源）。" +

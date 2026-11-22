@@ -62,9 +62,11 @@ function stripComments(root) {
 /**
  * @param {SVGElement} svg a rendered diagram
  * @param {number} scale raster scale relative to the SVG's intrinsic size
+ * @param {string} [fill="#ffffff"] 位图底色。深色主题（sunset）传实测的 section 背景，
+ *   图表位图不再带白疤；浅色主题量出来就是白，与旧版逐字节一致。
  * @returns {Promise<string|null>} PNG data URL, or null when the raster came out blank
  */
-const rasterizeSvg = (svg, scale) => new Promise(resolve => {
+const rasterizeSvg = (svg, scale, fill = "#ffffff") => new Promise(resolve => {
   const { width, height } = svgSize(svg)
   const clone = svg.cloneNode(true)
   clone.setAttribute("xmlns", XMLNS)
@@ -79,10 +81,10 @@ const rasterizeSvg = (svg, scale) => new Promise(resolve => {
     canvas.width = Math.max(1, Math.round(width * scale))
     canvas.height = Math.max(1, Math.round(height * scale))
     const ctx = canvas.getContext("2d")
-    ctx.fillStyle = "#ffffff"
+    ctx.fillStyle = fill
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
-    if (isBlank(ctx, canvas)) {
+    if (isBlank(ctx, canvas, fill)) {
       console.warn("[md2slides] diagram rasterized blank (foreignObject?), falling back to SVG")
       resolve(null)
       return
@@ -96,8 +98,27 @@ const rasterizeSvg = (svg, scale) => new Promise(resolve => {
   image.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(clone))
 })
 
-/** A diagram that drew nothing is worse than no rasterization at all, so detect it. */
-const isBlank = (ctx, canvas) => {
+/** fill 的 RGB 通道：收 #rgb/#rrggbb 与 rgb()/rgba()，解析不了按白处理。 */
+const fillChannels = fill => {
+  const text = String(fill ?? "#ffffff")
+  const rgb = /^rgba?\(([^)]+)\)$/i.exec(text)
+  if (rgb) {
+    const parts = rgb[1].split(/[\s,]+/).filter(Boolean).map(Number)
+    if (parts.length >= 3 && parts.slice(0, 3).every(Number.isFinite)) return parts.slice(0, 3)
+  }
+  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(text)
+  if (hex) {
+    const digits = hex[1].length === 3 ? [...hex[1]].map(c => c + c).join("") : hex[1]
+    return [0, 2, 4].map(i => Number.parseInt(digits.slice(i, i + 2), 16))
+  }
+  return [255, 255, 255]
+}
+
+/** A diagram that drew nothing is worse than no rasterization at all, so detect it.
+ *  「墨水」= 与底色偏离的像素：白底时等价于旧的 `通道 < 245`（255-245=10），深底
+ *  同样成立——底就是参照系，整张画布只会因为真的画了东西才偏离底色。 */
+const isBlank = (ctx, canvas, fill = "#ffffff") => {
+  const [fr, fg, fb] = fillChannels(fill)
   if (!canvas.width || !canvas.height) return true
   const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height)
   const stride = 4 * 37 // sample sparsely; an actual diagram leaves far more than 0.05% ink
@@ -105,9 +126,13 @@ const isBlank = (ctx, canvas) => {
   let ink = 0
   for (let i = 0; i < data.length; i += stride) {
     total += 1
-    if (data[i] < 245 || data[i + 1] < 245 || data[i + 2] < 245) ink += 1
+    if (
+      Math.abs(data[i] - fr) > 10 ||
+      Math.abs(data[i + 1] - fg) > 10 ||
+      Math.abs(data[i + 2] - fb) > 10
+    ) ink += 1
   }
   return total > 0 && ink / total < 0.0005
 }
 
-module.exports = { svgSize, fitBox, rasterizeSvg }
+module.exports = { svgSize, fitBox, rasterizeSvg, fillChannels }

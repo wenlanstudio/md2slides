@@ -125,11 +125,16 @@ const compose = (md, opts = {}) => {
   const painted = (opts.highlight ?? true) ? highlightCode(doc) : 0
 
   // 按需拼 CSS：没公式不背 KaTeX，没代码不背高亮配色。
-  const cssParts = [theme?.css]
+  // 高亮兜底必须在主题 CSS **之前**：同特异性规则层叠后者赢，兜底在后会把主题
+  // 自己的 .hljs-* 配色整个压掉（2026-11-22 sunset 抓出——关键字永远渲染兜底的
+  // 紫 #8250df；此前隐形是因为兜底配色就是照着 lecture 抄的，两者完全相同）。
+  // 主题压轴 = 主题声明什么色就渲染什么色，兜底只补主题没写的 token。
+  const cssParts = []
+  if (painted > 0) cssParts.push(highlightCss({ readFile: opts.readFile }))
+  cssParts.push(theme?.css)
   if ((opts.math ?? true) && /class="katex/.test(deck.innerHTML)) {
     cssParts.push(katexCss({ readFile: opts.readFile, fontsUrl: opts.katexFontsUrl }))
   }
-  if (painted > 0) cssParts.push(highlightCss({ readFile: opts.readFile }))
   cssParts.push(codeCss(opts.codeWrap ?? true))
   const css = cssParts.filter(Boolean).join("\n")
 

@@ -10,8 +10,44 @@
  * 渲染完取 `getDataURL()` 直接就是 PNG —— 省掉了 SVG→PNG 那一道栅格。
  */
 
+const { fillChannels } = require("../../core/render/diagram")
+
 const DEFAULT_WIDTH = 800
 const DEFAULT_HEIGHT = 450
+
+/** 深底上的默认浅字（中性暖白，不属于任何主题）。 */
+const DARK_BG_TEXT_COLOR = "#e8e4f5"
+/** 相对亮度低于此值算深色底（0-255 灰阶当量）。 */
+const DARK_FILL_LUMA = 128
+
+const isDarkFill = fill => {
+  const [r, g, b] = fillChannels(fill)
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b < DARK_FILL_LUMA
+}
+
+/** echarts 默认文字色（#6E7079 一族）是给浅底准备的：深底上轴标签整个被吞
+ *  （2026-11-22 视觉验收抓出）。底色实测为深色时，给作者**没显式配色**的位置
+ *  注入浅色默认：全局 textStyle、坐标轴 axisLabel、图例。作者写了的颜色一字不改。 */
+const asArray = value => (Array.isArray(value) ? value : value == null ? [] : [value])
+
+const injectDarkTextDefaults = (option, color) => {
+  if (!option.textStyle?.color) {
+    option.textStyle = { ...(option.textStyle ?? {}), color }
+  }
+  for (const key of ["xAxis", "yAxis"]) {
+    for (const axis of asArray(option[key])) {
+      if (!axis.axisLabel?.color) {
+        axis.axisLabel = { ...(axis.axisLabel ?? {}), color }
+      }
+    }
+  }
+  for (const legend of asArray(option.legend)) {
+    if (!legend.textStyle?.color) {
+      legend.textStyle = { ...(legend.textStyle ?? {}), color }
+    }
+  }
+  return option
+}
 
 /**
  * 围栏里的 echarts 配置：先当 JSON 解析，不行再当 JS 对象字面量求值。
@@ -56,6 +92,9 @@ const renderEcharts = async (block, opts = {}) => {
   const width = opts.width ?? DEFAULT_WIDTH
   const height = opts.height ?? DEFAULT_HEIGHT
   const ratio = opts.pixelRatio ?? 2
+  const background = opts.background ?? "#ffffff"
+  // 深底注入浅字默认（作者显式配色不动）；浅底什么都不碰，与旧版逐字节一致。
+  if (isDarkFill(background)) injectDarkTextDefaults(option, DARK_BG_TEXT_COLOR)
 
   // 离屏容器：不能 display:none（那样量不到尺寸），挪到屏幕外即可。
   const host = document.createElement("div")
@@ -70,7 +109,7 @@ const renderEcharts = async (block, opts = {}) => {
     const dataUrl = chart.getDataURL({
       type: "png",
       pixelRatio: ratio,
-      backgroundColor: opts.background ?? "#ffffff",
+      backgroundColor: background,
     })
     chart.dispose()
     if (!dataUrl) throw new Error("echarts 没吐出图像")

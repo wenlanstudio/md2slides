@@ -48,7 +48,8 @@ const renderMermaid = async (block, opts = {}) => {
 
   const svgEl = parsed.documentElement
   const size = svgSize(svgEl)
-  const dataUrl = await rasterizeSvg(svgEl, opts.scale ?? 2)
+  // fill 缺省白：分派点（index.js）会注入实测的 section 背景色，深色主题位图不再白疤。
+  const dataUrl = await rasterizeSvg(svgEl, opts.scale ?? 2, opts.fill ?? "#ffffff")
   if (!dataUrl) {
     throw new Error("mermaid SVG 栅格失败：画出来是空白，多半含 foreignObject（浏览器不给画）")
   }

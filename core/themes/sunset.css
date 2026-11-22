@@ -1,0 +1,347 @@
+/* @theme sunset */
+/*
+ * sunset — 热带日落主题（热血橙蓝版）。奶白底 + 火焰橙红×深海蓝冷暖对撞，
+ * 为《数据可视化》这类活泼绚烂的课程而生。
+ * 配色沿革（2026-11-22 一天三轮）：深色黄昏底被否（"太暗黑"）→ 浅色品红版
+ * 被否（"有点娘"）→ 定热血橙蓝：品红全部退役，火焰橙红当主角、深海蓝当
+ * 副色，孔雀青保三级——鲜艳但不粉。
+ *
+ * 设计纪律一（与 lecture 同构）：结构/度量逐条沿用 lecture——--fs-* 字号体系、
+ * 1920x1080 画布、padding 72/84、furniture 定位、cols/封面/图表豁免全部照搬，
+ * 只换颜色不动度量。分页靠浏览器实测布局，度量不变 = 分页行为与 lecture
+ * 完全同构，同一份文档两套主题页数一致，互验时不会互相污染基线。
+ *
+ * 设计纪律二（艳色全靠纯色）：刻意不用渐变底/渐变字（background-clip 文本）。
+ * IR 的 runStyleOf 读浏览器实测色，渐变底导出 pptx 会退化成不可靠的实底，
+ * 渐变字实测 color 是透明。热血感由「橙红主角 + 蓝青对撞 + 每级标题一色」
+ * 的纯色体系承担。
+ *
+ * 色板（落日时分的海面：天上烧着橙红，海里沉着深蓝）：
+ *   底 #fff9f0 日落奶白   正文 #2d3436 深板岩灰   家具/次级 #8892a0 暖灰
+ *   h1 #f4511e 火焰橙红（+ #d84315 深红海平线）  h2 #1565c0 深海蓝
+ *   h3 #00897b 孔雀青      h4-h6 #455a64 蓝灰    强调 #e53935 火焰红
+ */
+
+@import 'default';
+
+section {
+  --fs-body: 42px;
+  --fs-h1: 104px;
+  --fs-h2: 84px;
+  --fs-h3: 68px;
+  --fs-h4: 58px;
+  --fs-h5: 50px;
+  --fs-h6: 46px;
+  --fs-code: 34px;
+  --fs-code-short: 51px;
+  --fs-table: 36px;
+  --fs-quote: 40px;
+  --fs-figcap: 26px;
+  --fs-meta: 28px;
+
+  width: 1920px;
+  height: 1080px;
+  box-sizing: border-box;
+  padding: 72px 84px;
+  font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", sans-serif;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: #2d3436;
+  background: #fff9f0;
+  justify-content: safe center;
+  letter-spacing: 0.2px;
+}
+
+/* 页码 / 页眉页脚 */
+section::after {
+  color: #8892a0;
+  font-size: 26px;
+  right: 36px;
+  bottom: 21px;
+}
+
+header,
+footer {
+  color: #8892a0;
+  font-size: var(--fs-meta);
+}
+
+/* 家具（furniture.js 注入的页眉页脚）：左右贴齐正文边距（section padding 84px），
+   颜色字号沿用上面的 header/footer 规则。base 的 :where 兜底是 2em，这里按主题精确对齐。 */
+section > header.md2s-furniture,
+section > footer.md2s-furniture { left: 84px; right: 84px; }
+section > header.md2s-furniture { top: 24px; }
+section > footer.md2s-furniture { bottom: 21px; }
+
+/* 标题基底（分家后归主题）：字重与行高决定版面节奏。 */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  color: #f4511e;
+  margin: 0 0 0.35em 0;
+  padding-bottom: 0.22em;
+  border-bottom: 4px solid #d84315;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  color: #1565c0;
+  margin: 0 0 0.35em 0;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  color: #00897b;
+  margin: 0.15em 0 0.35em 0;
+}
+
+h4 { font-size: var(--fs-h4); color: #455a64; margin: 0.15em 0 0.3em 0; }
+h5 { font-size: var(--fs-h5); color: #455a64; margin: 0.15em 0 0.3em 0; }
+h6 { font-size: var(--fs-h6); color: #455a64; margin: 0.15em 0 0.3em 0; }
+
+strong { color: #e53935; font-weight: 700; }
+em { color: #d84315; }
+a { color: #1976d2; }
+
+/* 关键词高亮（front-matter `keywords`；core/render/keywords.js 包 <mark class="md2s-kw">）：
+   与 **加粗** 的 strong 完全同款——统一强调语言。IR 的 runStyleOf 读浏览器实测色，
+   PPTX 导出自动跟随。标题与代码块不高亮；作者手写的 <mark> 不带此类，不受影响。 */
+mark.md2s-kw {
+  color: #e53935;
+  font-weight: 700;
+  background: transparent;
+}
+
+ul, ol { margin: 0.25em 0; padding-left: 1.1em; }
+li { margin: 0.15em 0; line-height: 1.5; }
+
+/* 章节目录页（core/paginate/toc.js）：当前章用火焰橙红、其余暖灰——"我们在哪"一眼可见。
+   沿用标题（h1 #f4511e）与家具（#8892a0）的既定语言，不引入新色。
+   字号与 lecture 同规：目录标题 = --fs-h2（84px），目录项 = --fs-h3（68px）；
+   当前章只加粗/换色，不再放大；子项同字号，只靠缩进区分层级。 */
+section.md2s-toc > p.md2s-toc-title { color: #8892a0; font-size: var(--fs-h2); }
+section.md2s-toc > ol.md2s-toc-list { font-size: var(--fs-h3); }
+section.md2s-toc > ol.md2s-toc-list > li { color: #8892a0; line-height: 1.25; }
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-current {
+  color: #f4511e;
+  font-weight: 600;
+}
+/* 子项认语义类 md2s-toc-sub（级别比章深），不认 -hN 后缀——章的级别随文档而变
+   （H1/H2/H3 都可能是章），后缀硬编码必然误伤（2026-10-30 实测翻车过）。
+   比 current 规则多带一个类（0,4,3 > 0,3,3）：与书写顺序解链，谁调顺序都不翻。 */
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-item.md2s-toc-sub {
+  font-weight: 400;
+}
+/* 子项当前章用深海蓝：与橙红 current 构成冷暖对撞（目录两级一眼分开） */
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-item.md2s-toc-sub.md2s-toc-current {
+  color: #1565c0;
+  font-weight: 600;
+}
+section.md2s-toc > ol.md2s-toc-list > li > .md2s-toc-page { color: #8892a0; font-size: 0.9em; }
+section.md2s-toc > ol.md2s-toc-list > li.md2s-toc-current > .md2s-toc-page { color: #f4511e; }
+/* 嵌套列表跟随父项，不加额外下距（分家时从 base 搬入） */
+li > ul, li > ol { margin-bottom: 0; }
+p { margin: 0.3em 0; }
+
+/* 中文排版：正文段落首行缩进 2 字符 */
+section p { text-indent: 2em; }
+section p.figcap,
+section .cover p { text-indent: 0; }
+
+/* 行内代码：用 em 相对容器字号，正文里 ≈0.9×42=38px（即原"正文-2pt"意图），
+   标题里则随 h1~h6 同比放大，不再被固定 38px 压成标题的一半。pre>code 已在下方覆盖为 1em。
+   青绿系 chip 呼应 h3：与橙红强调错开色相，代码不抢正文的戏。 */
+code {
+  font-family: "Cascadia Mono", "Consolas", "JetBrains Mono", monospace;
+  background: #e0f2f1;
+  color: #00695c;
+  padding: 0.05em 0.32em;
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+
+pre {
+  font-family: "Cascadia Mono", "Consolas", "JetBrains Mono", monospace;
+  background: #faf5ee;
+  border: 1px solid #eaddce;
+  border-left: 6px solid #f4511e;
+  border-radius: 8px;
+  padding: 16px 24px;
+  margin: 0.25em 0;
+  font-size: var(--fs-code);
+  line-height: 1.38;
+  box-shadow: none;
+}
+
+pre > code {
+  background: transparent;
+  color: #2d3436;
+  padding: 0;
+  font-size: 1em;
+  border-radius: 0;
+}
+
+blockquote {
+  background: #fff3e0;
+  border-left: 6px solid #f57c00;
+  color: #9c4a00;
+  padding: 10px 24px;
+  margin: 0.3em 0;
+  font-size: var(--fs-quote);
+}
+
+blockquote code { background: #ffe0b2; color: #9c4a00; }
+
+/* 用 section table 提升特异性，覆盖内置 GitHub 风格的 display:block + width:max-content */
+section table {
+  display: table;
+  border-collapse: collapse;
+  font-size: var(--fs-table);
+  width: 100%;
+  max-width: 100%;
+  /* auto：列宽按内容分配（"编号"列窄、"核心内容"列宽），总宽仍锁 100%。
+     此前 fixed 是防两类退化：auto 布局超宽压缩时 CJK 列（min-content 仅 1 字）会被压成
+     一字一行、长标识符列（max-content 巨大）反被撑宽；现由下方 min-width 下限兜底。 */
+  table-layout: auto;
+  margin: 0.25em auto;
+  overflow: visible;
+}
+
+/* 断行策略：overflow-wrap 用 break-word 而非 anywhere——anywhere 会把断行机会计入
+   min-content 固有宽度，导致列被压到最长单词以下，出现 "boolean→bool/ean" 的
+   词中断行；break-word 不参与固有宽度计算，列宽不会低于最长单词，仅当单个单词
+   本身超出列宽时才词内断行（最后手段）。
+   min-width 是 auto 布局的压缩下限，保证 CJK 列不会被压成一字一行。 */
+section table th,
+section table td {
+  overflow-wrap: break-word;
+  vertical-align: middle;
+  min-width: 3em;
+}
+
+/* 表格内的行内代码（参数名/参数值）：整段不换行。列宽会自动让位给最长的
+   参数，杜绝 --showHeader=boolean 这类参数单元格折行。 */
+section table th code,
+section table td code {
+  white-space: nowrap;
+}
+
+/* 表头深海蓝底白字：5.6:1，投影仪上最稳的一档 */
+th {
+  background: #1565c0;
+  color: #ffffff;
+  font-weight: 700;
+  border: 1px solid #1565c0;
+  padding: 10px 22px;
+}
+
+td { border: 1px solid #dfe3e8; padding: 9px 22px; }
+tr:nth-child(even) td { background: #f4f8fb; }
+
+img {
+  max-width: 92%;
+  max-height: 720px;
+  object-fit: contain;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 图表位图（引擎产物）豁免主题的高度钳制：大图（如 mermaid 时序图 900×1637）被
+   720 压小后引擎量不到「它想占多大」，永远轮不到裸页独占——图被腰斩在小框里
+   （2026-11-17 用户裁决：图片太大应独占一页）。豁免后高度归引擎的裸页媒体缩放链
+   管（上限=页高）。宽度仍钳 92% 防横向溢出。 */
+img.md2slides-diagram {
+  max-height: none;
+}
+
+/* 图题 */
+section p.figcap {
+  text-align: center;
+  font-size: var(--fs-figcap);
+  color: #8892a0;
+  margin: 0.35em 0 0.1em 0;
+  line-height: 1.4;
+}
+
+/* 分栏容器 */
+section .cols {
+  display: flex;
+  flex-direction: row;
+  /* stretch：各栏拉满 .cols 整高。"栏中居中"的前提是栏自己有高度——原来
+     center 让栏缩成内容高，.col 里的 justify-content 什么也居不了。 */
+  align-items: stretch;
+  justify-content: center;
+  align-self: stretch;
+  /* 占满 section 剩余高度：栏从"内容多高"变成"整屏多高"，顶级元素才有垂直
+     居中的空间（2026-10-30 用户：栏中顶级元素水平垂直都居中）。
+     装不下时不压瘪（flex 项 min-height:auto 兜底），溢出仍走 overflow.js 老路。 */
+  flex-grow: 1;
+  width: 100%;
+  gap: 40px;
+  margin: 0.2em 0;
+}
+
+section .cols > .col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* 顶级元素水平居中：子元素按 fit-content 收窄后再居中——长段落/代码的
+     max-content 超过栏宽，收窄结果仍是整栏宽，观感与单栏一致；图、短标题
+     才显出居中。表格有 width:100% 显式值，依旧铺满栏宽（内容样式不动）。 */
+  align-items: center;
+  justify-content: center;
+}
+
+section .cols > .col > :first-child { margin-top: 0; }
+section .cols > .col > :last-child { margin-bottom: 0; }
+
+section .cols img { width: 100%; max-height: 840px; }
+
+/* 分栏内适度收窄，避免挤爆栏宽 */
+section .cols table { font-size: 30px; }
+section .cols pre { font-size: 28px; }
+section .cols h3 { margin-top: 0; }
+
+/* 短代码块放大（<=4 行；.bigcode 由引擎包，见 IR_v3 预留的短码标记）。
+   必须放在 .cols pre 之后：同特异性下靠顺序覆盖。 */
+section .cols .bigcode pre,
+section .bigcode pre {
+  font-size: var(--fs-code-short);
+}
+
+hr { border: 0; border-top: 1px dashed #e5ddd0; margin: 1em 0; }
+section.lead { justify-content: center; }
+
+/* 封面 / 结尾页 */
+section .cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+
+section .cover h1 { font-size: 112px; border-bottom: none; }
+section .cover h2 { font-size: 76px; }
+section .cover p.subtitle { font-size: 56px; color: #d84315; }
+section .cover p { font-size: 44px; color: #8892a0; }
+
+/* lead 标题页：火焰橙红 + 深红海平线，与正文 h1 同语言 */
+section.lead h1 { color: #f4511e; border-bottom-color: #d84315; }
+
+/* highlight.js 配色（浅色）：keyword 火焰红 / string 孔雀青 / number 橙 /
+   title 深海蓝 / built_in 青蓝 / comment 暖灰 */
+.hljs-comment, .hljs-quote { color: #a09890; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal { color: #e53935; }
+.hljs-string, .hljs-doctag { color: #00897b; }
+.hljs-number, .hljs-symbol, .hljs-bullet { color: #ef6c00; }
+.hljs-title, .hljs-section, .hljs-name { color: #1565c0; font-weight: 600; }
+.hljs-built_in, .hljs-builtin-name { color: #00838f; }
+.hljs-attr, .hljs-attribute { color: #ef6c00; }
