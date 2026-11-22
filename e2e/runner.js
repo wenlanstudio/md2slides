@@ -29,6 +29,7 @@ const { JSDOM } = require("jsdom")
 const { compose } = require("../core/compose")
 const { renderDiagrams, chartBlocksOf } = require("../core/render/diagramHost")
 const { renderDiagram: thinRenderDiagram, NODE_TYPES } = require("../host/thin")
+const { DIAGRAM_LIBS } = require("../host/browser/libAssets")
 const { bundleScript } = require("./bundle")
 const { launch } = require("./browser")
 const { serve } = require("./serve")
@@ -130,9 +131,10 @@ const settle = async (page, opts, maxRounds = 6) => {
  * 管线副本是「预览什么样，导出就什么样」这条承诺的天敌）。
  * 顺序要紧：hljs 是 externals 里那一项的来源，externals 又是 bundle 的依赖。
  */
-const injectRuntime = async (page, deferred) => {
+const injectRuntime = async (page, deferred, baseUrl = null) => {
   await page.addScriptTag({ path: require.resolve("../lib/highlight.min.js") })
-  // IR 抽取要用它把公式 / 图表栅格成 PNG（ir.js 的 rasterize 钩子）。
+  // IR 抽取要用它把公式 / 图表栅格成 PNG（ir.js 的 rasterize 钩子）；abc 多谱面的
+  // 整容器 compose 也用它（abcHost）。
   await page.addScriptTag({ path: require.resolve("../lib/html-to-image.js") })
   await page.addScriptTag({ path: require.resolve("./externals.js") })
   await page.addScriptTag({ content: bundleScript(require.resolve("./entry")) })
@@ -141,16 +143,23 @@ const injectRuntime = async (page, deferred) => {
   })
 
   // 图表预通行第二遍：mermaid / echarts 是浏览器运行时，svg 栅格要 canvas，
-  // 三者都只能在真页面里渲染。两个 lib 都不小（mermaid 5.5 MB、echarts 1.1 MB），
-  // 只在文档真用到时才注入；svg 不需要任何 lib。
-  if (deferred.includes("mermaid")) {
-    await page.addScriptTag({ path: require.resolve("../host/lib/mermaid.min.js") })
+  // vega-lite/flowchart/sequence/wavedrom/chart/abc 是各自的 JS 运行时——都只能在
+  // 真页面里渲染。清单单一事实源在 host/browser/libAssets.js（与 pack 同表），
+  // 本地路径 = host/lib/<file>；文件都不小，只在文档真用到时才注入。
+  // svg 不需要任何 lib；drawio 走 diagrams.net embed（要网络，e2e 不碰它）。
+  if (baseUrl) {
+    // sequence 的手写字体 @font-face 要按资产根拼 URL（pack 形态由 deck-full-entry 设）。
+    await page.evaluate(base => {
+      window.__md2slides_assetBase = `${base}/host/lib/`
+    }, baseUrl)
   }
-  if (deferred.includes("echarts")) {
-    await page.addScriptTag({ path: require.resolve("../host/lib/echarts.min.js") })
+  for (const type of deferred) {
+    for (const file of DIAGRAM_LIBS[type] ?? []) {
+      await page.addScriptTag({ path: path.join(ROOT, "host", "lib", path.basename(file)) })
+    }
   }
   // 这一遍跑完会当场过 `assertDiagramsRendered` 闸门：谁都没接手的图表类型在这里炸。
-  // 不传 only：默认接管页面侧全部类型（mermaid + echarts + svg）。
+  // 不传 only：默认接管页面侧全部类型（BROWSER_TYPES 全家）。
   return page.evaluate(() => window.md2slides.diagramPass({}))
 
   // 字体没就位就量，量到的是 fallback 字体的高度——中文字体尤其明显。
@@ -219,7 +228,7 @@ const runDeck = async input => {
       await page.goto(`${server.url}/${posix(path.relative(ROOT, file))}`, { waitUntil: "load" })
 
       const deferred = deck.diagram?.deferred ?? []
-      const diagramPass = await injectRuntime(page, deferred)
+      const diagramPass = await injectRuntime(page, deferred, server.url)
 
       const before = await page.evaluate(() => window.md2slides.snapshot())
       const { rounds, repainted, roundsAfterRepaint } = await settleDeck(page, paginateOpts)

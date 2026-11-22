@@ -15,7 +15,11 @@
  * 本模块不碰 Node 专有 API，所以浏览器里也能跑（会被 `e2e/bundle.js` 原样搬进页面）。
  */
 
-/** 围栏语言 → 图表类型。认不出的语言不是图表，原样当代码块处理。 */
+/** 围栏语言 → 图表类型。认不出的语言不是图表，原样当代码块处理。
+ *
+ * vega-lite / flowchart / sequence / wavedrom / chart / abc / drawio 与编辑器
+ * （wenlan muya fence.ts DIAGRAM_LANGS）对齐：编辑器能画的这七类 deck 也必须能画，
+ * 「一文多览」不许某一览悄悄掉队。语言别名（chartjs→chart）也照抄编辑器。 */
 const DIAGRAM_TYPES = {
   mermaid: "mermaid",
   dot: "graphviz",
@@ -24,11 +28,21 @@ const DIAGRAM_TYPES = {
   plantuml: "plantuml",
   puml: "plantuml",
   echarts: "echarts",
+  "vega-lite": "vega-lite",
+  flowchart: "flowchart",
+  sequence: "sequence",
+  wavedrom: "wavedrom",
+  chart: "chart",
+  chartjs: "chart",
+  abc: "abc",
   // svg 是作者手写的完整 <svg> 源码：浏览器侧栅格成 PNG（见 host/browser/svgHost）。
   // 不是"把 SVG 塞进 deck"——预通行结束时它已经是 <img>，与其余图表同一份位图契约。
   svg: "svg",
   // matplotlib 不是浏览器运行时：core 只认类型，真出图由宿主 spawn Python（见 host/thin）。
   matplotlib: "matplotlib",
+  // drawio 的 XML 直接嵌围栏，或 {source: "x.drawio"} 指向文件（deck 页经 /f?p= 取）。
+  // 出图走 diagrams.net embed 的 postMessage 协议，与编辑器同一条路（见 host/browser/drawioHost）。
+  drawio: "drawio",
 }
 
 /**

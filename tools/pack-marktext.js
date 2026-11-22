@@ -21,6 +21,13 @@
  *   katex/fonts/*              /fonts/ 的服务根
  *   lib/mermaid.min.js         按需注入的图表运行时（echarts 同）
  *   lib/echarts.min.js
+ *   lib/vega*.min.js           新七类运行时（清单 = host/browser/libAssets.js 的
+ *   lib/flowchart.min.js       DIAGRAM_LIBS；sequence-fonts/ 的手写字体同批）
+ *   lib/sequence.min.js
+ *   lib/sequence-fonts/*
+ *   lib/wavedrom.min.js
+ *   lib/chart.umd.min.js
+ *   lib/abcjs-basic-min.js
  *   lib/layout-core.js         分页决策内核（纯函数，M4.2 起 vendor 进 fork
  *                              renderer 源树——双端共用，view-model §5）
  *   server.js                  host/server/index.js 原样拷贝（fork main 直接 require，
@@ -35,6 +42,8 @@
 
 const fs = require("fs")
 const path = require("path")
+
+const { DIAGRAM_LIBS } = require("../host/browser/libAssets")
 
 const ROOT = path.resolve(__dirname, "..")
 const OUT = path.join(ROOT, "out", "marktext")
@@ -99,6 +108,14 @@ const main = () => {
 
   copy("host/lib/mermaid.min.js", "lib/mermaid.min.js")
   copy("host/lib/echarts.min.js", "lib/echarts.min.js")
+  // 新七类的运行时（vega 三件套 / flowchart+raphael / sequence+字体 / wavedrom /
+  // chart.umd / abcjs）——清单单一事实源在 host/browser/libAssets.js，这里照表拷。
+  for (const files of Object.values(DIAGRAM_LIBS)) {
+    for (const file of files) copy(path.join("host", file), file)
+  }
+  // sequence 手绘主题的 danielbd 字体不在 libs 清单（不是脚本），随包走：
+  // sequenceHost 的 @font-face 按 __md2slides_assetBase 拼 URL 指到这里。
+  copyTree("host/lib/sequence-fonts", "lib/sequence-fonts")
   copy("host/server/index.js", "server.js")
 
   // M4.2：分页决策内核（纯函数，零 DOM）随包出货——fork 侧 sync 脚本把它
@@ -123,7 +140,8 @@ const main = () => {
   const manifest = {
     themes,
     katexCss: "katex/katex.min.css",
-    libs: { mermaid: "lib/mermaid.min.js", echarts: "lib/echarts.min.js" },
+    // 图表运行时清单（数组按序加载；deck-full-entry.ensureDiagramLibs 照单取件）。
+    libs: { ...DIAGRAM_LIBS },
   }
   fs.writeFileSync(path.join(OUT, "assets.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8")
 

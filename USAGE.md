@@ -309,7 +309,7 @@ toc: true        # 开（缺省）；false 关；2 表示子项列到 H2
 
 | 用途 | 语言标记示例 |
 | --- | --- |
-| 图表渲染 | `plantUML` `mermaid` `chart` `echarts` `kanban` `graphviz` `matplotlib` `svg` |
+| 图表渲染 | `plantUML` `mermaid` `chart`/`chartjs` `echarts` `vega-lite` `flowchart` `sequence` `wavedrom` `abc` `drawio` `kanban`（mermaid 子图） `graphviz` `matplotlib` `svg` |
 | 可执行 | `python` `powershell` `bash` `hive` `mysql` |
 | 仅展示 | `sql` `shell`（通用语言标记，只上色不执行） |
 

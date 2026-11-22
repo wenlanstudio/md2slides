@@ -10,7 +10,7 @@
  *
  * 桥协议（postMessage，设计稿 integration-marktext.md §5.3）：
  *   页面 → 宿主  {type:"md2s:boot"}                     页面就绪（脚本装载完毕，可收 build）
- *   宿主 → 页面  {type:"md2s:build", md, mdDir, runOpts?{mode,browse,startIndex}}
+ *   宿主 → 页面  {type:"md2s:build", md, mdDir, runOpts?{mode,browse,startIndex,drawioServer}}
  *              | {type:"md2s:build", html, mdDir, runOpts?…}      （HTML 放映稿，契约 v1）
  *   页面 → 宿主  {type:"md2s:ready", pages, index, total, steps, diagrams, images,
  *                 slideWidth, slideHeight, meta, theme, ms}
@@ -33,7 +33,9 @@
  *   页面 → 宿主  {type:"md2s:locate-up", line, click}   列表态点击某页上报（首现行位；§6.2 降级后点击是唯一同步触发）
  *
  * 图表三级策略在本形态的落法：
- *   mermaid / echarts → 页面自己画（运行时按需从服务加载，见 ensureDiagramLibs）；
+ *   mermaid / echarts / vega-lite / flowchart / sequence / wavedrom / chart / abc →
+ *   页面自己画（运行时按需从服务加载，见 ensureDiagramLibs；清单在 libAssets.js）；
+ *   drawio → 页面里起 diagrams.net embed 出图（drawioHost，走网络，与编辑器同协议）；
  *   graphviz / plantuml → 经 rpc 托宿主离屏出图（marktext 用 muya 同款 viz WASM /
  *   fetchPlantuml IPC——与编辑器同库同版本，所见一致）；
  *   都失败 → DiagramError 硬失败（deck-core 的闸门），经 md2s:error 上报宿主。
@@ -43,6 +45,7 @@
  */
 
 const deckCore = require("../browser/deck-core")
+const { LIB_KEY_OF_LANG } = require("../browser/libAssets")
 const { compose } = require("../../core/compose")
 const { sectionsOf } = require("../../core/section")
 const { CONT_CLASS, OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS } = require("../../core/paginate/overflow")
@@ -55,6 +58,14 @@ const {
 // html-to-image 在本形态是 bundle 模块（sourceRoots 含 lib）；deck-core 的
 // ir()/exportImages() 读 window.htmlToImage（Typora 形态由 srcdoc 内联脚本提供）——挂上。
 window.htmlToImage = require("../../lib/html-to-image.js")
+
+// 图表宿主环境约定（deck 页自己出图的那七类用）：
+//   __md2slides_assetBase   静态资产根 URL（sequenceHost 的手写字体 @font-face 用）
+//   __md2slides_mdDir       当前文档目录（drawioHost 的本地 source 经 /f?p= 改道用）
+//   __md2slides_drawioServer drawio embed 服务（文览偏好经 runOpts.drawioServer 透传）
+window.__md2slides_assetBase = `${location.origin}/`
+window.__md2slides_mdDir = ""
+window.__md2slides_drawioServer = ""
 
 // ---------------------------------------------------------------------------
 // 缺口 B（2026-11-15 发题对齐）：当前页的 quiz 标记 id 列表。
@@ -133,18 +144,26 @@ const ensureLib = async type => {
   if (loadedLibs.has(type)) return
   const rel = libUrls[type]
   if (!rel) return
-  await new Promise((resolve, reject) => {
-    const el = document.createElement("script")
-    el.src = `/${rel}`
-    el.onload = resolve
-    el.onerror = () => reject(new Error(`图表运行时加载失败：/${rel}`))
-    document.head.appendChild(el)
-  })
+  // manifest 里是文件数组（vega-lite 三件套有 UMD externals 顺序依赖），字符串兼容旧包。
+  const files = Array.isArray(rel) ? rel : [rel]
+  for (const file of files) {
+    await new Promise((resolve, reject) => {
+      const el = document.createElement("script")
+      el.src = `/${file}`
+      el.onload = resolve
+      el.onerror = () => reject(new Error(`图表运行时加载失败：/${file}`))
+      document.head.appendChild(el)
+    })
+  }
   loadedLibs.add(type)
 }
 
 const ensureDiagramLibs = async md => {
-  const wanted = new Set([...String(md).matchAll(/^```\s*(mermaid|echarts)\b/gm)].map(m => m[1]))
+  // 超集预扫：把全部浏览器侧图表语言捞出来按需加载（drawio 无本地运行时，表里无键自然跳过）。
+  const wanted = new Set(
+    [...String(md).matchAll(/^```\s*(mermaid|echarts|vega-lite|flowchart|sequence|wavedrom|chartjs|chart|abc)\b/gm)]
+      .map(m => LIB_KEY_OF_LANG[m[1]] ?? m[1]),
+  )
   for (const type of wanted) await ensureLib(type)
 }
 
@@ -558,6 +577,10 @@ const doBuild = async msg => {
   missingImages = []
   setDeckBuilding(true)
   try {
+    // 图表宿主环境随 build 更新：文档目录（drawio 本地 source 的 /f?p= 改道）
+    // 与 drawio embed 服务（文览偏好 drawioServer 经 runOpts 透传，缺省官方 embed）。
+    window.__md2slides_mdDir = String(msg.mdDir ?? "")
+    window.__md2slides_drawioServer = String(msg.runOpts?.drawioServer ?? "")
     // 第三方 HTML 放映稿：绕开 compose，已编排好的 DOM 直接建播放器。
     if (msg.html != null) {
       await buildHtml(msg, started)

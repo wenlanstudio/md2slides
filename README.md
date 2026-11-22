@@ -217,7 +217,7 @@ md2slides.checkIr(iframeDoc, ir)
 > marktext 与自定义宿主。
 
 - **marktext deck-full**：整链 deck 页面 + 共享本地服务 + postMessage 桥。宿主侧实现在独立 fork，本仓库只含页面入口
-- **自己的宿主**：实现 `renderDiagram` 等钩子即可；参考 `host/thin/`（graphviz / plantuml / matplotlib）与 `host/browser/`（mermaid / echarts）
+- **自己的宿主**：实现 `renderDiagram` 等钩子即可；参考 `host/thin/`（graphviz / plantuml / matplotlib）与 `host/browser/`（mermaid / echarts / vega-lite / flowchart / sequence / wavedrom / chart / abc / drawio / svg）
 
 core 不渲染图表、不碰编辑器；宿主专属能力全部经 opts 钩子注入。`host/` 随仓库分发，
 **不进 npm 包**；npm 包只含库本体（core / kit / export / lib / types / docs）。

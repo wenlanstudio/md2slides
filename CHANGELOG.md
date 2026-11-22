@@ -6,6 +6,29 @@
 > Typora 宿主壳已因合规评估从主仓库移出（代码、设计文档与专属测试单独备份）；下文历史
 > 记录中的 Typora 条目保留原貌，仅作历史参考，不代表当前支持。
 
+## [Unreleased] — 图表透传：编辑器七类补齐 deck 渲染（2026-11-22）
+
+文览编辑器（muya）能画的图表里，有七类在 deck 引擎里会退回普通代码块——与「一文多览」
+的承诺相悖。本版补齐：
+
+- **七类围栏进 deck 渲染**：`vega-lite` / `flowchart` / `sequence` / `wavedrom` /
+  `chart`（别名 `chartjs`）/ `abc` / `drawio` 加入 `core/render/diagramHost.js` 的
+  `DIAGRAM_TYPES`；浏览器侧渲染器在 `host/browser/`（vegaHost / flowchartHost /
+  sequenceHost / wavedromHost / chartHost / abcHost / drawioHost），与编辑器同库同
+  版本（运行时文件产自 wenlan muya 依赖，`tools/build-diagram-libs.js` 产出并提交）。
+- **Typora 块配置头移植**：`core/render/blockSource.js`（`==BlockCodeConfig==` 头 +
+  `config = {…}` 赋值 + 注释/尾逗号容忍），chart/wavedrom/drawio 的围栏解析与编辑器
+  同规格。
+- **drawio 走 diagrams.net embed**：与编辑器同一 postMessage 协议（init → load →
+  autosave → export PNG）；`{source: "x.drawio"}` 本地文件经宿主服务 `/f?p=` 改道；
+  embed 服务可经 runOpts `drawioServer` 透传（文览偏好同一键）。需要网络——与编辑器
+  同一软依赖。
+- **运行时按需加载**：`host/browser/libAssets.js` 是运行时清单单一事实源，pack 的
+  assets.json 与 e2e 注入共用一张表；vega 三件套按 UMD externals 顺序加载。
+- **回归**：`e2e/fixtures/diagram-more.md` 真浏览器全链（六类离线图 → IR → PPTX），
+  单测 `test/unit/diagram-passthrough.test.js`。
+
+
 ## [Unreleased] — quiz id 放开 + 内容寻址 + 围栏默认（ADR-26，2026-11-18）
 
 - **quiz 缺省 id 走内容寻址**（`core/teaching-fences/src/autoid.js`）：`q-` + 题面
