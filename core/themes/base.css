@@ -66,6 +66,17 @@ section[data-slide] > :is(p, div, ul, ol, li, dl, table, pre, blockquote,
 :where(section > header.md2s-furniture) { top: 0.6em; }
 :where(section > footer.md2s-furniture) { bottom: 0.6em; }
 
+/* 溢出分栏页（红标 md2s-overflow，overflow.js 打标）的布局契约。分栏溢出时
+   .cols 被内容的 min-height:auto 兜底撑到页外（不压瘪是 overflow.js 的老路），
+   栏随 stretch 拉满这个超高栏——栏内 center 居中的图会跟着栏的下半段落到页外，
+   视觉上"图跑到右下角+底部被裁"（2026-11-22 用户报：3D 星星分栏页）。这里把
+   栏高钳回 flex 可用区，让放得下的内容真正在可视区居中；放不下的栏（大代码块）
+   safe 退顶对齐、裁切留在底部，与老路的裁切位置一致。正常页零改动。
+   特异性 (0,2,1)/(0,2,2) 刻意压主题的 `section .cols`/`section .cols > .col`
+   一层——这是引擎契约，不是主题可随手覆盖的视觉（同 section[data-slide] 先例）。 */
+section.md2s-overflow .cols { min-height: 0; }
+section.md2s-overflow .cols > .col { justify-content: safe center; }
+
 /* 章节目录页（core/paginate/toc.js 注入的引擎产物）：结构位与"没有就难看"的
    兜底归这里，颜色字号归主题。一律 :where()（特异性 0）——主题的具名规则必赢，
    与家具同款纪律。

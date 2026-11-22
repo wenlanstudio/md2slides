@@ -51,17 +51,24 @@ const copyTree = (from, to) => {
   const src = path.join(ROOT, from)
   if (!fs.existsSync(src)) throw new Error(`源不存在：${from}（build:host 没跑？）`)
   fs.rmSync(path.join(OUT, to), { recursive: true, force: true })
-  fs.cpSync(src, path.join(OUT, to), { recursive: true })
+  // dereference：pnpm 的 node_modules 全是 junction/symlink，Windows 无管理员
+  // 特权建不了 symlink（EEXIST/EPERM）——一律 follow 后实体复制。
+  fs.cpSync(src, path.join(OUT, to), { recursive: true, dereference: true })
 }
 
 /** 把 npm 包连同依赖闭包拷进目标 node_modules（flat）。 */
 const copyDepTree = (name, destDir) => {
   if (name.startsWith("@types/")) return
-  const src = path.join(ROOT, "node_modules", name)
-  if (!fs.existsSync(src)) return // 内置模块 / 未安装
+  const link = path.join(ROOT, "node_modules", name)
+  if (!fs.existsSync(link)) return // 内置模块 / 未安装
   const dest = path.join(destDir, name)
   if (fs.existsSync(dest)) return
-  fs.cpSync(src, dest, { recursive: true })
+  // pnpm 的 node_modules 顶层全是 symlink/junction：cpSync 直接吃 symlink src
+  // 会走「重建链接」的分支（Windows 无管理员特权必挂）——先 realpath 到 .pnpm
+  // 实体目录，树内残留的链接靠 dereference 展开成实体文件。
+  const src = fs.realpathSync(link)
+  if (!fs.statSync(src).isDirectory()) return
+  fs.cpSync(src, dest, { recursive: true, dereference: true })
   let pkg
   try {
     pkg = JSON.parse(fs.readFileSync(path.join(src, "package.json"), "utf8"))
@@ -103,7 +110,12 @@ const main = () => {
   copy("host/pptx/index.js", "pptx.js")
   const pptxDir = path.join(OUT, "lib", "pptxgenjs")
   fs.mkdirSync(path.join(pptxDir, "node_modules"), { recursive: true })
-  fs.cpSync(path.join(ROOT, "node_modules", "pptxgenjs"), pptxDir, { recursive: true })
+  // 同 copyDepTree：realpath 穿透 pnpm symlink 再实体复制，Windows 免特权。
+  fs.cpSync(
+    fs.realpathSync(path.join(ROOT, "node_modules", "pptxgenjs")),
+    pptxDir,
+    { recursive: true, dereference: true }
+  )
   const pptxDeps = require(path.join(ROOT, "node_modules", "pptxgenjs", "package.json")).dependencies || {}
   for (const d of Object.keys(pptxDeps)) copyDepTree(d, path.join(pptxDir, "node_modules"))
   copyTree("export/pptx/sidecar", "lib/sidecar")
