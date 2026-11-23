@@ -6,10 +6,17 @@
 > Typora 宿主壳已因合规评估从主仓库移出（代码、设计文档与专属测试单独备份）；下文历史
 > 记录中的 Typora 条目保留原貌，仅作历史参考，不代表当前支持。
 
-## [Unreleased] — 图表透传：编辑器七类补齐 deck 渲染（2026-11-22）
+## [Unreleased] — 图表透传：编辑器七类补齐 deck 渲染（2026-11-22/23）
 
 文览编辑器（muya）能画的图表里，有七类在 deck 引擎里会退回普通代码块——与「一文多览」
 的承诺相悖。本版补齐：
+
+- **幻灯片显示尺寸规则**（2026-11-23 补）：新七类 1x 固有尺寸上 1920×1080 幻灯片
+  只占 10–30% 宽（「映视图都偏矮」，视觉验收抓出）。新增 `core/render/diagram.js`
+  的 `slideDisplay` 纯函数：显示宽 = clamp(固有宽, 640, 1100)、高度钳 820（竖长
+  flowchart 不顶破页高）、栅格倍率自适应（位图 ≥ 2× 显示密度，上限 6）。作者显式
+  声明不走规则（vega spec 数值 width、chart `@width/@height` 按声明显示）；
+  chart 缺省画布改 800×450（与 deck echartsHost 同款；编辑器仍 640×400）。
 
 - **七类围栏进 deck 渲染**：`vega-lite` / `flowchart` / `sequence` / `wavedrom` /
   `chart`（别名 `chartjs`）/ `abc` / `drawio` 加入 `core/render/diagramHost.js` 的

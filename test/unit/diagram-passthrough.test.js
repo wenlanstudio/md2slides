@@ -22,6 +22,7 @@ const {
   typeOfBlock,
   chartBlocksOf,
 } = require("../../core/render/diagramHost")
+const { slideDisplay } = require("../../core/render/diagram")
 const { parseDiagramBlock, parseJsonBlock, pixelSize } = require("../../core/render/blockSource")
 const { embedUrl, pngSize, sourcePath, localUrl } = require("../../host/browser/drawioHost")
 const { DIAGRAM_LIBS, LIB_KEY_OF_LANG } = require("../../host/browser/libAssets")
@@ -141,4 +142,34 @@ test("libAssets：七类都有运行时清单；drawio 无本地运行时", () =
   assert.equal(DIAGRAM_LIBS.drawio, undefined, "drawio 走 embed，不该有本地运行时")
   assert.equal(DIAGRAM_LIBS["vega-lite"].length, 3, "vega 三件套顺序固定")
   assert.equal(LIB_KEY_OF_LANG.chartjs, "chart")
+})
+
+test("slideDisplay：小图放大到可读下限、大图钳顶、栅格倍率自适应", () => {
+  // vega 缺省 200px 宽 → 放大到 640，高度等比；栅格倍率要盖住 2× 显示密度
+  //（ceil(3.2×2)=7，但被 maxScale=6 钳顶——矢量栅格 6 倍已是 1200px 位图，够清）。
+  const tiny = slideDisplay(200, 180)
+  assert.equal(tiny.width, 640)
+  assert.equal(tiny.height, 576)
+  assert.equal(tiny.scale, 6)
+
+  // 已够宽的谱面（abc ~770）保持原样；倍率回落到下限 2。
+  const wide = slideDisplay(770, 144)
+  assert.equal(wide.width, 770)
+  assert.equal(wide.height, 144)
+  assert.equal(wide.scale, 2)
+
+  // 特大图钳到 1100 防独占。
+  const huge = slideDisplay(1600, 900)
+  assert.equal(huge.width, 1100)
+  assert.equal(huge.height, Math.round(900 * (1100 / 1600)))
+
+  // 竖长图：宽度规则让位给高度钳制（flowchart 230×593 若按宽放大 2.78 倍会到
+  // 1650 高——超页高；钳到 820 高后宽 ~318，竖图就该吃纵向空间）。
+  const tall = slideDisplay(230, 593)
+  assert.equal(tall.height, 820)
+  assert.equal(tall.width, Math.round(230 * (820 / 593)))
+
+  // 非法固有尺寸直接 null，让调用方走兜底。
+  assert.equal(slideDisplay(0, 100), null)
+  assert.equal(slideDisplay(100, -1), null)
 })

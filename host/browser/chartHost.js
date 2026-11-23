@@ -15,8 +15,10 @@
 
 const { parseJsonBlock, pixelSize } = require("../../core/render/blockSource")
 
-const DEFAULT_WIDTH = 640
-const DEFAULT_HEIGHT = 400
+// 缺省画布跟 deck 的 echartsHost 同款 800×450：幻灯片媒介上的可读缺省（640×400 是
+// 编辑器的缺省，网页媒介语义）。作者写了 @width/@height 就按声明的来。
+const DEFAULT_WIDTH = 800
+const DEFAULT_HEIGHT = 450
 const PIXEL_RATIO = 2
 
 const settleFrames = async frames => {

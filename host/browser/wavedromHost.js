@@ -12,7 +12,7 @@
  * 运行时是 wavedrom 的 unpkg UMD（globalThis.wavedrom，含 renderAny/waveSkin/onml）。
  */
 
-const { rasterizeSvg, svgSize } = require("../../core/render/diagram")
+const { rasterizeSvg, svgSize, slideDisplay } = require("../../core/render/diagram")
 const { parseJsonBlock } = require("../../core/render/blockSource")
 
 /**
@@ -45,11 +45,14 @@ const renderWavedrom = async (block, opts = {}) => {
     const svg = host.querySelector("svg")
     if (!svg) throw new Error("wavedrom 渲染完没有产出 SVG")
 
+    // 显示尺寸走 slideDisplay：波形图固有宽（~350px 级）1x 上幻灯片偏小。
     const size = svgSize(svg)
-    const dataUrl = await rasterizeSvg(svg, opts.scale ?? 2, opts.fill ?? "#ffffff")
+    const box = slideDisplay(size.width, size.height)
+    const scale = opts.scale ?? box?.scale ?? 2
+    const dataUrl = await rasterizeSvg(svg, scale, opts.fill ?? "#ffffff")
     if (!dataUrl) throw new Error("wavedrom SVG 栅格失败：画出来是空白")
 
-    return { dataUrl, width: size?.width, height: size?.height }
+    return { dataUrl, width: box?.width ?? size?.width, height: box?.height ?? size?.height }
   } finally {
     host.remove()
   }

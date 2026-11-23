@@ -40,6 +40,37 @@ const fitBox = (size, boxW, boxH, maxUpscale = Infinity) => {
 }
 
 /**
+ * slideDisplay — 幻灯片媒介上的显示尺寸规则（新七类 SVG 图表用）。
+ *
+ * 编辑器里的「固有尺寸」是网页媒介的语义（vega-lite 缺省画布宽只有 200px，
+ * flowchart.js 跟着内容走），直接 1x 搬上 1920×1080 的幻灯片只占 10–30% 宽，
+ * 教室后排根本读不了（2026-11-23 视觉验收抓出「映视图都偏矮」）。svgHost 的既有
+ * 立场是「固有尺寸不是幻灯片显示尺寸」（viewBox ×2 显示），这里把它推广成一条
+ * 可测试的规则：
+ *
+ *   显示宽 = clamp(固有宽, 640, 1100)——小图放大到可读下限（640 ≈ 33% 页宽），
+ *   大图钳到 1100（≈57% 页宽，防独占）；高度等比，但**钳在 maxHeight（缺省 820）内**
+ *   ——竖长图（flowchart 230×593 这种）按宽放大会把高度顶过页高，宽度规则让位给高度。
+ *   栅格倍率自适应：位图 ≥ 2× 显示像素（retina 级清晰），上限 6（矢量栅格很便宜）。
+ *
+ * 作者显式声明的尺寸不走这条规则（vega spec 写了数值 width、chart 写了 @width）——
+ * 声明就是意图，按声明显示。
+ *
+ * @returns {{width: number, height: number, scale: number}|null} 固有尺寸非法时 null
+ */
+const slideDisplay = (
+  width,
+  height,
+  { min = 640, max = 1100, maxHeight = 820, density = 2, maxScale = 6 } = {},
+) => {
+  if (!(width > 0) || !(height > 0)) return null
+  let ratio = Math.min(max, Math.max(min, width)) / width
+  if (height * ratio > maxHeight) ratio = maxHeight / height
+  const scale = Math.min(maxScale, Math.max(2, Math.ceil(ratio * density)))
+  return { width: Math.round(width * ratio), height: Math.round(height * ratio), scale }
+}
+
+/**
  * PlantUML 会往 SVG 里写 `<!--?plantuml-src …-->` 注释，注释内容里带 `--`。
  * XML 注释不允许出现连续两个连字符，于是整个 SVG **不是合法 XML**——Chrome 会拒绝把它当作
  * 图片加载（`image.onerror`），表现为：这张图退化成内联 SVG 留在 deck 里；更糟的是它还会
@@ -135,4 +166,4 @@ const isBlank = (ctx, canvas, fill = "#ffffff") => {
   return total > 0 && ink / total < 0.0005
 }
 
-module.exports = { svgSize, fitBox, rasterizeSvg, fillChannels }
+module.exports = { svgSize, fitBox, slideDisplay, rasterizeSvg, fillChannels }

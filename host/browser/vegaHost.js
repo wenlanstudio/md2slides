@@ -12,12 +12,12 @@
  * libAssets 表管理，页面按需注入。
  */
 
-const { rasterizeSvg, svgSize } = require("../../core/render/diagram")
+const { rasterizeSvg, svgSize, slideDisplay } = require("../../core/render/diagram")
 
 /**
  * @param {{type: string, source: string}} block
  * @param {object} [opts]
- * @param {number} [opts.scale=2] 栅格倍数（相对 SVG 固有尺寸）
+ * @param {number} [opts.scale] 栅格倍数（相对 SVG 固有尺寸；缺省按显示尺寸自适应）
  * @returns {Promise<{dataUrl: string, width?: number, height?: number}>}
  * @throws {Error} 没有运行时 / spec 不是 JSON / 渲染失败 / 栅格空白 —— 一律硬失败
  */
@@ -48,11 +48,20 @@ const renderVegaLite = async (block, opts = {}) => {
     if (!svg) throw new Error("vega-lite 渲染完没有产出 SVG")
 
     const size = svgSize(svg)
+    // 显示尺寸：spec 显式写了数值 width = 作者意图，按固有尺寸 1x 显示（与编辑器
+    // 一致）；没写就用 slideDisplay 的滑片规则（vega-lite 缺省画布宽只有 200px，
+    // 1x 上幻灯片只有 10% 宽，教室后排读不了）。
+    const declared = typeof spec?.width === "number"
+    const box = declared
+      ? { width: size.width, height: size.height, scale: opts.scale ?? 2 }
+      : slideDisplay(size.width, size.height)
+    const scale = opts.scale ?? box?.scale ?? 2
+
     // fill 缺省白：分派点（index.js）会注入实测的 section 背景色，深色主题位图不再白疤。
-    const dataUrl = await rasterizeSvg(svg, opts.scale ?? 2, opts.fill ?? "#ffffff")
+    const dataUrl = await rasterizeSvg(svg, scale, opts.fill ?? "#ffffff")
     if (!dataUrl) throw new Error("vega-lite SVG 栅格失败：画出来是空白（多半含外链图片/字体）")
 
-    return { dataUrl, width: size?.width, height: size?.height }
+    return { dataUrl, width: box?.width ?? size?.width, height: box?.height ?? size?.height }
   } finally {
     host.remove()
   }

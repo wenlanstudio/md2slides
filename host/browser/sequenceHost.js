@@ -15,7 +15,7 @@
  * webfontloader 的 inactive 分支放行、退回等宽字体，图不会缺。
  */
 
-const { rasterizeSvg, svgSize } = require("../../core/render/diagram")
+const { rasterizeSvg, svgSize, slideDisplay } = require("../../core/render/diagram")
 
 const FONT_FAMILY = "danielbd"
 const WAIT_TIMEOUT_MS = 8000
@@ -83,11 +83,14 @@ const renderSequence = async (block, opts = {}) => {
       throw new Error(`sequence ${WAIT_TIMEOUT_MS}ms 内没画出 SVG（字体就绪等待超时）`)
     }
 
+    // 显示尺寸走 slideDisplay：DSL 没有尺寸声明，固有宽（~250px 级）1x 上幻灯片太小。
     const size = svgSize(svg)
-    const dataUrl = await rasterizeSvg(svg, opts.scale ?? 2, opts.fill ?? "#ffffff")
+    const box = slideDisplay(size.width, size.height)
+    const scale = opts.scale ?? box?.scale ?? 2
+    const dataUrl = await rasterizeSvg(svg, scale, opts.fill ?? "#ffffff")
     if (!dataUrl) throw new Error("sequence SVG 栅格失败：画出来是空白")
 
-    return { dataUrl, width: size?.width, height: size?.height }
+    return { dataUrl, width: box?.width ?? size?.width, height: box?.height ?? size?.height }
   } finally {
     host.remove()
   }

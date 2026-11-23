@@ -11,11 +11,15 @@ sequence / wavedrom / chart / abc（drawio 走 diagrams.net embed、要网络，
 ## 一张声明式统计图（vega-lite）
 
 vega 只认 JSON（与编辑器同规格），svg 渲染器产出，栅格成 PNG。
+spec 不写 `width` 时 vega-lite 缺省画布宽只有 200px（声明式规范的网页缺省），
+写上才是幻灯片该有的宽度。
 
 ```vega-lite
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "柱状图",
+  "width": 640,
+  "height": 360,
   "data": { "values": [
     {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
     {"a": "D", "b": 91}, {"a": "E", "b": 81}
@@ -66,14 +70,11 @@ Bob-->Alice: 应答
 
 ## 一张统计图（chart.js）
 
-canvas 直出 PNG，@width/@height 块配置头决定显示尺寸。
+canvas 直出 PNG。不写块配置头时编辑器按 640×400、幻灯片按 800×450 出图；
+`@width`/`@height` 可钉死尺寸（注意：写了 `@width` 编辑器里块会缩到该宽、
+左锚在编辑列，幻灯片上仍居中）。
 
 ```chart
-// ==BlockCodeConfig==
-// @width 560px
-// @height 300px
-// ==/BlockCodeConfig==
-
 config = {
   type: "bar",
   data: {
