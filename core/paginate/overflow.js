@@ -36,6 +36,10 @@ const OVERFLOW_CLASS = "md2s-overflow"
  * 角标的依据——图片缩放是认可的正路（2026-11-17 拍板），只提示不告警框。 */
 const MEDIA_SHRUNK_CLASS = "md2s-media-shrunk"
 
+/** 页内有表格经 fitTablesToWidth 缩字号适配过页宽（横向拟合）。与「图已缩」同路数：
+ * 缩字号是认可的正路，只提示不告警框；类先随 MEDIA_SHRUNK 的机制留位。 */
+const TABLE_FIT_CLASS = "md2s-table-fit"
+
 /** 诚实溢出的版面配合：页面裁掉放不下的部分。与 CONT_CSS 同一注入槽
  * （deck-core 加载即注入）。 */
 const OVERFLOW_CSS = `
@@ -262,6 +266,63 @@ function fitImagesInPlace(el, boxW, boxH, scale) {
     changed += 1
   }
   return changed > 0
+}
+
+/** 表格所在包含块的可用内容宽。表直接挂在 section 下时与 contentWidth 同口径；
+ * 分栏/引语里的表以各自父块的 padding 后宽度为准——超宽与否只能跟自己的容器比。 */
+function containerWidthOf(table) {
+  const parent = table.parentElement
+  if (!parent) return 0
+  const cs = parent.ownerDocument.defaultView.getComputedStyle(parent)
+  return Math.max(0,
+    parent.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0))
+}
+
+/**
+ * 超宽表格原位缩字号（横向拟合，2026-11-24）：表声明 width:100% 但 auto 布局的
+ * min-content 压不下去时——行内 code 是 nowrap 整片（lecture.css「参数单元格不折
+ * 行」），几个长片叠满五列就超过版心——表格盒越过幻灯片右缘被裁，整列消失。纵向
+ * 分页对此失明：行数不多的表高度全然不溢出，一刀都轮不到它。
+ * 治法与裸页媒体同路数：实测 need/avail，按比例缩 table 的 font-size（chips 随 em
+ * 收敛；cell padding 不随字缩，靠迭代逼近），放得下即收；触底仍超宽则保留已缩的
+ * 字号、按诚实溢出红标交给作者。缩的是 computed 链源头（内联 font-size 压过主题的
+ * --fs-table），PPTX 导出的 styleOf/tableOf 读到的就是缩后的字号与列宽，导出自洽。
+ */
+function fitTablesToWidth(doc, opts = {}) {
+  let fitted = 0
+  // 放得下的判据带 1px 容差：收敛点附近布局量化有亚像素噪声，逼着凑到 0 反而
+  // 会在差 1px 处打转、把差一点就放下的表误判成触底（e2e 首跑实证）。
+  const EPS = 1
+  for (const section of sectionsOf(doc)) {
+    const scale = scaleOf(section)
+    for (const table of section.querySelectorAll("table")) {
+      const avail = containerWidthOf(table)
+      if (avail <= 0) continue
+      let need = table.getBoundingClientRect().width / scale
+      if (need <= avail + EPS) continue                   // 放得下，不动
+      const view = table.ownerDocument.defaultView
+      let fs = parseFloat(view.getComputedStyle(table).fontSize)
+      let hit = false
+      for (let round = 0; round < STRATEGY.tableFitRounds && fs > STRATEGY.tableFitFloor; round++) {
+        const next = Math.max(STRATEGY.tableFitFloor,
+          Math.floor(fs * (avail / need) * 100) / 100)
+        if (next >= fs - 0.01) break                      // 一轮缩不动了（浮点地板）
+        table.style.fontSize = `${next}px`
+        need = table.getBoundingClientRect().width / scale
+        fs = next
+        if (need <= avail + EPS) { hit = true; break }
+      }
+      if (hit) {
+        fitted += 1
+        section.classList.add(TABLE_FIT_CLASS)
+        warnDiag(opts, "超宽表格已缩小字号适配页宽")
+      } else if (need > avail + EPS) {
+        markHonestOverflow(section, opts,
+          `表格超宽（缩到最小字号仍放不下，超出约 ${Math.round(need - avail)}px），右侧内容会被裁——请精简表格或拆成两张表`)
+      }
+    }
+  }
+  return fitted
 }
 
 /**
@@ -974,6 +1035,9 @@ function splitOverflow(doc, opts = {}) {
   let added = 0
   try {
     beginMeasure(doc, opts.slideWidth, opts.slideHeight)
+    // 超宽表先横向拟合（缩字号）再谈纵向：拟合会改变表高，纵向分页量到的必须是
+    // 拟合后的高度。横向裁切纵向溢出判定量不到，此前无人看管（2026-11-24）。
+    fitTablesToWidth(doc, opts)
     // 先落实"每页最多一个中心内容"。它只看单元边界、不测量，所以放在测量块里也无妨；
     // 之后再由高度分页处理超长的中心内容与文档流。
     added += enforceOneCorePerSlide(doc, opts)
@@ -1034,5 +1098,5 @@ function splitOverflow(doc, opts = {}) {
 // 「什么算内容块」全工程只此一份，分页与步进不许可各漂各的。
 module.exports = {
   splitOverflow, CONT_CSS, CONT_CLASS, coreTypeOf, isFixed,
-  OVERFLOW_CSS, OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS,
+  OVERFLOW_CSS, OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS, TABLE_FIT_CLASS,
 }

@@ -90,6 +90,15 @@ const audit = async input => {
     assert.strictEqual(s.overflowing, 0, `${s.overflowing} 页溢出，最大 ${s.maxOverflow}px\n        ${detail.join("\n        ")}`)
   })
 
+  // 横向（2026-11-24）：右缘裁列与底缘裁行同罪。fitTablesToWidth 缩字号拟合是正路；
+  // 拟合+触底都不济的必须打红标，未标记的超宽表 = 分页缺陷。
+  await check("收敛后无未标记超宽表格（缩字号拟合，触底仍超宽必须红标）", () => {
+    const bad = report.pages.filter(p => p.tableAudit.some(x => x.over > 1) && !p.overflowMarked)
+    const detail = bad.map(p => `第${p.index || "?"}页表超宽 ${p.tableAudit.filter(x => x.over > 1).map(x => x.over).join("/")}px`)
+    assert.strictEqual(s.wideUnmarked, 0,
+      `${s.wideUnmarked} 页有未标记的超宽表格\n        ${detail.join("\n        ")}`)
+  })
+
   await check("物理分页没把页数越切越少", () => {
     assert.ok(s.total >= deck.slideCount, `逻辑 ${deck.slideCount} 页，物理只剩 ${s.total} 页`)
   })
@@ -563,6 +572,50 @@ const audit = async input => {
       assert.ok(
         !r.console.some(l => l.includes("字号已缩至")),
         "段落不应再缩字号（2026-11-17 拍板：缩了就看不清）",
+      )
+    })
+  }
+
+  // wide-table：超宽表格横向拟合（2026-11-24）。五列长 code 片（nowrap）min-content
+  // 超版心 → 缩字号拟合；窄参数表不许被殃及；触底仍超宽 → 诚实溢出红标。
+  if (deck.name === "wide-table") {
+    console.log("超宽表格横向拟合（wide-table 专用）")
+    const allTables = () => report.pages
+      .flatMap(p => p.tableAudit.map(x => ({ page: p.index, ...x })))
+    await check("宽表：缩字号拟合成功（警告已发、页已打拟合标）", () => {
+      assert.ok(
+        r.console.some(l => l.includes("超宽表格已缩小字号适配页宽")),
+        "拟合警告没出现；实际 [md2slides] 日志：" +
+          r.console.filter(l => l.includes("md2slides")).join(" | "),
+      )
+      assert.ok(s.tablesFit >= 1, `应有 ≥1 页打 md2s-table-fit 标，实际 ${s.tablesFit}`)
+    })
+    await check("拟合画像：恰好一张拟合成功（fs 落在 20 与 36 之间、放得下）", () => {
+      const fitted = allTables().filter(x => x.fs > 20 && x.fs < 36 && x.over <= 1)
+      assert.strictEqual(fitted.length, 1,
+        `拟合成功的表应恰 1 张，实际 ${fitted.length}：${JSON.stringify(fitted)}`)
+    })
+    await check("极端表：触底认输走诚实溢出（fs=20、仍超宽、红标已打、警告已发）", () => {
+      assert.ok(
+        r.console.some(l => l.includes("表格超宽")),
+        "触底警告没出现；实际 [md2slides] 日志：" +
+          r.console.filter(l => l.includes("md2slides")).join(" | "),
+      )
+      const floored = allTables().filter(x => x.fs <= 20 && x.over > 1)
+      assert.strictEqual(floored.length, 1,
+        `触底的表应恰 1 张，实际 ${floored.length}：${JSON.stringify(floored)}`)
+      const marked = report.pages.filter(p =>
+        p.overflowMarked && p.tableAudit.some(x => x.over > 1))
+      assert.ok(marked.length >= 1, "没有一页同时满足「红标 + 表超宽」——触底认输链没走到")
+    })
+    await check("其余表格：字号与页宽原样（窄表不许被拟合殃及）", () => {
+      const bad = allTables()
+        .filter(x => !(x.fs < 36))          // 排掉拟合成功与触底的两张
+        .filter(x => x.fs !== 36 || x.over > 1)
+      assert.deepStrictEqual(
+        bad.map(x => `第${x.page || "?"}页 fs=${x.fs} over=${x.over}`),
+        [],
+        "这些表不该动：放得下的表必须保持主题字号 36px",
       )
     })
   }

@@ -10,7 +10,7 @@
  * 那样失败信息才带得全（哪一页、溢出多少像素、页里有什么）。
  */
 
-const { splitOverflow, OVERFLOW_CLASS } = require("../core/paginate/overflow")
+const { splitOverflow, OVERFLOW_CLASS, TABLE_FIT_CLASS } = require("../core/paginate/overflow")
 const { FURNITURE_CLASS, SLOT_LEFT_CLASS, SLOT_RIGHT_CLASS } = require("../core/paginate/furniture")
 const { highlightCode } = require("../core/render/highlight")
 const { sectionsOf, beginMeasure, endMeasure } = require("../core/section")
@@ -74,6 +74,29 @@ const measureSlide = (section, margin) => {
     bottom: Math.round(bottom),
     overflow: Math.round(Math.max(0, bottom - avail * margin)),
   }
+}
+
+/**
+ * 一页里每张表的横向审计：{over, fs}——over = 表盒实测宽 − 容器可用宽（px），
+ * fs = 表的实际字号。全量返回不预过滤，判定（谁该超宽、谁不许缩）在 check.js。
+ * 口径与 `overflow.js::fitTablesToWidth` 一致。故意不复用引擎函数：判据两边各写
+ * 一份，哪天漂移了要在这里炸出来（与上面 coreTypeOf 的镜像同理）。
+ */
+const wideOverOf = section => {
+  const rect = section.getBoundingClientRect()
+  const scale = rect.height > 0 && section.clientHeight > 0 ? rect.height / section.clientHeight : 1
+  return [...section.querySelectorAll("table")].map(t => {
+    const parent = t.parentElement
+    const view = t.ownerDocument.defaultView
+    const cs = parent ? view.getComputedStyle(parent) : null
+    const avail = parent && cs
+      ? parent.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)
+      : 0
+    return {
+      over: Math.round(t.getBoundingClientRect().width / scale - avail),
+      fs: parseFloat(view.getComputedStyle(t).fontSize),
+    }
+  })
 }
 
 /**
@@ -147,6 +170,10 @@ const report = (opts = {}) => {
           head: t.querySelector("thead")
             ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
         })),
+        // 横向审计（2026-11-24）：fitTablesToWidth 缩字号拟合后仍超宽的表，右缘会
+        // 裁掉整列。未打红标的页不许有超宽表——check.js 闸门用。
+        tableAudit: wideOverOf(section),
+        tableFitMarked: section.classList.contains(TABLE_FIT_CLASS),
         // 一页里出现两个「（续）」，说明克隆标题时没把旧的剥掉，页越拆标记越多。
         contMarks: section.querySelectorAll(".md2s-cont").length,
         // 诚实溢出页（2026-11-17 拍板）：内容按原样保留、底部被裁，页打红标。
@@ -174,6 +201,10 @@ const report = (opts = {}) => {
       overflowing: overflowing.length,
       // 诚实溢出页（打红标、原样保留）：不是缺陷，是等作者改文档的提醒。
       honestOverflow: pages.filter(p => p.overflow > 0 && p.overflowMarked).length,
+      // 未打红标却仍横向超宽的表所在页——横向裁列与纵向裁底同罪，闸门必须等严。
+      wideUnmarked: pages.filter(p => p.tableAudit.some(x => x.over > 1) && !p.overflowMarked).length,
+      // 缩字号拟合成功的页数（wide-table 夹具专用断言用）。
+      tablesFit: pages.filter(p => p.tableFitMarked).length,
       maxOverflow: overflowing.reduce((m, p) => Math.max(m, p.overflow), 0),
       dividerRepeats: pages.filter(p => p.dividerRepeat).map(p => p.index || pages.indexOf(p) + 1),
       empties: pages.filter(p => p.empty).map(p => p.index || pages.indexOf(p) + 1),

@@ -33,6 +33,12 @@ const STRATEGY = Object.freeze({
   mediaFitRounds: 4,
   /** 裸页媒体缩放每轮的盒高收缩系数（overflow.js spillToBarePage）。 */
   mediaFitShrink: 0.95,
+  /** 超宽表格原位缩字号的最多轮数（overflow.js fitTablesToWidth）。cell padding
+   *  不随字缩，一轮按剩余比例缩往往差一口气，靠多轮逼近。 */
+  tableFitRounds: 5,
+  /** 超宽表格字号下限 px——触底仍超宽就保留已缩字号、走诚实溢出红标（横向裁列
+   *  与纵向裁底同罪：都是内容丢失）。36px 主题字缩到 20px 仍可放映。 */
+  tableFitFloor: 20,
   /** splitOverflow 外层 pass 上限（overflow.js opts.maxPasses 缺省）。 */
   maxPasses: 4,
   /** 预算系数（overflow.js opts.margin 缺省；测试钩子用 >1 放宽页高）。 */
