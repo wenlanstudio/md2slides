@@ -14,6 +14,8 @@
  *              | {type:"md2s:build", html, mdDir, runOpts?…}      （HTML 放映稿，契约 v1）
  *   页面 → 宿主  {type:"md2s:ready", pages, index, total, steps, diagrams, images,
  *                 slideWidth, slideHeight, meta, theme, ms}
+ *              | {type:"md2s:progress", phase:"assets"}               （图表运行时注入完毕）
+ *              | {type:"md2s:progress", phase:"diagrams", done, total, type?} （逐张渲染进度）
  *              | {type:"md2s:change", index, total, step, steps, mode}
  *              | {type:"md2s:warn", message}                       （缺图占位等非致命提示）
  *              | {type:"md2s:error", stage:"build", message}
@@ -575,7 +577,11 @@ const buildHtml = async (msg, started) => {
 const doBuild = async msg => {
   const started = performance.now()
   missingImages = []
-  setDeckBuilding(true)
+  // 首帧（#deck 为空）才隐藏：rebuild 保留旧画面，消分屏打字反复闪黑。
+  // 裸渲染跳变由宿主层进度遮罩（半透明深色）盖住，不靠 visibility:hidden。
+  const root = document.getElementById("deck")
+  const isFirstBuild = !root || !root.innerHTML.trim()
+  setDeckBuilding(isFirstBuild)
   try {
     // 图表宿主环境随 build 更新：文档目录（drawio 本地 source 的 /f?p= 改道）
     // 与 drawio embed 服务（文览偏好 drawioServer 经 runOpts 透传，缺省官方 embed）。
@@ -588,6 +594,7 @@ const doBuild = async msg => {
     }
     await warmAssets()
     await ensureDiagramLibs(msg.md ?? "")
+    post({ type: "md2s:progress", phase: "assets" })   // 图表运行时注入完毕，接下来开始逐张渲染
     const deck = compose(msg.md ?? "", {
       document,
       themesDir: "/themes",
@@ -622,6 +629,18 @@ const doBuild = async msg => {
       slideHeight: deck.slideHeight,
       meta: deck.meta,
       renderDiagramHost: rpcDiagram,
+      // 图表逐张渲染进度（diagramHost 的 onProgress 回调）：phase=diagrams，
+      // done/total 是本遍图表块的序号/总数，type 标当前块的图表类型（matplotlib 等）。
+      // 缓存命中也算一次 done（进度会跳，可接受——命中意味着快）。ready/error 即终态。
+      // ⚠ info.type 是图表类型（mermaid/matplotlib…），不能直接展开覆盖消息的 type 字段
+      // （会把它从 "md2s:progress" 改成图表类型名，宿主端的 case 匹配就失配了）。
+      onProgress: info => post({
+        type: "md2s:progress",
+        phase: info.phase,
+        done: info.done,
+        total: info.total,
+        diagramType: info.type,
+      }),
       onChange: ({ index, total, step, steps, mode: m }) =>
         post({ type: "md2s:change", index, total, step, steps, mode: m, quizKeys: currentPageQuizKeys() }),
       mode,

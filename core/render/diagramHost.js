@@ -224,6 +224,13 @@ const renderDiagrams = async (doc, opts = {}) => {
   const done = []
   const deferred = []
   const useCache = opts.cache !== false
+  const onProgress = typeof opts.onProgress === "function" ? opts.onProgress : null
+  let processed = 0
+  const report = type => {
+    processed += 1
+    onProgress?.({ phase: "diagrams", done: processed, total: blocks.length, type })
+  }
+  onProgress?.({ phase: "diagrams", done: 0, total: blocks.length })
   for (const block of blocks) {
     // 命中进程/页面内位图缓存：同一图表源码（type+source）跳过昂贵的运行时重绘。
     if (useCache) {
@@ -231,6 +238,7 @@ const renderDiagrams = async (doc, opts = {}) => {
       if (cached) {
         injectDiagram(doc, block.pre, { ...cached, type: block.type })
         done.push(block.type)
+        report(block.type)
         continue
       }
     }
@@ -247,6 +255,7 @@ const renderDiagrams = async (doc, opts = {}) => {
     // 块级 defer：这一遍不接，原样留给下一遍（父侧收割不了的浏览器类型图走这条）。
     if (result && result.defer) {
       deferred.push(block.type)
+      report(block.type)
       continue
     }
     // 只要位图，不要裸 SVG：IR 的 image 块走 media 落盘、sidecar 照图放，
@@ -269,6 +278,7 @@ const renderDiagrams = async (doc, opts = {}) => {
       })
     }
     done.push(block.type)
+    report(block.type)
   }
 
   if (opts.settle !== false) {

@@ -117,6 +117,7 @@ const diagramPass = async (opts = {}) => {
     renderDiagram: block =>
       host && !BROWSER_TYPES.includes(block.type) ? host(block) : pageRenderDiagram(block),
     ...(host ? {} : { only: BROWSER_TYPES }),
+    ...(opts.onProgress ? { onProgress: opts.onProgress } : {}),
   })
   assertDiagramsRendered(document)
   return result
