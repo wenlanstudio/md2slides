@@ -21,6 +21,9 @@ const { registerQuizFence } = require("../quiz/fence")
 const { registerFencePolicy } = require("./fencePolicy")
 const { FENCE_ACTIONS } = require("../teaching-fences")
 
+/** 两栏活格（python short）认的语言标记首词；与 kit/shortCode.js 的 SHORT_LANGS 同口径。 */
+const SHORT_FENCE_LANGS = new Set(["python", "py"])
+
 // KaTeX 是可选的：拿不到就把公式原样留着，总好过整个解析器起不来。
 let katex = null
 try {
@@ -106,7 +109,16 @@ const md = () => {
     // 默认 fence 规则不渲染 token.attrs 到 <pre> 上（attrs 全给了 <code>），注入到开标签。
     // 本实例没配 options.highlight，输出恒以 <pre> 开头；以防万一仍做前缀判断。
     if (!token.map || !html.startsWith("<pre>")) return html
-    const attrs = ` data-src-start="${token.map[0] + 1}" data-src-end="${token.map[1]}"`
+    let attrs = ` data-src-start="${token.map[0] + 1}" data-src-end="${token.map[1]}"`
+    // ` ```python short `（2026-11-26 定稿）：short 修饰词 = 「两栏活格短代码块」。
+    // 这里只挂**内容级标记属性**——进 HTML/IR 零副作用；真正的两栏改造在
+    // kit/shortCode.js（deck 管线里、染色之后、分页复测之前）。lang 只认 python/py：
+    // 其他语言的 short 只是普通修饰词，不标。
+    const info = String(token.info ?? "").trim().split(/\s+/)
+    if (info.length > 1 && info.slice(1).includes("short")
+      && SHORT_FENCE_LANGS.has((info[0] ?? "").toLowerCase())) {
+      attrs += ` data-md2s-short=""`
+    }
     return html.replace("<pre>", `<pre${attrs}>`)
   }
 

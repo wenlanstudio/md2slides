@@ -13,6 +13,7 @@
 const { splitOverflow, OVERFLOW_CLASS, TABLE_FIT_CLASS } = require("../core/paginate/overflow")
 const { FURNITURE_CLASS, SLOT_LEFT_CLASS, SLOT_RIGHT_CLASS } = require("../core/paginate/furniture")
 const { highlightCode } = require("../core/render/highlight")
+const { layoutShortBlocks } = require("../kit/shortCode")
 const { sectionsOf, beginMeasure, endMeasure } = require("../core/section")
 const { extractIr, IR_VERSION } = require("../export/pptx/ir")
 const { createDeckPlayer } = require("../kit/player")
@@ -128,6 +129,14 @@ const paginate = (opts = {}) => splitOverflow(document, opts)
 
 /** 物理分页会把代码块的 span 切没，收敛后必须补一次色。 */
 const repaint = () => highlightCode(document)
+
+/**
+ * 两栏活格改造（kit/shortCode.layoutShortBlocks 的页面侧入口）。opts 直传：
+ * { enabled, diags? }——enabled 由 front-matter stepLines 决定，
+ * runner 从 compose 的 meta 带过来。v2：收窄+行标记，不造格子（结果浮层在放映期
+ * 由宿主 exec 桥注入，构建/分页期零运行期信息依赖）。
+ */
+const short = opts => layoutShortBlocks(document, opts)
 
 /**
  * 全篇量一遍。返回逐页数字 + 汇总。
@@ -381,11 +390,14 @@ const irAudit = async (opts = {}) => {
     // front-matter 七键 → IR 文件属性四键（title/subtitle/author/date）
     meta: opts.meta ?? null,
     media,
+    // 生产导出（deck-core.ir）用 skipSelector 剔掉放映期 UI（▶ 按钮、两栏活格的
+    // 结果格）；e2e 默认不带（旧夹具没有这些 UI），short-code 夹具会传同款。
+    skipSelector: opts.skipSelector ?? "",
     // 浏览器里的栅格钩子：`lib/html-to-image.js` 挂在 `window.htmlToImage` 上。
     // 没有它，图表和公式只能登记成 custom/unknown —— 而 sidecar 对这两类是跳过。
     rasterize: opts.rasterize === false ? undefined : el => window.htmlToImage?.toPng(el),
   })
-  const { issues, stats } = checkIr(document, ir)
+  const { issues, stats } = checkIr(document, ir, { skipSelector: opts.skipSelector ?? "" })
 
   return {
     version: ir.version,
@@ -711,6 +723,9 @@ module.exports = {
   playerProbe,
   lightboxProbe,
   repaint,
+  // 两栏活格改造（shortCode）：runner 的 settleDeck 在 repaint 后调用，镜像生产管线
+  // （deck-core.run：paginate → highlight → shortCode → paginate）。
+  short,
   report,
   deckHtml,
   coreTypeOf,

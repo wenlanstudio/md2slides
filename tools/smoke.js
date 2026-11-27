@@ -1081,6 +1081,98 @@ check("stepLines：代码块逐行拆步 / 缺省整块一步 / 行包装幂等"
   assert.strictEqual(p3.steps, 1, "单行代码应整块一步")
   p3.destroy(); root3.remove()
 })
+// ---- 8b2. 两栏活格（kit/shortCode.js，`python short`，2026-11-26 定稿）------
+if (document) {
+  console.log("kit/shortCode.js（两栏活格）")
+  const { layoutShortBlocks, SHORT_LIMIT, CELL_ATTR } = require("../kit/shortCode")
+  const { renderMarkdown } = require("../core/parse/markdown")
+
+  check("围栏 short 修饰词 → pre 挂 data-md2s-short；python/short 词表外不标", () => {
+    const ok = renderMarkdown('```python short\nx = 1\n```')
+    assert.ok(/<pre[^>]*data-md2s-short=""/.test(ok), "python short 应挂标记")
+    const alias = renderMarkdown('```py short\nx = 1\n```')
+    assert.ok(/data-md2s-short=""/.test(alias), "py 别名应挂标记")
+    const plain = renderMarkdown('```python\nx = 1\n```')
+    assert.ok(!/data-md2s-short/.test(plain), "无修饰词不挂")
+    const java = renderMarkdown('```java short\nint x = 1;\n```')
+    assert.ok(!/data-md2s-short/.test(java), "java 不在词表，short 只是普通修饰词")
+    const noise = renderMarkdown('```python shortcut\nx = 1\n```')
+    assert.ok(!/data-md2s-short/.test(noise), "shortcut 是整词不等于 short")
+  })
+
+  /** compose → 独立文档 → shortCode 改造（enabled 由调用方传，模拟 deck 管线）。 */
+  const shortDeck = (md, opts = {}) => {
+    const out = compose(md, { document })
+    const host = new (require("jsdom").JSDOM)(`<html><body>${out.html}</body></html>`).window.document
+    const diags = []
+    const shorted = layoutShortBlocks(host, { enabled: opts.enabled !== false, slideHeight: out.slideHeight, diags })
+    return { out, host, shorted, diags }
+  }
+  const SHORT_MD = [
+    "---", "stepLines: true", "---", "",
+    "# 短代码", "",
+    "```python short",
+    "import pandas as pd",
+    "df.head()",
+    "```",
+  ].join("\n")
+
+  check("改造 v2：收窄类 + run-line 挂行 + 零格子 + textContent 逐字不变", () => {
+    const d = shortDeck(SHORT_MD)
+    assert.strictEqual(d.shorted, 1, "应恰改造 1 块")
+    const pre = d.host.querySelector("pre[data-md2s-short]")
+    assert.ok(pre.classList.contains("md2s-short"), "pre 应挂两栏类")
+    const lines = pre.querySelectorAll("[data-md2s-run-line]")
+    assert.strictEqual(lines.length, 2, "2 行代码")
+    // v2 铁律：构建期 DOM 零格子——结果浮层是放映期 UI（exec 桥注入）
+    assert.strictEqual(pre.querySelectorAll("[data-md2s-short-cell]").length, 0, "构建期不许有结果卡")
+    // textContent 保真（IR/expect/后续分页读它不漂移）
+    assert.strictEqual(pre.querySelector("code").textContent, "import pandas as pd\ndf.head()",
+      "textContent 保持逐字一致")
+    // 幂等：再跑一轮不再动刀
+    assert.strictEqual(layoutShortBlocks(d.host, { enabled: true }), 0, "幂等：第二轮应 0")
+  })
+
+  check("enabled=false（stepLines 缺关）整链不两栏；超帽回退 + 警告", () => {
+    const off = shortDeck(SHORT_MD, { enabled: false })
+    assert.strictEqual(off.shorted, 0)
+    assert.strictEqual(off.host.querySelectorAll(".md2s-short").length, 0, "关掉就不许有改造类")
+
+    const over = shortDeck(["# o", "", "```python short", ...Array.from({ length: SHORT_LIMIT + 1 }, (_, i) => `x = ${i}`), "```"].join("\n"))
+    assert.strictEqual(over.shorted, 0, `${SHORT_LIMIT + 1} 行超帽应回退`)
+    assert.strictEqual(over.host.querySelectorAll(".md2s-short").length, 0, "回退不许挂改造类")
+    assert.ok(over.diags.some(x => x.message.includes("已回退普通代码块")), "超帽要发警告")
+
+    const plain = shortDeck(["# o", "", "```python", "x = 1", "```"].join("\n"))
+    assert.strictEqual(plain.shorted, 0, "无 short 修饰词不改造")
+  })
+
+  check("分页护栏：改造过的块 splitCodeBlock 拒切（行级步进语义不许被切毁）", () => {
+    const { splitCodeBlock } = require("../core/paginate/overflow")
+    const d = shortDeck(SHORT_MD)
+    const pre = d.host.querySelector("pre[data-md2s-short]")
+    assert.strictEqual(splitCodeBlock(pre, 10000, {}), null, "改造块不可按行切")
+    // 超帽回退的块（有标记、无改造类）不受护栏殃及
+    const over = shortDeck(["# o", "", "```python short", ...Array.from({ length: SHORT_LIMIT + 1 }, (_, i) => `x = ${i}`), "```"].join("\n"))
+    const plainPre = over.host.querySelector("pre[data-md2s-short]")
+    assert.ok(!plainPre.classList.contains("md2s-short"), "回退块不挂改造类")
+    // jsdom 量不出高度，切分结果不可断言——「还能切」这件事由 e2e 真布局守恒门看守
+  })
+
+  check("ir.js：codeLines 尊重 stop——放映期结果卡文本不进 IR（导出右栏留白）", () => {    const { codeLines } = require("../export/pptx/ir")
+    const host = new (require("jsdom").JSDOM)(`<html><body></body></html>`).window.document
+    const code = host.createElement("code")
+    code.innerHTML = '<span class="code-line">a = 1</span><span data-md2s-short-cell="" data-line="0"><span>回填的结果</span></span>'
+      + '\n<span class="code-line">b = 2</span><span data-md2s-short-cell="" data-line="1"></span>'
+    const stop = child => !!child.matches?.("[data-md2s-short-cell]")
+    // base 是 styleOf 的产物（运行时必有），这里传空样式只测 stop 语义
+    const lines = codeLines(code, {}, { stop })
+      .map(l => l.map(r => r.text ?? "").join(""))
+    assert.deepStrictEqual(lines, ["a = 1", "b = 2"], "格子文本不该进 IR 行")
+    const raw = codeLines(code, {}).map(l => l.map(r => r.text ?? "").join(""))
+    assert.ok(raw.join("\n").includes("回填的结果"), "不传 stop 时能读到（证明 stop 真在干活）")
+  })
+}
 check("触屏手势：左右翻页 / 上下步进，与键盘同一语义", () => {
   const { createDeckPlayer } = require("../kit/player")
   const win = document.defaultView

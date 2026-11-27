@@ -393,6 +393,11 @@ function splitTable(table, room, opts) {
  * 容量二分。空行归头部（作分组的收尾行），尾部从空行后的内容行开始。
  */
 function splitCodeBlock(pre, room, opts) {
+  // 两栏活格块（kit/shortCode.js v2 收窄过的 `python short`）不可按行切：行 span
+  // 的 run-line 步进语义会被摧毁。类名不经 require 引用（core 不依赖 kit），
+  // 与 SHORT_CLASS 同字面量；行数帽（SHORT_LIMIT=12）保证它独占一页放得下——
+  // 放不下走诚实溢出红标，交给作者拆块。
+  if (pre.classList?.contains("md2s-short")) return null
   const scale = opts.scale ?? 1
   const code = pre.querySelector("code") ?? pre
   const source = code.textContent ?? ""
@@ -1096,7 +1101,9 @@ function splitOverflow(doc, opts = {}) {
 
 // isFixed / coreTypeOf 同时是 kit/steps.js（步进表）的判块词汇：家具白名单与
 // 「什么算内容块」全工程只此一份，分页与步进不许可各漂各的。
+// splitCodeBlock 一并导出：两栏活格的拒切护栏（shortCode 改造过的块不可按行切）
+// 是纯判据行为，smoke 直接验。
 module.exports = {
-  splitOverflow, CONT_CSS, CONT_CLASS, coreTypeOf, isFixed,
+  splitOverflow, CONT_CSS, CONT_CLASS, coreTypeOf, isFixed, splitCodeBlock,
   OVERFLOW_CSS, OVERFLOW_CLASS, MEDIA_SHRUNK_CLASS, TABLE_FIT_CLASS,
 }

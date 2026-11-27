@@ -21,6 +21,7 @@ const { renderDiagrams, assertDiagramsRendered } = require("../../core/render/di
 const { renderDiagram: pageRenderDiagram, BROWSER_TYPES } = require("./index")
 const { sectionsOf } = require("../../core/section")
 const { createDeckPlayer } = require("../../kit/player")
+const { layoutShortBlocks, SHORT_CSS } = require("../../kit/shortCode")
 const { mountLightbox } = require("../../kit/lightbox")
 const { mountLinkbox } = require("../../kit/linkbox")
 const { extractIr } = require("../../export/pptx/ir")
@@ -43,6 +44,9 @@ injectStyle("md2slides-toc-css", TOC_CSS)
 // 诚实溢出（2026-11-17 拍板：段落/分栏放不下就原样保留）：页面裁掉放不下的部分，
 // 内容仍在 DOM 里。同为引擎产物的兜底样式，跟着代码版本走。
 injectStyle("md2slides-overflow-css", OVERFLOW_CSS)
+// 两栏活格（`python short`，2026-11-26 定稿）：格子的占位预算与运行期形态。
+// 与上面三段同为「跟着运行代码走」的兜底样式，主题可覆盖。
+injectStyle("md2slides-short-css", SHORT_CSS)
 
 /**
  * 反复分页直到没活干（`splitOverflow` 返回 0）。
@@ -172,7 +176,15 @@ const run = async (opts = {}) => {
     paginate(paginateOpts)
     // 切页会丢高亮 span，收敛后必须补染（API.md 时序铁律 2）
     const painted = highlightCode(document)
-    if (painted > 0) paginate(paginateOpts)
+    // 两栏活格（`python short`）：必须赶在染色**之后**（highlight 用 innerHTML 整段
+    // 覆盖，早一步行包装全毁）、分页复测**之前**（右列占位预算分页量得到）。
+    // 双条件 = front-matter stepLines: true + 围栏 short 修饰词（meta 与围栏同出
+    // 一份 md，自洽）。改造会改行宽/行高 → 复测分页。
+    const shorted = layoutShortBlocks(document, {
+      enabled: opts.meta?.stepLines === true,
+      diags,
+    })
+    if (painted > 0 || shorted > 0) paginate(paginateOpts)
   }
 
   // 原地重建（deck-full 的防抖 rebuild 会重调 run）：先拆旧播放器，键盘/触屏监听
@@ -284,11 +296,12 @@ const ir = async (opts = {}) => {
   }
   // 播放器把非当前页设成 display:none：IR 量几何会全 0。导出前强制全可见，完事还原。
   const restore = showAllSlides()
-  // exec 桥注入的运行/重放按钮（▶/⏩，带 data-md2s-activatable）是 UI 不是内容：
-  // 顶层代码块里它是 <code> 的兄弟、codeLines 读不到；但列表项里的代码块会经
-  // listItems 的 runsOf 摊平整棵 li 把它念进 IR。故 extractIr 与 checkIr 两侧都要按它剔除，
-  // 否则 IR 带 ▶、DOM 不带，逐页"文本不一致"误报中止导出。
-  const EXEC_UI = "[data-md2s-activatable]"
+  // exec 桥注入的运行按钮（▶，data-md2s-activatable）是 UI 不是内容；两栏活格的
+  // 结果格（data-md2s-short-cell，kit/shortCode）同样——运行期注入的执行结果
+  // 不是讲义内容，导出右栏留白（2026-11-26 定稿）。两者共用 skipSelector：
+  // 顶层代码块里它们是 <code> 的兄弟/子元素，codeLines 读不到兄弟、子元素靠
+  // ir.js 的 stop 跳过；列表项里的代码块会经 listItems 的 runsOf 摊平——两边都要剔。
+  const EXEC_UI = "[data-md2s-activatable],[data-md2s-short-cell]"
   let result, issues, stats
   try {
     result = await extractIr(document, {
@@ -332,9 +345,10 @@ const exportImages = async (opts = {}) => {
     `width:${W}px!important;height:${H}px!important;` +
     "position:absolute!important;left:0!important;top:0!important;" +
     "transform:none!important;overflow:hidden!important;}" +
-    // 图片型栅格时隐藏 exec 桥注入的运行/重放按钮（▶/⏩，data-md2s-activatable），
-    // 否则代码块角落会带着小按钮出图；可编辑型走 IR 抽取，不受此影响。
-    "[data-md2s-activatable]{display:none!important;}"
+    // 图片型栅格时隐藏 exec 桥注入的运行按钮（▶，data-md2s-activatable）与两栏活格的
+    // 结果格（data-md2s-short-cell）——前者不该出片，后者按 2026-11-26 定稿「导出
+    // 右栏留白」。格子 display:none 后 grid 行自动收缩回代码行自身，右列留空。
+    "[data-md2s-activatable],[data-md2s-short-cell]{display:none!important;}"
   document.head.appendChild(style)
   // 契约 v1 §4.1：逐页栅格也取静态终态，冻结宿主触发的动画。
   player?.freezeAnims?.()

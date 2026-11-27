@@ -641,8 +641,12 @@ const doBuild = async msg => {
         total: info.total,
         diagramType: info.type,
       }),
-      onChange: ({ index, total, step, steps, mode: m }) =>
-        post({ type: "md2s:change", index, total, step, steps, mode: m, quizKeys: currentPageQuizKeys() }),
+      onChange: ({ index, total, step, steps, mode: m }) => {
+        post({ type: "md2s:change", index, total, step, steps, mode: m, quizKeys: currentPageQuizKeys() })
+        // 两栏活格结果浮层的几何标定信号：decorate 时块多半在隐藏页（rect 全 0），
+        // 翻到可见页这一刻才量得准——exec 桥听这个事件重标定（惰性计量的另一半）。
+        window.dispatchEvent(new CustomEvent("md2s-page-shown"))
+      },
       mode,
       browse,
       stepLines,

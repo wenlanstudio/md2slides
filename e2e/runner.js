@@ -166,13 +166,19 @@ const injectRuntime = async (page, deferred, baseUrl = null) => {
   await page.evaluate(() => document.fonts.ready.then(() => true))
 }
 
-/** 收敛循环（管线第 3 段）：分页到不动 → 补染 → 再来一轮看回不回潮。 */
+/** 收敛循环（管线第 3 段）：分页到不动 → 补染 → 两栏活格 → 再来一轮看回不回潮。
+ * 与生产管线（deck-core.run）同序：染色后改造 shortCode——highlight 用 innerHTML
+ * 整段覆盖，早一步行包装全毁；改造改了行宽/行高，必须复测分页。 */
 const settleDeck = async (page, opts) => {
   const rounds = await settle(page, opts)
   const repainted = await page.evaluate(() => window.md2slides.repaint())
-  // 染色会往代码块里塞 span，理论上不改高度，但那正是要验的事：再来一轮看回不回潮。
-  const roundsAfterRepaint = repainted > 0 ? await settle(page, opts) : []
-  return { rounds, repainted, roundsAfterRepaint }
+  const shorted = await page.evaluate(o => window.md2slides.short(o), {
+    enabled: opts.shortMeta?.stepLines === true,
+  })
+  const roundsAfterRepaint = (repainted > 0 || shorted > 0)
+    ? await settle(page, opts)
+    : []
+  return { rounds, repainted, shorted, roundsAfterRepaint }
 }
 
 /**
@@ -208,6 +214,9 @@ const runDeck = async input => {
       margin: 1,
       // 页眉页脚的家居配置（front-matter 六键）：收敛后由 furniture.js 注入
       meta: deck.meta ?? null,
+      // 两栏活格的开关（front-matter stepLines）与画布高：shortCode 改造要用，
+      // 与 deck-core.run 从 meta 取同一份。
+      shortMeta: deck.meta ?? null,
       ...(input.paginate ?? {}),
     }
 
@@ -231,7 +240,7 @@ const runDeck = async input => {
       const diagramPass = await injectRuntime(page, deferred, server.url)
 
       const before = await page.evaluate(() => window.md2slides.snapshot())
-      const { rounds, repainted, roundsAfterRepaint } = await settleDeck(page, paginateOpts)
+      const { rounds, repainted, shorted, roundsAfterRepaint } = await settleDeck(page, paginateOpts)
 
       const report = await page.evaluate(o => window.md2slides.report(o), {
         slideWidth: paginateOpts.slideWidth,
@@ -247,13 +256,15 @@ const runDeck = async input => {
         margin: paginateOpts.margin,
       })
       // 分页收敛、代码补染之后才抽 IR：IR 不重新排版，它读的就是浏览器定好的这份 DOM，
-      // 所以顺序反了会抽到切碎前的样子。
+      // 所以顺序反了会抽到切碎前的样子。skipSelector 与生产导出（deck-core.ir）同款：
+      // 放映期 UI（▶ 按钮、两栏活格的结果格）不是内容，两侧同剔。
       const ir = await page.evaluate(o => window.md2slides.irAudit(o), {
         slideWidth: paginateOpts.slideWidth,
         slideHeight: paginateOpts.slideHeight,
         theme: deck.theme,
         // 文档元数据进 IR：sidecar 据此写 PPTX 文件属性
         meta: deck.meta ?? null,
+        skipSelector: "[data-md2s-activatable],[data-md2s-short-cell]",
       })
 
       // 播放器探针：会搬动页面 DOM，放在 IR 抽取**之后**跑；趁浏览器活着，page 一关
@@ -335,6 +346,7 @@ const runDeck = async input => {
         shot,
         rounds,
         repainted,
+        shorted,
         roundsAfterRepaint,
         report,
         finalHtml,

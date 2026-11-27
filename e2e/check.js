@@ -620,6 +620,53 @@ const audit = async input => {
     })
   }
 
+  // short-code：两栏活格（`python short`，2026-11-27 v2 定稿）。改造器在染色后跑
+  // （settleDeck 镜像生产管线），此处对着收敛后的 DOM（finalHtml）与 IR 断言：
+  // 标记块收窄成左列（零格子——结果浮层是放映期 UI）、超帽块回退、普通块不受殃及。
+  if (deck.name === "short-code") {
+    console.log("两栏活格（short-code 专用）")
+    await check("恰一个块被改造（5 行 short 块）；超帽 13 行块回退、普通块不殃及", () => {
+      assert.strictEqual(r.shorted, 1, `shorted 应为 1，实际 ${r.shorted}`)
+      const marked = r.finalHtml.match(/<pre[^>]*data-md2s-short=""/g) ?? []
+      const transformed = r.finalHtml.match(/<pre[^>]*class="md2s-short/g) ?? []
+      assert.strictEqual(marked.length, 2, "标记的 pre 应恰 2 个（5 行 + 13 行各一）")
+      assert.strictEqual(transformed.length, 1, "改造的 pre 应恰 1 个（13 行超帽回退）")
+    })
+    await check("v2 铁律：构建期零格子、5 行全挂 run-line（结果浮层是放映期 UI）", () => {
+      assert.ok(!r.finalHtml.includes("md2s-short-zone"), "构建期不许有结果浮层")
+      assert.ok(!r.finalHtml.includes("md2s-short-res"), "构建期不许有结果卡")
+      assert.ok(!/data-md2s-short-cell/.test(r.finalHtml), "构建期不许有豁免属性实例")
+      const lines = r.finalHtml.match(/data-md2s-run-line=""/g) ?? []
+      assert.strictEqual(lines.length, 5, `run-line 行应 5 个，实际 ${lines.length}`)
+    })
+    await check("超帽回退要发警告（作者得知道两栏没生效）", () => {
+      assert.ok(
+        r.console.some(l => l.includes("已回退普通代码块")),
+        "回退警告没出现；实际 [md2slides] 日志：" +
+          r.console.filter(l => l.includes("md2slides")).join(" | "),
+      )
+    })
+    await check("改造块没被分页切开（收窄块整块存在，不许跨页）", () => {
+      const presShort = r.finalHtml.split("<pre").filter(p => p.includes('class="md2s-short')).length
+      assert.strictEqual(presShort, 1, `改造的 pre 应恰 1 个，实际 ${presShort}`)
+    })
+    await check("IR 里改造块是纯代码：5 行与源文逐行一致、无格子文本", () => {
+      // 行文本先 join（hljs span 会把一行切成多个 run，比对必须在行级做）
+      const flat = (r.ir.ir?.slides ?? []).flatMap(s => s.blocks ?? [])
+        .filter(b => b.type === "code")
+        .map(b => (b.lines ?? []).map(l => l.map(r2 => r2.text ?? "").join("")))
+      const code = flat.filter(lines => lines.some(t => t.includes("import pandas")))
+      assert.strictEqual(code.length, 1, `找不到 pandas 那个代码块（现有行集：${JSON.stringify(flat)}）`)
+      assert.deepStrictEqual(code[0], [
+        'import pandas as pd',
+        'df = pd.read_csv("scores.csv")',
+        "df.head()",
+        'df["总分"] = df.sum(axis=1)',
+        'df.sort_values("总分", ascending=False).head()',
+      ], "IR 代码行与源文不一致（格子文本渗进去了？）")
+    })
+  }
+
   // ---- 7. 浏览器侧干净 ----------------------------------------------------
 
   console.log("控制台")

@@ -226,10 +226,11 @@ function runsOf(el, base, { keepWhitespace = false, stop = null } = {}) {
 const nestedListsOf = li => [...li.children].filter(c => c.tagName === "UL" || c.tagName === "OL")
 const isNestedList = el => el.tagName === "UL" || el.tagName === "OL"
 
-/** 代码块：run 里的换行重新切成行，行内保留前导空格 */
-function codeLines(code, base) {
+/** 代码块：run 里的换行重新切成行，行内保留前导空格。opts.stop 同 runsOf——
+ *  skipSelector 命中的子树整棵跳过（两栏活格的结果格是放映期 UI，不是代码）。 */
+function codeLines(code, base, opts = {}) {
   const lines = [[]]
-  for (const run of runsOf(code, base, { keepWhitespace: true })) {
+  for (const run of runsOf(code, base, { keepWhitespace: true, stop: opts.stop ?? null })) {
     if (run.br) {
       lines.push([])
       continue
@@ -522,7 +523,13 @@ async function blocksOf(el, ctx, container) {
 
   if (tag === "PRE") {
     const code = el.querySelector("code") ?? el
-    return [mark({ type: "code", geo: geoOf(el, ctx), style: styleOf(code, ctx.inPerPx), lines: codeLines(code, styleOf(code, ctx.inPerPx)) })]
+    const style = styleOf(code, ctx.inPerPx)
+    // 两栏活格（kit/shortCode，`python short`）的结果格挂在 code 里、行 span 之后。
+    // 它们是放映期注入的执行结果，不是代码内容——skipSelector 命中整棵跳过，
+    // IR/PPTX 只见纯代码（导出右栏留白，2026-11-26 定稿）；空格子本就零文本，
+    // 这条 stop 管的是「跑过之后再导出」的场景。
+    const stopUI = ctx.skipSelector ? child => !!child.matches?.(ctx.skipSelector) : null
+    return [mark({ type: "code", geo: geoOf(el, ctx), style, lines: codeLines(code, style, { stop: stopUI }) })]
   }
 
   if (tag === "TABLE") {
@@ -751,4 +758,5 @@ async function extractIr(doc, opts = {}) {
   }
 }
 
-module.exports = { extractIr, IR_VERSION, CANVAS_WIDTH_IN, RASTER_ATTR, MATH_ATTR }
+// codeLines 供契约测试直测（两栏活格的格子豁免靠 stop 落地，smoke 验它不渗 IR）。
+module.exports = { extractIr, codeLines, IR_VERSION, CANVAS_WIDTH_IN, RASTER_ATTR, MATH_ATTR }
